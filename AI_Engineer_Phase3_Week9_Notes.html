@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Engineer — Phase 3, Week 9: ReAct Agents</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,300&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08090d;--bg2:#0f1117;--bg3:#161921;--bg4:#1e2128;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.14);
+  --text:#e5e1d8;--text2:#8e8a82;--text3:#484540;
+  --orange:#fb923c;--violet:#a78bfa;--cyan:#22d3ee;
+  --green:#4ade80;--rose:#f43f5e;--yellow:#facc15;
+  --mono:'IBM Plex Mono',monospace;--serif:'Fraunces',serif;--sans:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.75;}
+.layout{display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sb{width:268px;min-width:268px;background:var(--bg2);border-right:1px solid var(--border);padding:28px 0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sb-top{padding:0 22px 22px;border-bottom:1px solid var(--border);margin-bottom:18px;}
+.sb-badge{display:inline-block;background:var(--orange);color:#1a0800;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.08em;padding:3px 8px;border-radius:3px;margin-bottom:8px;}
+.sb-top h1{font-family:var(--serif);font-weight:700;font-size:17px;line-height:1.3;}
+.sb-top p{font-size:12px;color:var(--text2);margin-top:4px;}
+.nav-s{padding:0 14px;margin-bottom:4px;}
+.nav-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--text3);padding:0 8px;margin-bottom:5px;text-transform:uppercase;}
+.ni{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;font-size:12.5px;color:var(--text2);transition:all .15s;text-decoration:none;border:1px solid transparent;}
+.ni:hover{background:var(--bg3);color:var(--text);}
+.ni.active{background:var(--bg3);color:var(--orange);border-color:var(--border);}
+.ndot{width:6px;height:6px;border-radius:50%;background:var(--text3);flex-shrink:0;}
+.ni.active .ndot{background:var(--orange);}
+
+/* MAIN */
+.main{flex:1;max-width:900px;padding:48px 56px;}
+
+/* HERO */
+.hero{padding:40px 0 48px;border-bottom:1px solid var(--border);margin-bottom:48px;}
+.htag{font-family:var(--mono);font-size:11px;color:var(--orange);letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.htag::before{content:'';display:block;width:28px;height:1px;background:var(--orange);}
+.hero h1{font-family:var(--serif);font-size:50px;font-weight:700;line-height:1.06;letter-spacing:-.02em;margin-bottom:18px;}
+.hero h1 em{font-style:italic;color:var(--violet);}
+.hero p{font-size:16px;color:var(--text2);max-width:580px;line-height:1.7;}
+.hmeta{display:flex;gap:20px;margin-top:24px;flex-wrap:wrap;}
+.hm{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--text2);}
+.hm span{color:var(--green);}
+
+/* PROGRESS */
+.pcard{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:48px;}
+.prow{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:8px;}
+.pbar{height:3px;background:var(--bg4);border-radius:99px;overflow:hidden;}
+.pfill{height:100%;background:var(--orange);border-radius:99px;width:45%;}
+.ppills{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.ppill{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:99px;border:1px solid var(--border);color:var(--text3);}
+.ppill.done{border-color:var(--green);color:var(--green);}
+.ppill.active{border-color:var(--orange);color:var(--orange);background:rgba(251,146,60,.06);}
+.wpills{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.wp{font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:99px;border:1px solid var(--border);color:var(--text3);}
+.wp.done{border-color:var(--green);color:var(--green);}
+.wp.active{border-color:var(--orange);color:var(--orange);}
+
+/* SECTIONS */
+.sec{margin-bottom:64px;scroll-margin-top:24px;}
+.snum{font-family:var(--mono);font-size:11px;color:var(--orange);letter-spacing:.1em;margin-bottom:8px;}
+.sec h2{font-family:var(--serif);font-size:32px;font-weight:700;line-height:1.2;margin-bottom:20px;}
+.sec h3{font-family:var(--serif);font-size:20px;font-weight:500;font-style:italic;margin-top:36px;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+p{margin-bottom:14px;color:var(--text2);}
+strong{color:var(--text);font-weight:500;}
+
+/* CODE */
+.cb{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden;}
+.cb-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg3);}
+.cb-lang{font-family:var(--mono);font-size:10px;color:var(--orange);letter-spacing:.08em;text-transform:uppercase;}
+.dots{display:flex;gap:5px;}
+.dot{width:8px;height:8px;border-radius:50%;}
+.dot:nth-child(1){background:rgba(244,63,94,.4);}
+.dot:nth-child(2){background:rgba(250,204,21,.4);}
+.dot:nth-child(3){background:rgba(74,222,128,.4);}
+pre{padding:20px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.7;color:#b8b3aa;}
+.cm{color:#484540;font-style:italic;}
+.ck{color:var(--violet);}
+.cf{color:var(--cyan);}
+.cs{color:var(--yellow);}
+.cn{color:var(--orange);}
+.ca{color:var(--green);}
+code{font-family:var(--mono);font-size:12px;background:var(--bg3);border:1px solid var(--border);padding:1px 6px;border-radius:4px;color:var(--cyan);}
+
+/* FORMULA */
+.formula{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px 24px;font-family:var(--mono);font-size:13px;color:var(--yellow);margin:16px 0;text-align:center;line-height:2;}
+
+/* CALLOUTS */
+.box{border-left:3px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin:20px 0;background:var(--bg2);}
+.box.ora{border-color:var(--orange);}
+.box.vio{border-color:var(--violet);}
+.box.cyn{border-color:var(--cyan);}
+.box.grn{border-color:var(--green);}
+.box.ros{border-color:var(--rose);}
+.box.yel{border-color:var(--yellow);}
+.bxt{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
+.box.ora .bxt{color:var(--orange);}
+.box.vio .bxt{color:var(--violet);}
+.box.cyn .bxt{color:var(--cyan);}
+.box.grn .bxt{color:var(--green);}
+.box.ros .bxt{color:var(--rose);}
+.box.yel .bxt{color:var(--yellow);}
+.box p{margin:0;font-size:14px;line-height:1.6;}
+
+/* INSIGHT */
+.insight{background:linear-gradient(135deg,#0e0a1e 0%,#080c09 100%);border:1px solid var(--violet);border-radius:12px;padding:22px 24px;margin:28px 0;}
+.insight h4{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--violet);margin-bottom:12px;}
+.insight p{color:var(--text2);font-size:14px;margin:0;line-height:1.65;}
+
+/* TABLES */
+.tw{overflow-x:auto;margin:20px 0;border-radius:10px;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+th{background:var(--bg3);padding:11px 16px;text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);border-bottom:1px solid var(--border2);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--bg2);}
+td strong{color:var(--text);}
+td code{font-size:11px;}
+
+/* DIAGRAM */
+.diagram{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;margin:20px 0;overflow-x:auto;}
+.diagram svg{width:100%;height:auto;display:block;}
+
+/* TRACE BOX */
+.trace{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:20px;margin:20px 0;font-family:var(--mono);font-size:13px;line-height:1.8;}
+.trace .thought{color:var(--violet);}
+.trace .action{color:var(--orange);}
+.trace .obs{color:var(--cyan);}
+.trace .final{color:var(--green);}
+.trace .label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.5;margin-right:8px;}
+
+/* CHECKPOINT */
+.ckpt{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;margin:28px 0;}
+.ckpt h4{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);margin-bottom:16px;}
+.ci{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:14px;}
+.ci:last-child{border-bottom:none;}
+.cbox{width:16px;height:16px;border:1.5px solid var(--border2);border-radius:4px;flex-shrink:0;margin-top:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.cbox.chk{background:var(--green);border-color:var(--green);}
+.cbox.chk::after{content:'';width:4px;height:7px;border:1.5px solid #021008;border-top:none;border-left:none;transform:rotate(45deg) translate(-1px,-1px);}
+.clbl{color:var(--text2);line-height:1.5;}
+.csub{font-style:normal;color:var(--text3);font-size:12px;display:block;margin-top:2px;}
+
+/* PROJECT */
+.proj{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:22px 24px;margin:24px 0;}
+.proj h4{font-family:var(--mono);font-size:11px;color:var(--yellow);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;}
+.proj p{font-size:14px;color:var(--text2);margin-bottom:10px;}
+.psteps{list-style:none;padding:0;}
+.psteps li{font-size:13px;color:var(--text2);padding:4px 0 4px 20px;position:relative;}
+.psteps li::before{content:'○';position:absolute;left:0;color:var(--text3);font-size:10px;top:5px;}
+
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
+@media(max-width:768px){.sb{display:none;}.main{padding:28px 20px;}.hero h1{font-size:34px;}}
+@media print{.sb{display:none;}body{background:white;color:black;}}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ══ SIDEBAR ══ -->
+<nav class="sb">
+  <div class="sb-top">
+    <div class="sb-badge">PHASE 3 · WEEK 9</div>
+    <h1>ReAct Agents</h1>
+    <p>AI Engineer Roadmap</p>
+  </div>
+  <div class="nav-s">
+    <div class="nav-lbl">Contents</div>
+    <a class="ni active" href="#react-pattern"><div class="ndot"></div>The ReAct pattern</a>
+    <a class="ni" href="#tool-use-api"><div class="ndot"></div>Anthropic tool use API</a>
+    <a class="ni" href="#tool-definitions"><div class="ndot"></div>Tool definitions &amp; dispatch</a>
+    <a class="ni" href="#agent-loop"><div class="ndot"></div>The agent loop</a>
+    <a class="ni" href="#stopping"><div class="ndot"></div>Stopping conditions</a>
+    <a class="ni" href="#error-handling"><div class="ndot"></div>Error handling</a>
+    <a class="ni" href="#logging"><div class="ndot"></div>Logging &amp; traces</a>
+    <a class="ni" href="#full-agent"><div class="ndot"></div>Full agent from scratch</a>
+    <a class="ni" href="#project7"><div class="ndot"></div>Project 7</a>
+    <a class="ni" href="#checkpoint"><div class="ndot"></div>Checkpoint</a>
+  </div>
+</nav>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="htag">AI Engineer Roadmap — Phase 3</div>
+    <h1>Week 9 —<br><em>ReAct Agents</em></h1>
+    <p>The Thought → Action → Observation loop, Anthropic's native tool use API, tool definitions and dispatch, stopping conditions, error handling, and reasoning trace logging — all built from scratch in pure Python with zero frameworks.</p>
+    <div class="hmeta">
+      <div class="hm">📅 <span>Week 9 of 20</span></div>
+      <div class="hm">🎯 <span>Build agents from first principles</span></div>
+      <div class="hm">🔨 <span>Project 7: ReAct Agent</span></div>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="pcard">
+    <div class="prow"><span>Roadmap progress</span><span>Week 9 / 20</span></div>
+    <div class="pbar"><div class="pfill"></div></div>
+    <div class="ppills">
+      <div class="ppill done">Phase 1: ML Foundations ✓</div>
+      <div class="ppill done">Phase 2: LLMs &amp; Prompts ✓</div>
+      <div class="ppill active">Phase 3: Agents ←</div>
+      <div class="ppill">Phase 4: Production</div>
+    </div>
+    <div class="wpills">
+      <div class="wp done">W1–8 ✓</div>
+      <div class="wp active">W9 ←</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       01 · THE REACT PATTERN
+  ══════════════════════════════════ -->
+  <div class="sec" id="react-pattern">
+    <div class="snum">01</div>
+    <h2>The ReAct Pattern</h2>
+    <p>ReAct (Reasoning + Acting) is a 2022 paper from Google that showed a simple but powerful idea: letting the LLM <strong>interleave reasoning steps with actions</strong> dramatically improves performance on tasks that require external information. The model thinks, acts, observes the result, thinks again — looping until it has an answer.</p>
+
+    <div class="formula">
+Thought → Action → Observation → Thought → Action → Observation → … → Final Answer
+    </div>
+
+    <!-- ReAct loop diagram -->
+    <div class="diagram">
+      <svg viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+
+        <!-- User input -->
+        <rect x="10" y="78" width="96" height="44" rx="8" fill="#0f1117" stroke="rgba(34,211,238,.4)" stroke-width="1"/>
+        <text x="58" y="97" font-family="IBM Plex Mono,monospace" font-size="9" fill="rgba(34,211,238,.6)" text-anchor="middle" letter-spacing=".5">USER</text>
+        <text x="58" y="111" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(34,211,238,.8)" text-anchor="middle">Question</text>
+
+        <!-- Arrow to LLM -->
+        <line x1="106" y1="100" x2="140" y2="100" stroke="rgba(255,255,255,.2)" stroke-width="1" marker-end="url(#arr)"/>
+
+        <!-- LLM box -->
+        <rect x="142" y="60" width="130" height="80" rx="10" fill="#100e1e" stroke="rgba(167,139,250,.5)" stroke-width="1"/>
+        <text x="207" y="88" font-family="IBM Plex Mono,monospace" font-size="9" fill="rgba(167,139,250,.6)" text-anchor="middle" letter-spacing=".5">LLM</text>
+        <text x="207" y="104" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(167,139,250,.8)" text-anchor="middle">Thinks</text>
+        <text x="207" y="119" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(167,139,250,.6)" text-anchor="middle">+ calls tool</text>
+
+        <!-- Arrow to tools -->
+        <line x1="272" y1="100" x2="310" y2="100" stroke="rgba(255,255,255,.2)" stroke-width="1" marker-end="url(#arr)"/>
+
+        <!-- Tools box -->
+        <rect x="312" y="60" width="130" height="80" rx="10" fill="#0e1508" stroke="rgba(74,222,128,.4)" stroke-width="1"/>
+        <text x="377" y="88" font-family="IBM Plex Mono,monospace" font-size="9" fill="rgba(74,222,128,.6)" text-anchor="middle" letter-spacing=".5">TOOLS</text>
+        <text x="377" y="104" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(74,222,128,.8)" text-anchor="middle">Execute</text>
+        <text x="377" y="119" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(74,222,128,.6)" text-anchor="middle">Return result</text>
+
+        <!-- Observation back to LLM (curved arc below) -->
+        <path d="M377 140 Q377 170 207 170 Q142 170 142 140" fill="none" stroke="rgba(34,211,238,.35)" stroke-width="1" stroke-dasharray="5 3" marker-end="url(#arr)"/>
+        <text x="280" y="184" font-family="IBM Plex Mono,monospace" font-size="9" fill="rgba(34,211,238,.4)" text-anchor="middle">observation fed back into context</text>
+
+        <!-- Arrow to answer -->
+        <line x1="442" y1="100" x2="480" y2="100" stroke="rgba(255,255,255,.2)" stroke-width="1" marker-end="url(#arr)"/>
+
+        <!-- Answer box -->
+        <rect x="482" y="78" width="110" height="44" rx="8" fill="#0f1117" stroke="rgba(250,204,21,.35)" stroke-width=".5"/>
+        <text x="537" y="97" font-family="IBM Plex Mono,monospace" font-size="9" fill="rgba(250,204,21,.6)" text-anchor="middle" letter-spacing=".5">STOP</text>
+        <text x="537" y="111" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(250,204,21,.7)" text-anchor="middle">Final answer</text>
+
+        <!-- Loop label -->
+        <text x="280" y="22" font-family="IBM Plex Mono,monospace" font-size="9" fill="rgba(255,255,255,.18)" text-anchor="middle" letter-spacing=".5">LOOPS UNTIL STOP CONDITION OR MAX STEPS</text>
+      </svg>
+    </div>
+
+    <p>A key thing to understand: the "thinking" is not magic. The model generates text that <em>looks like reasoning</em>, and that text becomes context for the next token prediction. More reasoning tokens = better grounding for the final answer. The loop closes because tool results are appended to the message history, so the model always has full context of what it has tried and learned.</p>
+
+    <h3>A real ReAct trace</h3>
+    <p>Here is what the model actually produces for the question "How many seconds has Elon Musk been alive?":</p>
+
+    <div class="trace">
+<span class="thought"><span class="label">thought</span>I need to find Elon Musk's birth date to calculate his age in seconds. Let me search for it.</span>
+
+<span class="action"><span class="label">action</span>web_search("Elon Musk date of birth")</span>
+
+<span class="obs"><span class="label">obs</span>Elon Musk was born on June 28, 1971.</span>
+
+<span class="thought"><span class="label">thought</span>Now I need to calculate the number of seconds from June 28, 1971 to today's date. I'll use the calculator tool.</span>
+
+<span class="action"><span class="label">action</span>calculator("(2025 - 1971) * 365.25 * 24 * 3600 + (days_since_june28_2025 * 86400)")</span>
+
+<span class="obs"><span class="label">obs</span>Result: 1,701,388,800 (approximate, assuming today is mid-2025)</span>
+
+<span class="final"><span class="label">final answer</span>Elon Musk has been alive for approximately 1.7 billion seconds (born June 28, 1971). The exact number depends on today's date.</span>
+    </div>
+
+    <div class="insight">
+      <h4>🧠 Why ReAct outperforms single-shot prompting</h4>
+      <p>Without tools, the model would guess Elon Musk's birth year from training data — possibly wrong or outdated — and do arithmetic in its head — often wrong. With ReAct: the search tool guarantees the correct birth date. The calculator tool guarantees correct arithmetic. The model's job is just to <strong>orchestrate</strong> — decide what to search, what to compute, and when it has enough information to answer. This division of labor — LLM for reasoning, tools for execution — is the architecture of every production agent.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       02 · ANTHROPIC TOOL USE API
+  ══════════════════════════════════ -->
+  <div class="sec" id="tool-use-api">
+    <div class="snum">02</div>
+    <h2>Anthropic's Native Tool Use API</h2>
+    <p>Anthropic's API has first-class support for tool use. You define tools as JSON schemas, pass them with the request, and the model returns either a <code>text</code> block (thinking/answer) or a <code>tool_use</code> block (a structured tool call). No prompt parsing required.</p>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — Tool use API basics</div></div>
+      <pre><span class="ck">import</span> anthropic, json
+client = anthropic.Anthropic()
+
+<span class="cm"># ── Define tools ────────────────────────────────────────────────</span>
+tools = [
+    {
+        <span class="cs">"name"</span>: <span class="cs">"web_search"</span>,
+        <span class="cs">"description"</span>: <span class="cs">"Search the web for current information. Use for facts, dates, recent events."</span>,
+        <span class="cs">"input_schema"</span>: {
+            <span class="cs">"type"</span>: <span class="cs">"object"</span>,
+            <span class="cs">"properties"</span>: {
+                <span class="cs">"query"</span>: {
+                    <span class="cs">"type"</span>: <span class="cs">"string"</span>,
+                    <span class="cs">"description"</span>: <span class="cs">"The search query"</span>
+                }
+            },
+            <span class="cs">"required"</span>: [<span class="cs">"query"</span>]
+        }
+    }
+]
+
+<span class="cm"># ── First call — model decides to use a tool ────────────────────</span>
+response = client.messages.create(
+    model=<span class="cs">"claude-sonnet-4-20250514"</span>,
+    max_tokens=<span class="cn">1024</span>,
+    tools=tools,
+    messages=[{<span class="cs">"role"</span>: <span class="cs">"user"</span>, <span class="cs">"content"</span>: <span class="cs">"When was Elon Musk born?"</span>}]
+)
+
+<span class="cf">print</span>(response.stop_reason)  <span class="cm"># "tool_use" — model wants to call a tool</span>
+<span class="cf">print</span>(response.content)
+<span class="cm"># [</span>
+<span class="cm">#   TextBlock(text="I'll search for that.", type="text"),</span>
+<span class="cm">#   ToolUseBlock(id="toolu_abc123", name="web_search",</span>
+<span class="cm">#                input={"query": "Elon Musk date of birth"}, type="tool_use")</span>
+<span class="cm"># ]</span>
+
+<span class="cm"># ── Extract the tool call ────────────────────────────────────────</span>
+tool_block = next(b <span class="ck">for</span> b <span class="ck">in</span> response.content <span class="ck">if</span> b.type == <span class="cs">"tool_use"</span>)
+tool_name   = tool_block.name    <span class="cm"># "web_search"</span>
+tool_input  = tool_block.input   <span class="cm"># {"query": "Elon Musk date of birth"}</span>
+tool_use_id = tool_block.id      <span class="cm"># "toolu_abc123" — needed for response</span>
+
+<span class="cm"># ── Execute the tool ────────────────────────────────────────────</span>
+tool_result = <span class="cs">"Elon Musk was born on June 28, 1971."</span>   <span class="cm"># your real implementation</span>
+
+<span class="cm"># ── Return the result to the model ──────────────────────────────</span>
+<span class="cm"># CRITICAL: the full conversation history must be preserved</span>
+follow_up = client.messages.create(
+    model=<span class="cs">"claude-sonnet-4-20250514"</span>,
+    max_tokens=<span class="cn">1024</span>,
+    tools=tools,
+    messages=[
+        {<span class="cs">"role"</span>: <span class="cs">"user"</span>,    <span class="cs">"content"</span>: <span class="cs">"When was Elon Musk born?"</span>},
+        {<span class="cs">"role"</span>: <span class="cs">"assistant"</span>, <span class="cs">"content"</span>: response.content},  <span class="cm"># full assistant response</span>
+        {<span class="cs">"role"</span>: <span class="cs">"user"</span>,    <span class="cs">"content"</span>: [{                     <span class="cm"># tool result as user turn</span>
+            <span class="cs">"type"</span>:        <span class="cs">"tool_result"</span>,
+            <span class="cs">"tool_use_id"</span>: tool_use_id,
+            <span class="cs">"content"</span>:     tool_result,
+        }]}
+    ]
+)
+
+<span class="cf">print</span>(follow_up.stop_reason)   <span class="cm"># "end_turn" — model is done</span>
+<span class="cf">print</span>(follow_up.content[<span class="cn">0</span>].text)  <span class="cm"># "Elon Musk was born on June 28, 1971."</span></pre>
+    </div>
+
+    <div class="box cyn">
+      <div class="bxt">The message structure rule</div>
+      <p>Tool results are sent as <strong>user-role messages</strong> with type <code>tool_result</code>, not as assistant messages. The <code>tool_use_id</code> must match the ID from the assistant's <code>tool_use</code> block exactly. If you pass multiple tool calls in one turn, you must return all their results together in one user message before the model can continue.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       03 · TOOL DEFINITIONS & DISPATCH
+  ══════════════════════════════════ -->
+  <div class="sec" id="tool-definitions">
+    <div class="snum">03</div>
+    <h2>Tool Definitions &amp; Dispatch</h2>
+    <p>A well-designed tool definition is half the work of building a reliable agent. The model uses the <code>description</code> to decide <em>when</em> to call the tool, and the <code>input_schema</code> to know <em>what arguments</em> to pass. Vague descriptions produce incorrect tool choices.</p>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — Tool registry pattern</div></div>
+      <pre><span class="ck">import</span> math, re
+<span class="ck">from</span> typing <span class="ck">import</span> Callable, Any
+<span class="ck">from</span> dataclasses <span class="ck">import</span> dataclass
+
+<span class="ck">@dataclass</span>
+<span class="ck">class</span> <span class="ca">Tool</span>:
+    name:        str
+    description: str
+    schema:      dict           <span class="cm"># JSON Schema for input_schema</span>
+    fn:          Callable       <span class="cm"># actual Python function</span>
+
+    <span class="ck">def</span> <span class="cf">to_api_format</span>(self) -> dict:
+        <span class="cs">"""Convert to Anthropic API tool definition."""</span>
+        <span class="ck">return</span> {
+            <span class="cs">"name"</span>:         self.name,
+            <span class="cs">"description"</span>:  self.description,
+            <span class="cs">"input_schema"</span>: self.schema,
+        }
+
+    <span class="ck">def</span> <span class="cf">execute</span>(self, **kwargs) -> str:
+        <span class="cs">"""Execute the tool and always return a string."""</span>
+        <span class="ck">try</span>:
+            result = self.fn(**kwargs)
+            <span class="ck">return</span> str(result)
+        <span class="ck">except</span> <span class="ca">Exception</span> <span class="ck">as</span> e:
+            <span class="ck">return</span> <span class="cs">f"ERROR: {type(e).__name__}: {e}"</span>
+
+<span class="cm"># ── Tool implementations ─────────────────────────────────────────</span>
+<span class="ck">def</span> <span class="cf">_calculator</span>(expression: str) -> str:
+    <span class="cs">"""Safe eval: only allows numbers, operators, math functions."""</span>
+    allowed = set(<span class="cs">"0123456789+-*/().,% \n"</span>)
+    <span class="cm"># Allow math.* functions</span>
+    cleaned = re.sub(<span class="cs">r'math\.\w+'</span>, <span class="ck">lambda</span> m: m.group(), expression)
+    <span class="ck">if not</span> <span class="cf">all</span>(c <span class="ck">in</span> allowed <span class="ck">for</span> c <span class="ck">in</span> re.sub(<span class="cs">r'math\.\w+'</span>, <span class="cs">''</span>, cleaned)):
+        <span class="ck">raise</span> <span class="ca">ValueError</span>(<span class="cs">"Unsafe expression"</span>)
+    result = eval(expression, {<span class="cs">"__builtins__"</span>: {}, <span class="cs">"math"</span>: math})
+    <span class="ck">return</span> <span class="cs">f"{result:,.6g}"</span>
+
+<span class="ck">def</span> <span class="cf">_web_search</span>(query: str) -> str:
+    <span class="cs">"""Real web search using DuckDuckGo (free, no API key)."""</span>
+    <span class="ck">from</span> duckduckgo_search <span class="ck">import</span> DDGS
+    <span class="ck">with</span> DDGS() <span class="ck">as</span> ddgs:
+        results = <span class="cf">list</span>(ddgs.text(query, max_results=<span class="cn">3</span>))
+    <span class="ck">if not</span> results:
+        <span class="ck">return</span> <span class="cs">"No results found."</span>
+    parts = [<span class="cs">f"[{r['title']}]\n{r['body']}"</span> <span class="ck">for</span> r <span class="ck">in</span> results]
+    <span class="ck">return</span> <span class="cs">"\n\n"</span>.join(parts)
+
+<span class="ck">def</span> <span class="cf">_get_current_date</span>() -> str:
+    <span class="ck">from</span> datetime <span class="ck">import</span> date
+    <span class="ck">return</span> <span class="cs">f"Today is {date.today().isoformat()}"</span>
+
+<span class="cm"># ── Tool registry ────────────────────────────────────────────────</span>
+TOOLS = [
+    <span class="ca">Tool</span>(
+        name=<span class="cs">"calculator"</span>,
+        description=(
+            <span class="cs">"Evaluate a mathematical expression. Use for arithmetic, unit conversion, "
+            "date differences, and any calculation. Input is a Python math expression. "
+            "Example: '(2025 - 1971) * 365.25 * 24 * 3600'"</span>
+        ),
+        schema={
+            <span class="cs">"type"</span>: <span class="cs">"object"</span>,
+            <span class="cs">"properties"</span>: {
+                <span class="cs">"expression"</span>: {
+                    <span class="cs">"type"</span>: <span class="cs">"string"</span>,
+                    <span class="cs">"description"</span>: <span class="cs">"A valid Python math expression to evaluate"</span>
+                }
+            },
+            <span class="cs">"required"</span>: [<span class="cs">"expression"</span>]
+        },
+        fn=_calculator
+    ),
+    <span class="ca">Tool</span>(
+        name=<span class="cs">"web_search"</span>,
+        description=(
+            <span class="cs">"Search the web for current facts, people, events, and data. "
+            "Use for any information that may have changed or that you don't know. "
+            "Returns top 3 results with titles and summaries."</span>
+        ),
+        schema={
+            <span class="cs">"type"</span>: <span class="cs">"object"</span>,
+            <span class="cs">"properties"</span>: {
+                <span class="cs">"query"</span>: {
+                    <span class="cs">"type"</span>: <span class="cs">"string"</span>,
+                    <span class="cs">"description"</span>: <span class="cs">"Search query (be specific)"</span>
+                }
+            },
+            <span class="cs">"required"</span>: [<span class="cs">"query"</span>]
+        },
+        fn=_web_search
+    ),
+    <span class="ca">Tool</span>(
+        name=<span class="cs">"get_current_date"</span>,
+        description=<span class="cs">"Returns today's date. Use before any date arithmetic."</span>,
+        schema={<span class="cs">"type"</span>: <span class="cs">"object"</span>, <span class="cs">"properties"</span>: {}, <span class="cs">"required"</span>: []},
+        fn=_get_current_date
+    ),
+]
+
+<span class="cm"># Fast lookup by name for dispatch</span>
+TOOL_MAP = {t.name: t <span class="ck">for</span> t <span class="ck">in</span> TOOLS}</pre>
+    </div>
+
+    <div class="box ora">
+      <div class="bxt">Writing tool descriptions that work</div>
+      <p>The model uses your description to decide when to call the tool. Be explicit about: <strong>what it does</strong>, <strong>when to use it</strong>, and <strong>what format the input should be</strong>. Include an example input for complex schemas. Vague descriptions like "a tool for computation" produce wrong choices — be specific: "evaluate a Python math expression, e.g. (2025-1971)*365.25*24*3600."</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       04 · THE AGENT LOOP
+  ══════════════════════════════════ -->
+  <div class="sec" id="agent-loop">
+    <div class="snum">04</div>
+    <h2>The Agent Loop</h2>
+    <p>The agent loop is the engine of a ReAct agent. It runs until the model produces a final answer (stop_reason == "end_turn") or hits a safety limit. Understanding the message accumulation pattern — how the history grows with each step — is essential.</p>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — Core agent loop (without error handling yet)</div></div>
+      <pre><span class="ck">def</span> <span class="cf">run_agent_loop</span>(
+    user_query:  str,
+    tools:       list[<span class="ca">Tool</span>],
+    system:      str = <span class="cs">""</span>,
+    max_steps:   int = <span class="cn">10</span>,
+) -> dict:
+    tool_defs = [t.to_api_format() <span class="ck">for</span> t <span class="ck">in</span> tools]
+    tool_map  = {t.name: t <span class="ck">for</span> t <span class="ck">in</span> tools}
+
+    <span class="cm"># ── History accumulates every turn ───────────────────────────</span>
+    messages = [{<span class="cs">"role"</span>: <span class="cs">"user"</span>, <span class="cs">"content"</span>: user_query}]
+    steps    = []
+
+    <span class="ck">for</span> step <span class="ck">in</span> <span class="cf">range</span>(max_steps):
+        <span class="cm"># Call the model with full history + tool definitions</span>
+        response = client.messages.create(
+            model=<span class="cs">"claude-sonnet-4-20250514"</span>,
+            max_tokens=<span class="cn">4096</span>,
+            system=system,
+            tools=tool_defs,
+            messages=messages,
+        )
+
+        <span class="cm"># Add assistant response to history</span>
+        messages.append({<span class="cs">"role"</span>: <span class="cs">"assistant"</span>, <span class="cs">"content"</span>: response.content})
+
+        <span class="cm"># ── STOPPING CONDITIONS ───────────────────────────────────</span>
+        <span class="ck">if</span> response.stop_reason == <span class="cs">"end_turn"</span>:
+            final_text = next(
+                (b.text <span class="ck">for</span> b <span class="ck">in</span> response.content <span class="ck">if</span> b.type == <span class="cs">"text"</span>), <span class="cs">""</span>
+            )
+            <span class="ck">return</span> {<span class="cs">"answer"</span>: final_text, <span class="cs">"steps"</span>: steps, <span class="cs">"total_steps"</span>: step+<span class="cn">1</span>}
+
+        <span class="ck">if</span> response.stop_reason != <span class="cs">"tool_use"</span>:
+            <span class="ck">break</span>   <span class="cm"># unexpected stop reason</span>
+
+        <span class="cm"># ── TOOL EXECUTION ────────────────────────────────────────</span>
+        tool_results = []
+        <span class="ck">for</span> block <span class="ck">in</span> response.content:
+            <span class="ck">if</span> block.type != <span class="cs">"tool_use"</span>: <span class="ck">continue</span>
+
+            tool   = tool_map.get(block.name)
+            result = tool.execute(**block.input) <span class="ck">if</span> tool <span class="ck">else</span> <span class="cs">f"Unknown tool: {block.name}"</span>
+
+            steps.append({
+                <span class="cs">"step"</span>:       step + <span class="cn">1</span>,
+                <span class="cs">"tool"</span>:       block.name,
+                <span class="cs">"input"</span>:      block.input,
+                <span class="cs">"output"</span>:     result,
+            })
+
+            tool_results.append({
+                <span class="cs">"type"</span>:        <span class="cs">"tool_result"</span>,
+                <span class="cs">"tool_use_id"</span>: block.id,
+                <span class="cs">"content"</span>:     result,
+            })
+
+        <span class="cm"># ── Append all tool results as one user turn ─────────────</span>
+        messages.append({<span class="cs">"role"</span>: <span class="cs">"user"</span>, <span class="cs">"content"</span>: tool_results})
+
+    <span class="ck">return</span> {<span class="cs">"answer"</span>: <span class="cs">"Max steps reached without final answer."</span>,
+            <span class="cs">"steps"</span>: steps, <span class="cs">"total_steps"</span>: max_steps}</pre>
+    </div>
+
+    <h3>Message history growth — what the model sees</h3>
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Text — Message history after 2 tool calls</div></div>
+      <pre><span class="cm"># After step 1 (search): messages contains 3 items</span>
+messages = [
+    {<span class="cs">"role"</span>: <span class="cs">"user"</span>,      <span class="cs">"content"</span>: <span class="cs">"How many seconds has Elon Musk been alive?"</span>},
+    {<span class="cs">"role"</span>: <span class="cs">"assistant"</span>, <span class="cs">"content"</span>: [TextBlock(<span class="cs">"I'll search..."</span>),
+                                            ToolUseBlock(<span class="cs">"web_search"</span>, {<span class="cs">"query"</span>:...})]},
+    {<span class="cs">"role"</span>: <span class="cs">"user"</span>,      <span class="cs">"content"</span>: [{<span class="cs">"type"</span>:<span class="cs">"tool_result"</span>, <span class="cs">"content"</span>: <span class="cs">"Born June 28 1971"</span>}]},
+]
+
+<span class="cm"># After step 2 (calculator): messages contains 5 items</span>
+<span class="cm"># ...and so on — the ENTIRE history is sent every call.</span>
+<span class="cm"># Token cost grows with each step. A 10-step agent on sonnet</span>
+<span class="cm"># can easily consume 50,000+ input tokens across all calls.</span>
+<span class="cm"># This is why max_steps and early stopping matter for cost control.</span></pre>
+    </div>
+
+    <div class="box vio">
+      <div class="bxt">Why history grows and why it matters</div>
+      <p>Every API call sends the complete message history. A 10-step agent with 500-token steps sends roughly 1+2+3+…+10 = 55 "step-loads" of tokens across all calls. At Sonnet pricing, a complex 15-step agent can cost $0.10–$0.30. Always track cost per agent run with a budget guard, and set <code>max_steps</code> aggressively — most tasks should complete in 3–5 steps.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       05 · STOPPING CONDITIONS
+  ══════════════════════════════════ -->
+  <div class="sec" id="stopping">
+    <div class="snum">05</div>
+    <h2>Stopping Conditions</h2>
+    <p>A runaway agent burns money and can loop indefinitely. You need multiple independent stopping conditions — never rely on just one.</p>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — Complete stopping condition system</div></div>
+      <pre><span class="ck">import</span> time
+<span class="ck">from</span> dataclasses <span class="ck">import</span> dataclass, field
+<span class="ck">from</span> typing <span class="ck">import</span> Optional
+
+<span class="ck">@dataclass</span>
+<span class="ck">class</span> <span class="ca">AgentConfig</span>:
+    max_steps:          int   = <span class="cn">15</span>      <span class="cm"># hard cap on tool calls</span>
+    max_time_seconds:   float = <span class="cn">60.0</span>   <span class="cm"># wall-clock timeout</span>
+    max_cost_usd:       float = <span class="cn">0.50</span>   <span class="cm"># spend budget per run</span>
+    max_input_tokens:   int   = <span class="cn">100_000</span> <span class="cm"># context size guard</span>
+    same_tool_repeat:   int   = <span class="cn">3</span>      <span class="cm"># max identical calls in a row</span>
+
+<span class="ck">@dataclass</span>
+<span class="ck">class</span> <span class="ca">AgentState</span>:
+    start_time:  float        = field(default_factory=time.time)
+    total_input_tokens:  int  = <span class="cn">0</span>
+    total_output_tokens: int  = <span class="cn">0</span>
+    last_tool_calls: list     = field(default_factory=list)  <span class="cm"># for loop detection</span>
+
+    <span class="ck">@property</span>
+    <span class="ck">def</span> <span class="cf">elapsed</span>(self) -> float:
+        <span class="ck">return</span> time.time() - self.start_time
+
+    <span class="ck">@property</span>
+    <span class="ck">def</span> <span class="cf">cost_usd</span>(self) -> float:
+        <span class="ck">return</span> (self.total_input_tokens  * <span class="cn">3.0</span> +
+                self.total_output_tokens * <span class="cn">15.0</span>) / <span class="cn">1_000_000</span>
+
+<span class="ck">class</span> <span class="ca">StopCondition</span>(<span class="ca">Exception</span>):
+    <span class="ck">def</span> <span class="cf">__init__</span>(self, reason: str):
+        self.reason = reason
+
+<span class="ck">def</span> <span class="cf">check_stopping_conditions</span>(
+    step:     int,
+    state:    <span class="ca">AgentState</span>,
+    config:   <span class="ca">AgentConfig</span>,
+    new_tool_call: Optional[str] = <span class="cn">None</span>,
+) -> <span class="cn">None</span>:
+    <span class="cs">"""Raise StopCondition if any limit is exceeded."""</span>
+
+    <span class="ck">if</span> step >= config.max_steps:
+        <span class="ck">raise</span> <span class="ca">StopCondition</span>(<span class="cs">f"Max steps ({config.max_steps}) reached"</span>)
+
+    <span class="ck">if</span> state.elapsed > config.max_time_seconds:
+        <span class="ck">raise</span> <span class="ca">StopCondition</span>(<span class="cs">f"Timeout ({state.elapsed:.1f}s > {config.max_time_seconds}s)"</span>)
+
+    <span class="ck">if</span> state.cost_usd > config.max_cost_usd:
+        <span class="ck">raise</span> <span class="ca">StopCondition</span>(<span class="cs">f"Budget exceeded (${state.cost_usd:.4f} > ${config.max_cost_usd})"</span>)
+
+    <span class="ck">if</span> state.total_input_tokens > config.max_input_tokens:
+        <span class="ck">raise</span> <span class="ca">StopCondition</span>(<span class="cs">f"Context limit ({state.total_input_tokens} tokens)"</span>)
+
+    <span class="cm"># Loop detection: same tool called with same args N times</span>
+    <span class="ck">if</span> new_tool_call:
+        state.last_tool_calls.append(new_tool_call)
+        <span class="ck">if</span> <span class="cf">len</span>(state.last_tool_calls) >= config.same_tool_repeat:
+            recent = state.last_tool_calls[-config.same_tool_repeat:]
+            <span class="ck">if</span> <span class="cf">len</span>(<span class="cf">set</span>(recent)) == <span class="cn">1</span>:   <span class="cm"># all identical</span>
+                <span class="ck">raise</span> <span class="ca">StopCondition</span>(<span class="cs">f"Loop detected: '{new_tool_call}' repeated {config.same_tool_repeat} times"</span>)</pre>
+    </div>
+
+    <div class="tw">
+      <table>
+        <tr><th>Condition</th><th>Why it exists</th><th>Recommended limit</th></tr>
+        <tr><td><strong>max_steps</strong></td><td>Hard cap on tool calls — prevents infinite loops</td><td>10–15 for most tasks</td></tr>
+        <tr><td><strong>max_time_seconds</strong></td><td>Wall-clock timeout — catches hanging tools</td><td>30–120s per run</td></tr>
+        <tr><td><strong>max_cost_usd</strong></td><td>Budget guard — prevents runaway API spend</td><td>$0.10–$1.00 per run</td></tr>
+        <tr><td><strong>max_input_tokens</strong></td><td>Context overflow guard — long histories fail silently</td><td>80K–150K tokens</td></tr>
+        <tr><td><strong>loop detection</strong></td><td>Same tool called repeatedly — model is stuck</td><td>3 identical calls</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       06 · ERROR HANDLING
+  ══════════════════════════════════ -->
+  <div class="sec" id="error-handling">
+    <div class="snum">06</div>
+    <h2>Error Handling in Agent Loops</h2>
+    <p>Tool errors should not crash the agent. The correct pattern: catch all tool exceptions, return the error message as the tool result, and let the model decide how to recover. Models handle errors surprisingly well when given clear error descriptions.</p>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — Resilient agent loop with full error handling</div></div>
+      <pre><span class="ck">from</span> anthropic <span class="ck">import</span> RateLimitError, APIStatusError
+<span class="ck">import</span> time, json
+
+<span class="ck">def</span> <span class="cf">run_agent</span>(
+    query:    str,
+    tools:    list[<span class="ca">Tool</span>],
+    system:   str = <span class="cs">""</span>,
+    config:   <span class="ca">AgentConfig</span> = <span class="cn">None</span>,
+) -> dict:
+    config   = config <span class="ck">or</span> <span class="ca">AgentConfig</span>()
+    state    = <span class="ca">AgentState</span>()
+    tool_map = {t.name: t <span class="ck">for</span> t <span class="ck">in</span> tools}
+    messages = [{<span class="cs">"role"</span>: <span class="cs">"user"</span>, <span class="cs">"content"</span>: query}]
+    trace    = []
+
+    <span class="ck">try</span>:
+        <span class="ck">for</span> step <span class="ck">in</span> <span class="cf">range</span>(config.max_steps):
+            check_stopping_conditions(step, state, config)
+
+            <span class="cm"># ── API call with retry on rate limit ────────────────</span>
+            <span class="ck">for</span> attempt <span class="ck">in</span> <span class="cf">range</span>(<span class="cn">3</span>):
+                <span class="ck">try</span>:
+                    resp = client.messages.create(
+                        model=<span class="cs">"claude-sonnet-4-20250514"</span>,
+                        max_tokens=<span class="cn">4096</span>,
+                        system=system,
+                        tools=[t.to_api_format() <span class="ck">for</span> t <span class="ck">in</span> tools],
+                        messages=messages,
+                    )
+                    <span class="ck">break</span>
+                <span class="ck">except</span> <span class="ca">RateLimitError</span>:
+                    <span class="ck">if</span> attempt == <span class="cn">2</span>: <span class="ck">raise</span>
+                    time.sleep(<span class="cn">2</span> ** attempt)
+
+            <span class="cm"># Track token usage</span>
+            state.total_input_tokens  += resp.usage.input_tokens
+            state.total_output_tokens += resp.usage.output_tokens
+            check_stopping_conditions(step, state, config)   <span class="cm"># re-check after token update</span>
+
+            messages.append({<span class="cs">"role"</span>: <span class="cs">"assistant"</span>, <span class="cs">"content"</span>: resp.content})
+
+            <span class="cm"># ── Done ─────────────────────────────────────────────</span>
+            <span class="ck">if</span> resp.stop_reason == <span class="cs">"end_turn"</span>:
+                answer = next((b.text <span class="ck">for</span> b <span class="ck">in</span> resp.content <span class="ck">if</span> b.type == <span class="cs">"text"</span>), <span class="cs">""</span>)
+                <span class="ck">return</span> _build_result(answer, trace, state, <span class="cs">"success"</span>)
+
+            <span class="cm"># ── Execute tools ─────────────────────────────────────</span>
+            tool_results = []
+            <span class="ck">for</span> block <span class="ck">in</span> resp.content:
+                <span class="ck">if</span> block.type != <span class="cs">"tool_use"</span>: <span class="ck">continue</span>
+
+                check_stopping_conditions(step, state, config,
+                                          new_tool_call=<span class="cs">f"{block.name}:{json.dumps(block.input, sort_keys=True)}"</span>)
+
+                tool = tool_map.get(block.name)
+                <span class="ck">if</span> tool:
+                    result = tool.execute(**block.input)   <span class="cm"># errors caught inside execute()</span>
+                <span class="ck">else</span>:
+                    result = <span class="cs">f"ERROR: Unknown tool '{block.name}'. Available: {list(tool_map)}"</span>
+
+                trace.append({<span class="cs">"step"</span>:step+<span class="cn">1</span>,<span class="cs">"tool"</span>:block.name,<span class="cs">"input"</span>:block.input,<span class="cs">"output"</span>:result})
+                tool_results.append({
+                    <span class="cs">"type"</span>:        <span class="cs">"tool_result"</span>,
+                    <span class="cs">"tool_use_id"</span>: block.id,
+                    <span class="cs">"content"</span>:     result,
+                    <span class="cm"># Mark errors so model knows the tool failed</span>
+                    <span class="cs">"is_error"</span>:    result.startswith(<span class="cs">"ERROR:"</span>),
+                })
+
+            messages.append({<span class="cs">"role"</span>: <span class="cs">"user"</span>, <span class="cs">"content"</span>: tool_results})
+
+    <span class="ck">except</span> <span class="ca">StopCondition</span> <span class="ck">as</span> e:
+        <span class="ck">return</span> _build_result(<span class="cs">f"Stopped: {e.reason}"</span>, trace, state, e.reason)
+    <span class="ck">except</span> <span class="ca">Exception</span> <span class="ck">as</span> e:
+        <span class="ck">return</span> _build_result(<span class="cs">f"Fatal error: {e}"</span>, trace, state, <span class="cs">"error"</span>)
+
+    <span class="ck">return</span> _build_result(<span class="cs">"Max steps reached."</span>, trace, state, <span class="cs">"max_steps"</span>)
+
+<span class="ck">def</span> <span class="cf">_build_result</span>(answer, trace, state, stop_reason) -> dict:
+    <span class="ck">return</span> {
+        <span class="cs">"answer"</span>:       answer,
+        <span class="cs">"trace"</span>:        trace,
+        <span class="cs">"steps_used"</span>:   <span class="cf">len</span>(trace),
+        <span class="cs">"stop_reason"</span>:  stop_reason,
+        <span class="cs">"cost_usd"</span>:     <span class="cf">round</span>(state.cost_usd, <span class="cn">5</span>),
+        <span class="cs">"elapsed_s"</span>:    <span class="cf">round</span>(state.elapsed, <span class="cn">2</span>),
+        <span class="cs">"total_tokens"</span>: state.total_input_tokens + state.total_output_tokens,
+    }</pre>
+    </div>
+
+    <div class="box ros">
+      <div class="bxt">Pass errors back to the model — don't re-raise</div>
+      <p>When a tool fails, return the error as the tool result with <code>"is_error": True</code>. The model will read the error message, reason about it, and often try a different approach — a different query, a corrected expression, or a graceful acknowledgment that the tool can't help. Re-raising the exception kills the agent entirely. Error messages are just observations in the loop.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       07 · LOGGING & TRACES
+  ══════════════════════════════════ -->
+  <div class="sec" id="logging">
+    <div class="snum">07</div>
+    <h2>Logging Agent Reasoning Traces</h2>
+    <p>Agents are hard to debug because failures are non-deterministic. A trace that captures every thought, action, and observation is your only debugging tool. Without traces, a failing agent is a black box.</p>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — Structured trace logger</div></div>
+      <pre><span class="ck">import</span> json, logging
+<span class="ck">from</span> datetime <span class="ck">import</span> datetime
+<span class="ck">from</span> pathlib <span class="ck">import</span> Path
+
+<span class="ck">class</span> <span class="ca">AgentTracer</span>:
+    <span class="ck">def</span> <span class="cf">__init__</span>(self, run_id: str, log_dir: str = <span class="cs">"./traces"</span>):
+        self.run_id  = run_id
+        self.log_dir = Path(log_dir)
+        self.log_dir.mkdir(exist_ok=<span class="cn">True</span>)
+        self.events  = []
+        self.start   = datetime.utcnow()
+
+        <span class="cm"># Also log to console for live debugging</span>
+        logging.basicConfig(level=logging.INFO,
+                            format=<span class="cs">'%(asctime)s | %(levelname)s | %(message)s'</span>)
+        self.log = logging.getLogger(run_id)
+
+    <span class="ck">def</span> <span class="cf">log_thought</span>(self, step: int, text: str):
+        self._add({<span class="cs">"type"</span>:<span class="cs">"thought"</span>,<span class="cs">"step"</span>:step,<span class="cs">"text"</span>:text})
+        self.log.info(<span class="cs">f"Step {step} [THOUGHT] {text[:120]}..."</span>)
+
+    <span class="ck">def</span> <span class="cf">log_tool_call</span>(self, step: int, name: str, inp: dict):
+        self._add({<span class="cs">"type"</span>:<span class="cs">"action"</span>,<span class="cs">"step"</span>:step,<span class="cs">"tool"</span>:name,<span class="cs">"input"</span>:inp})
+        self.log.info(<span class="cs">f"Step {step} [ACTION]  {name}({json.dumps(inp)[:80]})"</span>)
+
+    <span class="ck">def</span> <span class="cf">log_observation</span>(self, step: int, result: str, is_error=<span class="cn">False</span>):
+        self._add({<span class="cs">"type"</span>:<span class="cs">"observation"</span>,<span class="cs">"step"</span>:step,<span class="cs">"result"</span>:result,<span class="cs">"is_error"</span>:is_error})
+        level = logging.ERROR <span class="ck">if</span> is_error <span class="ck">else</span> logging.INFO
+        self.log.log(level, <span class="cs">f"Step {step} [OBS]     {result[:120]}"</span>)
+
+    <span class="ck">def</span> <span class="cf">log_final</span>(self, answer: str, metadata: dict):
+        self._add({<span class="cs">"type"</span>:<span class="cs">"final"</span>,<span class="cs">"answer"</span>:answer,**metadata})
+        self.log.info(<span class="cs">f"FINAL ANSWER: {answer[:120]}"</span>)
+        self.log.info(<span class="cs">f"Cost: ${metadata.get('cost_usd',0):.5f} | Steps: {metadata.get('steps_used',0)}"</span>)
+
+    <span class="ck">def</span> <span class="cf">save</span>(self):
+        path = self.log_dir / <span class="cs">f"{self.run_id}.json"</span>
+        path.write_text(json.dumps({
+            <span class="cs">"run_id"</span>:    self.run_id,
+            <span class="cs">"started_at"</span>: self.start.isoformat(),
+            <span class="cs">"events"</span>:    self.events,
+        }, indent=<span class="cn">2</span>))
+        <span class="cf">print</span>(<span class="cs">f"Trace saved to {path}"</span>)
+
+    <span class="ck">def</span> <span class="cf">_add</span>(self, event: dict):
+        event[<span class="cs">"ts"</span>] = (datetime.utcnow() - self.start).total_seconds()
+        self.events.append(event)
+
+<span class="cm"># ── Integrate tracer into agent loop ─────────────────────────────</span>
+<span class="ck">import</span> uuid
+
+<span class="ck">def</span> <span class="cf">run_traced_agent</span>(query: str, tools: list[<span class="ca">Tool</span>]) -> dict:
+    run_id = str(uuid.uuid4())[:<span class="cn">8</span>]
+    tracer = <span class="ca">AgentTracer</span>(run_id)
+
+    <span class="cm"># Inside the loop, after each block:</span>
+    <span class="ck">for</span> block <span class="ck">in</span> resp.content:
+        <span class="ck">if</span> block.type == <span class="cs">"text"</span>:
+            tracer.log_thought(step, block.text)
+        <span class="ck">elif</span> block.type == <span class="cs">"tool_use"</span>:
+            tracer.log_tool_call(step, block.name, block.input)
+            result = tool_map[block.name].execute(**block.input)
+            is_err = result.startswith(<span class="cs">"ERROR:"</span>)
+            tracer.log_observation(step, result, is_error=is_err)
+
+    result = run_agent(query, tools)
+    tracer.log_final(result[<span class="cs">"answer"</span>], result)
+    tracer.save()
+    <span class="ck">return</span> result</pre>
+    </div>
+
+    <div class="box grn">
+      <div class="bxt">What to capture in every trace</div>
+      <p>Minimum viable trace: <strong>timestamp</strong>, <strong>step number</strong>, <strong>event type</strong> (thought/action/observation/final), <strong>content</strong>. Add: <strong>token count per step</strong>, <strong>cumulative cost</strong>, <strong>tool latency</strong>. When debugging a failing agent, the trace tells you exactly where the reasoning went wrong — whether the model misunderstood the task, called the wrong tool, or got stuck in a loop.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       08 · FULL AGENT FROM SCRATCH
+  ══════════════════════════════════ -->
+  <div class="sec" id="full-agent">
+    <div class="snum">08</div>
+    <h2>Full ReAct Agent — Complete Implementation</h2>
+    <p>All components assembled: tool registry, agent loop, stopping conditions, error handling, and trace logging in one clean module.</p>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — react_agent.py (complete, runnable)</div></div>
+      <pre><span class="cm">"""
+react_agent.py — ReAct agent in pure Python, no frameworks.
+pip install anthropic duckduckgo-search
+"""</span>
+<span class="ck">import</span> anthropic, json, math, re, time, uuid, logging
+<span class="ck">from</span> dataclasses <span class="ck">import</span> dataclass, field
+<span class="ck">from</span> typing <span class="ck">import</span> Callable, Optional
+<span class="ck">from</span> datetime <span class="ck">import</span> date
+
+logging.basicConfig(level=logging.INFO, format=<span class="cs">'%(levelname)s | %(message)s'</span>)
+log    = logging.getLogger(<span class="cs">"agent"</span>)
+client = anthropic.Anthropic()
+
+<span class="cm"># ═══════════════════════════════════════
+#  TOOLS
+# ═══════════════════════════════════════</span>
+<span class="ck">@dataclass</span>
+<span class="ck">class</span> <span class="ca">Tool</span>:
+    name: str; description: str; schema: dict; fn: Callable
+    <span class="ck">def</span> <span class="cf">api</span>(self): <span class="ck">return</span> {<span class="cs">"name"</span>:self.name,<span class="cs">"description"</span>:self.description,<span class="cs">"input_schema"</span>:self.schema}
+    <span class="ck">def</span> <span class="cf">run</span>(self,**kw):
+        <span class="ck">try</span>: <span class="ck">return</span> str(self.fn(**kw))
+        <span class="ck">except</span> <span class="ca">Exception</span> <span class="ck">as</span> e: <span class="ck">return</span> <span class="cs">f"ERROR: {e}"</span>
+
+<span class="ck">def</span> <span class="cf">_calc</span>(expression: str) -> str:
+    safe = <span class="cf">all</span>(c <span class="ck">in</span> <span class="cs">"0123456789+-*/().,% \nmath."</span> <span class="ck">or</span> c.isalpha() <span class="ck">for</span> c <span class="ck">in</span> expression)
+    <span class="ck">if not</span> safe: <span class="ck">raise</span> <span class="ca">ValueError</span>(<span class="cs">"Unsafe expression"</span>)
+    r = eval(expression, {<span class="cs">"__builtins__"</span>:{}, <span class="cs">"math"</span>:math})
+    <span class="ck">return</span> <span class="cs">f"{r:,.6g}"</span>
+
+<span class="ck">def</span> <span class="cf">_search</span>(query: str) -> str:
+    <span class="ck">from</span> duckduckgo_search <span class="ck">import</span> DDGS
+    <span class="ck">with</span> DDGS() <span class="ck">as</span> d: r = <span class="cf">list</span>(d.text(query, max_results=<span class="cn">3</span>))
+    <span class="ck">return</span> <span class="cs">"\n\n"</span>.join(<span class="cs">f"[{x['title']}]\n{x['body']}"</span> <span class="ck">for</span> x <span class="ck">in</span> r) <span class="ck">if</span> r <span class="ck">else</span> <span class="cs">"No results."</span>
+
+<span class="ck">def</span> <span class="cf">_today</span>() -> str: <span class="ck">return</span> <span class="cs">f"Today is {date.today().isoformat()}"</span>
+
+TOOLS = [
+    <span class="ca">Tool</span>(<span class="cs">"calculator"</span>,
+         <span class="cs">"Evaluate Python math expression. E.g. (2025-1971)*365.25*24*3600"</span>,
+         {<span class="cs">"type"</span>:<span class="cs">"object"</span>,<span class="cs">"properties"</span>:{<span class="cs">"expression"</span>:{<span class="cs">"type"</span>:<span class="cs">"string"</span>}},<span class="cs">"required"</span>:[<span class="cs">"expression"</span>]},
+         _calc),
+    <span class="ca">Tool</span>(<span class="cs">"web_search"</span>,
+         <span class="cs">"Search web for current facts. Returns top 3 results."</span>,
+         {<span class="cs">"type"</span>:<span class="cs">"object"</span>,<span class="cs">"properties"</span>:{<span class="cs">"query"</span>:{<span class="cs">"type"</span>:<span class="cs">"string"</span>}},<span class="cs">"required"</span>:[<span class="cs">"query"</span>]},
+         _search),
+    <span class="ca">Tool</span>(<span class="cs">"get_today"</span>,
+         <span class="cs">"Returns today's date. Call before any date arithmetic."</span>,
+         {<span class="cs">"type"</span>:<span class="cs">"object"</span>,<span class="cs">"properties"</span>:{},<span class="cs">"required"</span>:[]},
+         _today),
+]
+
+<span class="cm"># ═══════════════════════════════════════
+#  AGENT LOOP
+# ═══════════════════════════════════════</span>
+SYSTEM = <span class="cs">"""You are a helpful assistant with access to tools.
+Think step by step. Use tools when you need current information or calculation.
+When you have enough information, give a direct final answer.
+Do not call the same tool with identical arguments more than twice."""</span>
+
+<span class="ck">def</span> <span class="cf">run</span>(query: str, max_steps: int = <span class="cn">10</span>, max_cost: float = <span class="cn">0.50</span>) -> dict:
+    run_id   = str(uuid.uuid4())[:<span class="cn">8</span>]
+    tmap     = {t.name: t <span class="ck">for</span> t <span class="ck">in</span> TOOLS}
+    msgs     = [{<span class="cs">"role"</span>:<span class="cs">"user"</span>,<span class="cs">"content"</span>:query}]
+    trace    = []
+    cost     = <span class="cn">0.0</span>
+    t0       = time.time()
+
+    log.info(<span class="cs">f"[{run_id}] START: {query}"</span>)
+
+    <span class="ck">for</span> step <span class="ck">in</span> <span class="cf">range</span>(max_steps):
+        <span class="ck">if</span> cost > max_cost:
+            <span class="ck">break</span>
+
+        resp = client.messages.create(
+            model=<span class="cs">"claude-sonnet-4-20250514"</span>, max_tokens=<span class="cn">4096</span>,
+            system=SYSTEM, tools=[t.api() <span class="ck">for</span> t <span class="ck">in</span> TOOLS], messages=msgs
+        )
+        cost += (resp.usage.input_tokens*<span class="cn">3</span>+resp.usage.output_tokens*<span class="cn">15</span>)/<span class="cn">1e6</span>
+        msgs.append({<span class="cs">"role"</span>:<span class="cs">"assistant"</span>,<span class="cs">"content"</span>:resp.content})
+
+        <span class="ck">if</span> resp.stop_reason == <span class="cs">"end_turn"</span>:
+            answer = next((b.text <span class="ck">for</span> b <span class="ck">in</span> resp.content <span class="ck">if</span> b.type==<span class="cs">"text"</span>), <span class="cs">""</span>)
+            log.info(<span class="cs">f"[{run_id}] DONE in {step+1} steps | ${cost:.5f} | {time.time()-t0:.1f}s"</span>)
+            <span class="ck">return</span> {<span class="cs">"answer"</span>:answer,<span class="cs">"trace"</span>:trace,<span class="cs">"steps"</span>:step+<span class="cn">1</span>,<span class="cs">"cost"</span>:<span class="cf">round</span>(cost,<span class="cn">5</span>)}
+
+        results = []
+        <span class="ck">for</span> b <span class="ck">in</span> resp.content:
+            <span class="ck">if</span> b.type != <span class="cs">"tool_use"</span>: <span class="ck">continue</span>
+            out = tmap[b.name].run(**b.input) <span class="ck">if</span> b.name <span class="ck">in</span> tmap <span class="ck">else</span> <span class="cs">f"ERROR: unknown tool {b.name}"</span>
+            trace.append({<span class="cs">"step"</span>:step+<span class="cn">1</span>,<span class="cs">"tool"</span>:b.name,<span class="cs">"in"</span>:b.input,<span class="cs">"out"</span>:out})
+            log.info(<span class="cs">f"[{run_id}] step {step+1} | {b.name}({b.input}) → {out[:80]}"</span>)
+            results.append({<span class="cs">"type"</span>:<span class="cs">"tool_result"</span>,<span class="cs">"tool_use_id"</span>:b.id,<span class="cs">"content"</span>:out,<span class="cs">"is_error"</span>:out.startswith(<span class="cs">"ERROR"</span>)})
+
+        msgs.append({<span class="cs">"role"</span>:<span class="cs">"user"</span>,<span class="cs">"content"</span>:results})
+
+    <span class="ck">return</span> {<span class="cs">"answer"</span>:<span class="cs">"Max steps reached."</span>,<span class="cs">"trace"</span>:trace,<span class="cs">"steps"</span>:max_steps,<span class="cs">"cost"</span>:<span class="cf">round</span>(cost,<span class="cn">5</span>)}
+
+<span class="cm"># ═══════════════════════════════════════
+#  ENTRY POINT
+# ═══════════════════════════════════════</span>
+<span class="ck">if</span> __name__ == <span class="cs">"__main__"</span>:
+    tests = [
+        <span class="cs">"How many seconds has Elon Musk been alive?"</span>,
+        <span class="cs">"What is the square root of the current year?"</span>,
+        <span class="cs">"Who won the most recent FIFA World Cup and what is 2 to the power of their trophy count?"</span>,
+    ]
+    <span class="ck">for</span> q <span class="ck">in</span> tests:
+        result = run(q)
+        <span class="cf">print</span>(<span class="cs">f"\nQ: {q}"</span>)
+        <span class="cf">print</span>(<span class="cs">f"A: {result['answer']}"</span>)
+        <span class="cf">print</span>(<span class="cs">f"Steps: {result['steps']} | Cost: ${result['cost']}"</span>)
+        <span class="cf">print</span>(<span class="cs">"Trace:"</span>, json.dumps(result[<span class="cs">'trace'</span>], indent=<span class="cn">2</span>))</pre>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       09 · PROJECT 7
+  ══════════════════════════════════ -->
+  <div class="sec" id="project7">
+    <div class="snum">09</div>
+    <h2>Project 7 — ReAct Agent (Pure Python)</h2>
+
+    <div class="proj">
+      <h4>Project 7 — Build &amp; Test Checklist</h4>
+      <p>Build the agent loop manually in pure Python with no LangChain, no LangGraph, no AutoGen. Tools: calculator + web search. Prove it works by solving the benchmark question.</p>
+
+      <div class="cb">
+        <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — Test suite for Project 7</div></div>
+        <pre><span class="cm">"""test_agent.py — benchmark suite for Project 7"""</span>
+<span class="ck">from</span> react_agent <span class="ck">import</span> run
+<span class="ck">import</span> re, pytest
+
+<span class="ck">def</span> <span class="cf">test_birth_date_seconds</span>():
+    <span class="cs">"""Core benchmark: must use search then calculator."""</span>
+    result = run(<span class="cs">"How many seconds has Elon Musk been alive?"</span>)
+    <span class="cm"># Must have used at least 2 tool calls (search + calc)</span>
+    <span class="ck">assert</span> result[<span class="cs">"steps"</span>] >= <span class="cn">2</span>
+    <span class="cm"># Answer must contain a large number</span>
+    numbers = re.findall(<span class="cs">r'[\d,]+'</span>, result[<span class="cs">"answer"</span>])
+    big = [n <span class="ck">for</span> n <span class="ck">in</span> numbers <span class="ck">if</span> <span class="cf">int</span>(n.replace(<span class="cs">","</span>,<span class="cs">""</span>)) > <span class="cn">1_000_000_000</span>]
+    <span class="ck">assert</span> big, <span class="cs">f"Expected ~1.7B seconds in answer: {result['answer']}"</span>
+    <span class="cm"># Must include both tool types</span>
+    tools_used = {t[<span class="cs">"tool"</span>] <span class="ck">for</span> t <span class="ck">in</span> result[<span class="cs">"trace"</span>]}
+    <span class="ck">assert</span> <span class="cs">"web_search"</span> <span class="ck">in</span> tools_used
+    <span class="ck">assert</span> <span class="cs">"calculator"</span> <span class="ck">in</span> tools_used
+
+<span class="ck">def</span> <span class="cf">test_pure_math</span>():
+    result = run(<span class="cs">"What is 2^32?"</span>)
+    <span class="ck">assert</span> <span class="cs">"4,294,967,296"</span> <span class="ck">in</span> result[<span class="cs">"answer"</span>].replace(<span class="cs">" "</span>,<span class="cs">""</span>) <span class="ck">or</span> <span class="cs">"4294967296"</span> <span class="ck">in</span> result[<span class="cs">"answer"</span>]
+
+<span class="ck">def</span> <span class="cf">test_single_step</span>():
+    <span class="cs">"""Should answer without any tool calls."""</span>
+    result = run(<span class="cs">"What is the capital of France?"</span>)
+    <span class="ck">assert</span> <span class="cs">"Paris"</span> <span class="ck">in</span> result[<span class="cs">"answer"</span>]
+    <span class="ck">assert</span> result[<span class="cs">"steps"</span>] == <span class="cn">1</span>   <span class="cm"># no tools needed</span>
+
+<span class="ck">def</span> <span class="cf">test_cost_guard</span>():
+    result = run(<span class="cs">"What is 2+2?"</span>, max_cost=<span class="cn">0.001</span>)   <span class="cm"># tiny budget</span>
+    <span class="ck">assert</span> result[<span class="cs">"cost"</span>] <= <span class="cn">0.002</span>   <span class="cm"># allowed small overshoot</span>
+
+<span class="cm"># Run: pytest test_agent.py -v</span></pre>
+      </div>
+
+      <div class="cb">
+        <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Markdown — README.md template</div></div>
+        <pre><span class="cm"># ReAct Agent — Pure Python, No Frameworks</span>
+
+<span class="cm">## The benchmark test</span>
+Q: "How many seconds has Elon Musk been alive?"
+A: ~1,701,388,800 seconds (born June 28, 1971)
+
+Tool trace:
+1. web_search("Elon Musk date of birth") → "Born June 28, 1971"
+2. get_today() → "Today is 2025-06-15"
+3. calculator("(2025-1971)*365.25*24*3600 + ...") → "1,701,388,800"
+
+<span class="cm">## Architecture</span>
+- No LangChain, no AutoGen, no LangGraph
+- Pure Anthropic tool_use API + message history accumulation
+- Stopping: max_steps=10, max_cost=$0.50, loop detection
+- Tools: calculator, web_search (DuckDuckGo), get_today
+- Trace: JSON log of every step to ./traces/
+
+<span class="cm">## Run it</span>
+pip install anthropic duckduckgo-search
+export ANTHROPIC_API_KEY=...
+python react_agent.py
+pytest test_agent.py -v</pre>
+      </div>
+
+      <ul class="psteps">
+        <li>Copy <code>react_agent.py</code> — it's complete and runnable as written above</li>
+        <li>Run the 3 test queries manually, verify traces look correct</li>
+        <li>Run the pytest test suite — all 4 tests must pass</li>
+        <li>Add a 4th tool of your choice (weather, Wikipedia, file reader)</li>
+        <li>Add a 5th tool: <code>python_repl</code> — executes arbitrary Python (sandbox with restricted builtins)</li>
+        <li>Push to GitHub — README must show the benchmark trace and test results</li>
+      </ul>
+    </div>
+
+    <div class="insight">
+      <h4>🧠 Why "no frameworks" matters</h4>
+      <p>LangChain and LangGraph are excellent tools — you'll use them in Weeks 11–13. But building the agent loop manually first means you understand <em>exactly</em> what a framework is doing under the hood. When something breaks in LangGraph, you'll know it's a message history issue, or a tool dispatch issue, or a stopping condition issue — because you've built all three from scratch. Engineers who skip straight to frameworks end up debugging black boxes. You won't be one of them.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       10 · CHECKPOINT
+  ══════════════════════════════════ -->
+  <div class="sec" id="checkpoint">
+    <div class="snum">10</div>
+    <h2>Week 9 Checkpoint</h2>
+
+    <div class="ckpt">
+      <h4>✦ Mastery checklist</h4>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">ReAct pattern — draw the Thought→Action→Observation loop from memory and explain why it outperforms single-shot prompting
+          <span class="csub">LLM orchestrates, tools execute; loop closes because observations become context</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">Anthropic tool use API — implement a single tool call and response cycle from scratch
+          <span class="csub">stop_reason=="tool_use", extract ToolUseBlock, execute, return as tool_result user message</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">Tool definitions — write a tool schema and description that makes the model use it correctly
+          <span class="csub">input_schema JSON Schema, description with when-to-use and example input</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">Agent loop — implement the message history accumulation pattern and explain why history grows
+          <span class="csub">Every turn appends to messages; cost = O(n²) token-steps across all API calls</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">Stopping conditions — implement all 5: max_steps, timeout, budget, token limit, loop detection
+          <span class="csub">AgentConfig, AgentState, StopCondition exception, check before and after each step</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">Error handling — return tool errors as observations, not exceptions; explain why this is correct
+          <span class="csub">is_error=True in tool_result, model reads and recovers; re-raising kills the agent</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">Trace logging — implement AgentTracer that saves every thought/action/observation to JSON
+          <span class="csub">run_id, timestamp per event, cost per step, save to ./traces/</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">Project 7 complete — benchmark test passes, all 4 pytest tests green, pushed to GitHub
+          <span class="csub">Elon Musk seconds test: used web_search + calculator, returned ~1.7B, trace saved</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="box grn">
+      <div class="bxt">Next — Week 10: RAG Agent with Memory</div>
+      <p>Short-term memory (conversation history), long-term memory (vector store), episodic memory patterns, context window management across turns, and memory consolidation strategies. The agent from Week 9 gets a memory system. Say <strong>"start Week 10 — RAG agent with memory"</strong> to continue.</p>
+    </div>
+
+    <div class="box cyn">
+      <div class="bxt">Phase 3 big picture — what you're building toward</div>
+      <p>Week 9: single agent, simple tools (you are here). Week 10: agent with persistent memory. Week 11: LangGraph for stateful agents. Weeks 12–13: multi-agent systems. Weeks 14–15: MCP-connected agents with real external tools. Week 16: evaluation harness for agents. Each week builds directly on the last. The ReAct loop you just built is the atomic unit everything else is composed from.</p>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+  const sections = document.querySelectorAll('.sec');
+  const navItems = document.querySelectorAll('.ni');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const id = e.target.id;
+        navItems.forEach(n => n.classList.toggle('active', n.getAttribute('href') === '#' + id));
+      }
+    });
+  }, { threshold: 0.2 });
+  sections.forEach(s => io.observe(s));
+</script>
+</body>
+</html>

@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Engineer — Phase 3, Week 11: LangGraph &amp; Agent Frameworks</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,300&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070810;--bg2:#0d0e17;--bg3:#13152 0;--bg4:#191c28;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.14);
+  --text:#e2dfd5;--text2:#8b8880;--text3:#454240;
+  --pu:#a78bfa;--cy:#22d3ee;--or:#f97316;
+  --gr:#22c55e;--ro:#f43f5e;--am:#eab308;
+  --mono:'IBM Plex Mono',monospace;--serif:'Fraunces',serif;--sans:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.75;}
+.layout{display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sb{width:268px;min-width:268px;background:var(--bg2);border-right:1px solid var(--border);padding:28px 0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sb-top{padding:0 22px 22px;border-bottom:1px solid var(--border);margin-bottom:18px;}
+.sb-badge{display:inline-block;background:var(--pu);color:#0d0726;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.08em;padding:3px 8px;border-radius:3px;margin-bottom:8px;}
+.sb-top h1{font-family:var(--serif);font-weight:700;font-size:17px;line-height:1.3;}
+.sb-top p{font-size:12px;color:var(--text2);margin-top:4px;}
+.nav-s{padding:0 14px;margin-bottom:4px;}
+.nav-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--text3);padding:0 8px;margin-bottom:5px;text-transform:uppercase;}
+.ni{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;font-size:12.5px;color:var(--text2);transition:all .15s;text-decoration:none;border:1px solid transparent;}
+.ni:hover{background:var(--bg3);color:var(--text);}
+.ni.active{background:var(--bg3);color:var(--pu);border-color:var(--border);}
+.ndot{width:6px;height:6px;border-radius:50%;background:var(--text3);flex-shrink:0;}
+.ni.active .ndot{background:var(--pu);}
+
+/* MAIN */
+.main{flex:1;max-width:900px;padding:48px 56px;}
+
+/* HERO */
+.hero{padding:40px 0 48px;border-bottom:1px solid var(--border);margin-bottom:48px;}
+.htag{font-family:var(--mono);font-size:11px;color:var(--pu);letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.htag::before{content:'';display:block;width:28px;height:1px;background:var(--pu);}
+.hero h1{font-family:var(--serif);font-size:50px;font-weight:700;line-height:1.06;letter-spacing:-.02em;margin-bottom:18px;}
+.hero h1 em{font-style:italic;color:var(--cy);}
+.hero p{font-size:16px;color:var(--text2);max-width:580px;line-height:1.7;}
+.hmeta{display:flex;gap:20px;margin-top:24px;flex-wrap:wrap;}
+.hm{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--text2);}
+.hm span{color:var(--gr);}
+
+/* PROGRESS */
+.pcard{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:48px;}
+.prow{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:8px;}
+.pbar{height:3px;background:var(--bg4);border-radius:99px;overflow:hidden;}
+.pfill{height:100%;background:var(--pu);border-radius:99px;width:55%;}
+.ppills{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.ppill{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:99px;border:1px solid var(--border);color:var(--text3);}
+.ppill.done{border-color:var(--gr);color:var(--gr);}
+.ppill.active{border-color:var(--pu);color:var(--pu);background:rgba(167,139,250,.06);}
+.wpills{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.wp{font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:99px;border:1px solid var(--border);color:var(--text3);}
+.wp.done{border-color:var(--gr);color:var(--gr);}
+.wp.active{border-color:var(--pu);color:var(--pu);}
+
+/* SECTIONS */
+.sec{margin-bottom:64px;scroll-margin-top:24px;}
+.snum{font-family:var(--mono);font-size:11px;color:var(--pu);letter-spacing:.1em;margin-bottom:8px;}
+.sec h2{font-family:var(--serif);font-size:32px;font-weight:700;line-height:1.2;margin-bottom:20px;}
+.sec h3{font-family:var(--serif);font-size:20px;font-weight:500;font-style:italic;margin-top:36px;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+p{margin-bottom:14px;color:var(--text2);}
+strong{color:var(--text);font-weight:500;}
+
+/* CODE */
+.cb{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden;}
+.cb-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg3);}
+.cb-lang{font-family:var(--mono);font-size:10px;color:var(--pu);letter-spacing:.08em;text-transform:uppercase;}
+.dots{display:flex;gap:5px;}
+.dot{width:8px;height:8px;border-radius:50%;}
+.dot:nth-child(1){background:rgba(244,63,94,.4);}
+.dot:nth-child(2){background:rgba(234,179,8,.4);}
+.dot:nth-child(3){background:rgba(34,197,94,.4);}
+pre{padding:20px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.7;color:#b3aead;}
+.cm{color:#464340;font-style:italic;}
+.ck{color:var(--pu);}
+.cf{color:var(--cy);}
+.cs{color:var(--am);}
+.cn{color:var(--or);}
+.ca{color:var(--gr);}
+code{font-family:var(--mono);font-size:12px;background:var(--bg3);border:1px solid var(--border);padding:1px 6px;border-radius:4px;color:var(--cy);}
+
+/* CALLOUTS */
+.box{border-left:3px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin:20px 0;background:var(--bg2);}
+.box.pu{border-color:var(--pu);}
+.box.cy{border-color:var(--cy);}
+.box.or{border-color:var(--or);}
+.box.gr{border-color:var(--gr);}
+.box.ro{border-color:var(--ro);}
+.box.am{border-color:var(--am);}
+.bxt{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
+.box.pu .bxt{color:var(--pu);}
+.box.cy .bxt{color:var(--cy);}
+.box.or .bxt{color:var(--or);}
+.box.gr .bxt{color:var(--gr);}
+.box.ro .bxt{color:var(--ro);}
+.box.am .bxt{color:var(--am);}
+.box p{margin:0;font-size:14px;line-height:1.6;}
+
+/* INSIGHT */
+.insight{background:linear-gradient(135deg,#100e22 0%,#080a0e 100%);border:1px solid var(--pu);border-radius:12px;padding:22px 24px;margin:28px 0;}
+.insight h4{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--pu);margin-bottom:12px;}
+.insight p{color:var(--text2);font-size:14px;margin:0;line-height:1.65;}
+
+/* TABLES */
+.tw{overflow-x:auto;margin:20px 0;border-radius:10px;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+th{background:var(--bg3);padding:11px 16px;text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);border-bottom:1px solid var(--border2);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--bg2);}
+td strong{color:var(--text);}
+td code{font-size:11px;}
+.g{color:var(--gr);font-weight:500;}
+.y{color:var(--am);font-weight:500;}
+.r{color:var(--ro);font-weight:500;}
+
+/* DIAGRAM */
+.diagram{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;margin:20px 0;overflow-x:auto;}
+.diagram svg{width:100%;height:auto;display:block;}
+
+/* COMPARISON */
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0;}
+.cmp-card{border-radius:10px;padding:16px 18px;}
+.cmp-card.lc{background:rgba(234,179,8,.05);border:1px solid rgba(234,179,8,.2);}
+.cmp-card.lg{background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.2);}
+.cmp-title{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px;}
+.cmp-card.lc .cmp-title{color:var(--am);}
+.cmp-card.lg .cmp-title{color:var(--pu);}
+.cmp-item{font-size:13px;color:var(--text2);padding:3px 0 3px 16px;position:relative;}
+.cmp-item::before{content:'›';position:absolute;left:0;color:var(--text3);}
+
+/* CHECKPOINT */
+.ckpt{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;margin:28px 0;}
+.ckpt h4{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--pu);margin-bottom:16px;}
+.ci{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:14px;}
+.ci:last-child{border-bottom:none;}
+.cbox{width:16px;height:16px;border:1.5px solid var(--border2);border-radius:4px;flex-shrink:0;margin-top:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.cbox.chk{background:var(--pu);border-color:var(--pu);}
+.cbox.chk::after{content:'';width:4px;height:7px;border:1.5px solid #0d0726;border-top:none;border-left:none;transform:rotate(45deg) translate(-1px,-1px);}
+.clbl{color:var(--text2);line-height:1.5;}
+.csub{font-style:normal;color:var(--text3);font-size:12px;display:block;margin-top:2px;}
+
+/* PROJECT */
+.proj{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:22px 24px;margin:24px 0;}
+.proj h4{font-family:var(--mono);font-size:11px;color:var(--am);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;}
+.proj p{font-size:14px;color:var(--text2);margin-bottom:10px;}
+.psteps{list-style:none;padding:0;}
+.psteps li{font-size:13px;color:var(--text2);padding:4px 0 4px 20px;position:relative;}
+.psteps li::before{content:'○';position:absolute;left:0;color:var(--text3);font-size:10px;top:5px;}
+
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
+@media(max-width:768px){.sb{display:none;}.main{padding:28px 20px;}.hero h1{font-size:34px;}.cmp{grid-template-columns:1fr;}}
+@media print{.sb{display:none;}body{background:white;color:black;}}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ══ SIDEBAR ══ -->
+<nav class="sb">
+  <div class="sb-top">
+    <div class="sb-badge">PHASE 3 · WEEK 11</div>
+    <h1>LangGraph</h1>
+    <p>AI Engineer Roadmap</p>
+  </div>
+  <div class="nav-s">
+    <div class="nav-lbl">Contents</div>
+    <a class="ni active" href="#why-langgraph"><div class="ndot"></div>Why LangGraph exists</a>
+    <a class="ni" href="#vs-langchain"><div class="ndot"></div>LangGraph vs LangChain</a>
+    <a class="ni" href="#core-concepts"><div class="ndot"></div>Nodes, edges, state</a>
+    <a class="ni" href="#state-schema"><div class="ndot"></div>State schema design</a>
+    <a class="ni" href="#conditional"><div class="ndot"></div>Conditional routing</a>
+    <a class="ni" href="#state-mgmt"><div class="ndot"></div>State management</a>
+    <a class="ni" href="#hitl"><div class="ndot"></div>Human-in-the-loop</a>
+    <a class="ni" href="#langsmith"><div class="ndot"></div>LangSmith tracing</a>
+    <a class="ni" href="#code-reviewer"><div class="ndot"></div>Code reviewer agent</a>
+    <a class="ni" href="#project9"><div class="ndot"></div>Project 9</a>
+    <a class="ni" href="#checkpoint"><div class="ndot"></div>Checkpoint</a>
+  </div>
+</nav>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="htag">AI Engineer Roadmap — Phase 3</div>
+    <h1>Week 11 —<br><em>LangGraph</em></h1>
+    <p>Nodes, edges, typed state, conditional routing, state management in long-running agents, human-in-the-loop checkpoints, and production tracing with LangSmith — the framework layer on top of everything you built from scratch in Weeks 9–10.</p>
+    <div class="hmeta">
+      <div class="hm">📅 <span>Week 11 of 20</span></div>
+      <div class="hm">🎯 <span>Production agent framework</span></div>
+      <div class="hm">🔨 <span>Project 9: Autonomous Code Reviewer</span></div>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="pcard">
+    <div class="prow"><span>Roadmap progress</span><span>Week 11 / 20</span></div>
+    <div class="pbar"><div class="pfill"></div></div>
+    <div class="ppills">
+      <div class="ppill done">Phase 1: ML Foundations ✓</div>
+      <div class="ppill done">Phase 2: LLMs &amp; Prompts ✓</div>
+      <div class="ppill active">Phase 3: Agents ←</div>
+      <div class="ppill">Phase 4: Production</div>
+    </div>
+    <div class="wpills">
+      <div class="wp done">W1–10 ✓</div>
+      <div class="wp active">W11 ←</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       01 · WHY LANGGRAPH EXISTS
+  ══════════════════════════════════ -->
+  <div class="sec" id="why-langgraph">
+    <div class="snum">01</div>
+    <h2>Why LangGraph Exists</h2>
+    <p>In Weeks 9 and 10 you built agent loops manually — a <code>for</code> loop, a message list, some stopping conditions. That works for simple agents. But as agents grow more complex — multiple specialized steps, conditional branches, human approval gates, retry logic on failure — the raw loop becomes unmanageable. LangGraph solves this by representing your agent as an <strong>explicit directed graph</strong>.</p>
+
+    <p>Every node is a Python function. Every edge is a connection between nodes. The graph <em>is</em> the agent — you can visualize it, checkpoint it, resume it after failure, and inject human decisions at any point.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 680 220" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+
+        <!-- START -->
+        <circle cx="50" cy="110" r="18" fill="#0d0e17" stroke="rgba(34,197,94,.5)" stroke-width="1.5"/>
+        <text x="50" y="114" font-family="IBM Plex Mono,monospace" font-size="9" fill="rgba(34,197,94,.8)" text-anchor="middle">START</text>
+
+        <!-- agent node -->
+        <rect x="100" y="86" width="110" height="48" rx="8" fill="#100e22" stroke="rgba(167,139,250,.5)" stroke-width="1"/>
+        <text x="155" y="106" font-family="IBM Plex Mono,monospace" font-size="9" fill="rgba(167,139,250,.6)" text-anchor="middle">NODE</text>
+        <text x="155" y="120" font-family="DM Sans,sans-serif" font-size="12" fill="rgba(167,139,250,.9)" text-anchor="middle">agent</text>
+
+        <!-- conditional router -->
+        <polygon points="278,110 308,88 338,110 308,132" fill="#0e0a10" stroke="rgba(234,179,8,.4)" stroke-width="1"/>
+        <text x="308" y="114" font-family="IBM Plex Mono,monospace" font-size="8" fill="rgba(234,179,8,.7)" text-anchor="middle">route?</text>
+
+        <!-- tool_call branch -->
+        <rect x="370" y="60" width="110" height="48" rx="8" fill="#0e1108" stroke="rgba(34,197,94,.4)" stroke-width="1"/>
+        <text x="425" y="80" font-family="IBM Plex Mono,monospace" font-size="9" fill="rgba(34,197,94,.6)" text-anchor="middle">NODE</text>
+        <text x="425" y="94" font-family="DM Sans,sans-serif" font-size="12" fill="rgba(34,197,94,.9)" text-anchor="middle">tools</text>
+
+        <!-- human branch -->
+        <rect x="370" y="130" width="110" height="48" rx="8" fill="#0e0c08" stroke="rgba(249,115,22,.4)" stroke-width="1"/>
+        <text x="425" y="150" font-family="IBM Plex Mono,monospace" font-size="9" fill="rgba(249,115,22,.6)" text-anchor="middle">NODE</text>
+        <text x="425" y="164" font-family="DM Sans,sans-serif" font-size="12" fill="rgba(249,115,22,.9)" text-anchor="middle">human_review</text>
+
+        <!-- END -->
+        <circle cx="630" cy="110" r="18" fill="#0d0e17" stroke="rgba(244,63,94,.5)" stroke-width="1.5"/>
+        <text x="630" y="114" font-family="IBM Plex Mono,monospace" font-size="9" fill="rgba(244,63,94,.8)" text-anchor="middle">END</text>
+
+        <!-- edges -->
+        <line x1="68" y1="110" x2="98" y2="110" stroke="rgba(255,255,255,.2)" stroke-width="1" marker-end="url(#arr)"/>
+        <line x1="210" y1="110" x2="276" y2="110" stroke="rgba(255,255,255,.2)" stroke-width="1" marker-end="url(#arr)"/>
+
+        <!-- router to tools -->
+        <line x1="338" y1="100" x2="368" y2="86" stroke="rgba(34,197,94,.4)" stroke-width="1" marker-end="url(#arr)"/>
+        <text x="350" y="82" font-family="IBM Plex Mono,monospace" font-size="8" fill="rgba(34,197,94,.5)">tool_call</text>
+
+        <!-- router to human -->
+        <line x1="338" y1="120" x2="368" y2="140" stroke="rgba(249,115,22,.4)" stroke-width="1" marker-end="url(#arr)"/>
+        <text x="344" y="142" font-family="IBM Plex Mono,monospace" font-size="8" fill="rgba(249,115,22,.5)">needs_review</text>
+
+        <!-- router to end -->
+        <line x1="340" y1="110" x2="610" y2="110" stroke="rgba(244,63,94,.3)" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+        <text x="470" y="107" font-family="IBM Plex Mono,monospace" font-size="8" fill="rgba(244,63,94,.4)">done</text>
+
+        <!-- tools back to agent -->
+        <path d="M480 60 Q480 30 155 30 Q155 30 155 84" fill="none" stroke="rgba(167,139,250,.3)" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+        <text x="320" y="26" font-family="IBM Plex Mono,monospace" font-size="8" fill="rgba(167,139,250,.35)">loop back</text>
+
+        <!-- human to agent -->
+        <path d="M480 154 Q550 154 550 110 Q550 86 212 86" fill="none" stroke="rgba(249,115,22,.25)" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+
+        <!-- labels -->
+        <text x="340" y="200" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(255,255,255,.18)" text-anchor="middle">State flows through every node. Conditional edges route to different nodes based on state values.</text>
+      </svg>
+    </div>
+
+    <div class="insight">
+      <h4>🧠 Graph = explicit agent logic</h4>
+      <p>Your Week 9 agent loop was implicit — the logic lived inside a <code>for</code> loop with nested <code>if</code> statements. LangGraph makes that logic <strong>explicit</strong> as a graph you can visualize, serialize, checkpoint, and resume. When you say "go to the tools node if there's a tool call, go to human_review if confidence is low, otherwise end" — that IS the graph. The graph is the documentation of your agent's behavior.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       02 · LANGGRAPH VS LANGCHAIN
+  ══════════════════════════════════ -->
+  <div class="sec" id="vs-langchain">
+    <div class="snum">02</div>
+    <h2>LangGraph vs LangChain Chains</h2>
+    <p>LangChain chains are linear pipelines — A → B → C. LangGraph is a graph — cycles, branches, conditional routing, interrupts. They solve different problems.</p>
+
+    <div class="cmp">
+      <div class="cmp-card lc">
+        <div class="cmp-title">LangChain chains</div>
+        <div class="cmp-item">Linear: A → B → C</div>
+        <div class="cmp-item">No cycles — runs once and exits</div>
+        <div class="cmp-item">Good for: RAG pipelines, simple transforms</div>
+        <div class="cmp-item">No built-in state management</div>
+        <div class="cmp-item">No checkpointing or resumability</div>
+        <div class="cmp-item">Simpler to set up</div>
+      </div>
+      <div class="cmp-card lg">
+        <div class="cmp-title">LangGraph</div>
+        <div class="cmp-item">Graph: cycles, branches, parallel paths</div>
+        <div class="cmp-item">Loops — agent can revisit nodes</div>
+        <div class="cmp-item">Good for: agents, multi-step reasoning</div>
+        <div class="cmp-item">Typed state persisted across nodes</div>
+        <div class="cmp-item">Checkpoints — pause, resume, branch</div>
+        <div class="cmp-item">More setup, much more power</div>
+      </div>
+    </div>
+
+    <div class="tw">
+      <table>
+        <tr><th>Feature</th><th>LangChain Chain</th><th>LangGraph</th></tr>
+        <tr><td><strong>Execution model</strong></td><td>Sequential, single pass</td><td>Graph traversal, cycles allowed</td></tr>
+        <tr><td><strong>State</strong></td><td>Passed forward as dict</td><td>Typed schema, persisted, updatable</td></tr>
+        <tr><td><strong>Branching</strong></td><td>Manual (RunnableBranch)</td><td>First-class conditional edges</td></tr>
+        <tr><td><strong>Checkpointing</strong></td><td>Not built-in</td><td>Built-in (SQLite/Redis backends)</td></tr>
+        <tr><td><strong>Human-in-loop</strong></td><td>Not supported</td><td><code>interrupt_before</code> / <code>interrupt_after</code></td></tr>
+        <tr><td><strong>Use when</strong></td><td>Fixed pipeline, no decisions</td><td>Agent loop, conditional logic, retries</td></tr>
+      </table>
+    </div>
+
+    <div class="box am">
+      <div class="bxt">When to use which</div>
+      <p>Use LangChain chains for your RAG pipeline (ingest → embed → retrieve → generate). Use LangGraph for your agent (decide → act → observe → decide again). The two compose well: your LangGraph agent can <em>call</em> a LangChain RAG chain as one of its nodes.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       03 · CORE CONCEPTS
+  ══════════════════════════════════ -->
+  <div class="sec" id="core-concepts">
+    <div class="snum">03</div>
+    <h2>Nodes, Edges, and State</h2>
+    <p>Three primitives. Master these and you can build any LangGraph agent.</p>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — LangGraph minimal example</div></div>
+      <pre><span class="cm"># pip install langgraph langchain-anthropic</span>
+<span class="ck">from</span> langgraph.graph <span class="ck">import</span> StateGraph, END
+<span class="ck">from</span> typing <span class="ck">import</span> TypedDict, Annotated
+<span class="ck">import</span> operator
+
+<span class="cm"># ── 1. STATE — typed dict that flows through all nodes ─────────</span>
+<span class="ck">class</span> <span class="ca">AgentState</span>(TypedDict):
+    messages:  Annotated[list, operator.add]  <span class="cm"># append-only (never overwrite)</span>
+    task:      str                            <span class="cm"># the original task</span>
+    step:      int                            <span class="cm"># how many steps taken</span>
+    done:      bool                           <span class="cm"># termination signal</span>
+    result:    str                            <span class="cm"># final output</span>
+
+<span class="cm"># ── 2. NODES — pure functions: State → State update ────────────</span>
+<span class="ck">def</span> <span class="cf">agent_node</span>(state: <span class="ca">AgentState</span>) -> dict:
+    <span class="cs">"""The LLM reasoning step. Returns a partial state update."""</span>
+    <span class="cm"># ... call LLM, get response ...</span>
+    response = call_llm(state[<span class="cs">"messages"</span>])
+
+    <span class="ck">if</span> response.stop_reason == <span class="cs">"end_turn"</span>:
+        <span class="ck">return</span> {
+            <span class="cs">"messages"</span>: [response],
+            <span class="cs">"done"</span>:     <span class="cn">True</span>,
+            <span class="cs">"result"</span>:   response.content[<span class="cn">0</span>].text,
+            <span class="cs">"step"</span>:     state[<span class="cs">"step"</span>] + <span class="cn">1</span>,
+        }
+    <span class="ck">return</span> {
+        <span class="cs">"messages"</span>: [response],
+        <span class="cs">"step"</span>:     state[<span class="cs">"step"</span>] + <span class="cn">1</span>,
+    }
+
+<span class="ck">def</span> <span class="cf">tools_node</span>(state: <span class="ca">AgentState</span>) -> dict:
+    <span class="cs">"""Execute all tool calls from the last message."""</span>
+    last   = state[<span class="cs">"messages"</span>][-<span class="cn">1</span>]
+    results = []
+    <span class="ck">for</span> block <span class="ck">in</span> last.content:
+        <span class="ck">if</span> block.type == <span class="cs">"tool_use"</span>:
+            result = dispatch_tool(block.name, block.input)
+            results.append({<span class="cs">"type"</span>:<span class="cs">"tool_result"</span>,
+                             <span class="cs">"tool_use_id"</span>:block.id, <span class="cs">"content"</span>:result})
+    <span class="ck">return</span> {<span class="cs">"messages"</span>: [{<span class="cs">"role"</span>:<span class="cs">"user"</span>,<span class="cs">"content"</span>:results}]}
+
+<span class="cm"># ── 3. CONDITIONAL EDGE — returns the next node name ───────────</span>
+<span class="ck">def</span> <span class="cf">route_after_agent</span>(state: <span class="ca">AgentState</span>) -> str:
+    <span class="cs">"""Decide which node to go to next based on current state."""</span>
+    <span class="ck">if</span> state[<span class="cs">"done"</span>]:
+        <span class="ck">return</span> END
+    <span class="ck">if</span> state[<span class="cs">"step"</span>] >= <span class="cn">15</span>:
+        <span class="ck">return</span> END   <span class="cm"># max steps reached</span>
+    last = state[<span class="cs">"messages"</span>][-<span class="cn">1</span>]
+    <span class="ck">if</span> hasattr(last, <span class="cs">"stop_reason"</span>) <span class="ck">and</span> last.stop_reason == <span class="cs">"tool_use"</span>:
+        <span class="ck">return</span> <span class="cs">"tools"</span>
+    <span class="ck">return</span> END
+
+<span class="cm"># ── 4. GRAPH ASSEMBLY ──────────────────────────────────────────</span>
+graph = StateGraph(<span class="ca">AgentState</span>)
+
+<span class="cm"># Add nodes</span>
+graph.add_node(<span class="cs">"agent"</span>, agent_node)
+graph.add_node(<span class="cs">"tools"</span>, tools_node)
+
+<span class="cm"># Set entry point</span>
+graph.set_entry_point(<span class="cs">"agent"</span>)
+
+<span class="cm"># Add edges</span>
+graph.add_conditional_edges(<span class="cs">"agent"</span>, route_after_agent)  <span class="cm"># conditional</span>
+graph.add_edge(<span class="cs">"tools"</span>, <span class="cs">"agent"</span>)                        <span class="cm"># always back to agent</span>
+
+<span class="cm"># Compile</span>
+app = graph.compile()
+
+<span class="cm"># Run</span>
+result = app.invoke({
+    <span class="cs">"messages"</span>: [{<span class="cs">"role"</span>:<span class="cs">"user"</span>,<span class="cs">"content"</span>:<span class="cs">"What is 2^32?"</span>}],
+    <span class="cs">"task"</span>:     <span class="cs">"What is 2^32?"</span>,
+    <span class="cs">"step"</span>:     <span class="cn">0</span>,
+    <span class="cs">"done"</span>:     <span class="cn">False</span>,
+    <span class="cs">"result"</span>:   <span class="cs">""</span>,
+})
+<span class="cf">print</span>(result[<span class="cs">"result"</span>])</pre>
+    </div>
+
+    <div class="box cy">
+      <div class="bxt">The key rules of nodes</div>
+      <p>Nodes must be <strong>pure functions</strong>: they take the current state and return a <strong>partial state update</strong> (a dict with only the keys that changed). LangGraph merges the update into the full state. Never mutate the input state directly — always return a new dict. The <code>Annotated[list, operator.add]</code> annotation tells LangGraph to <em>append</em> to the list rather than overwrite it — critical for message history.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       04 · STATE SCHEMA DESIGN
+  ══════════════════════════════════ -->
+  <div class="sec" id="state-schema">
+    <div class="snum">04</div>
+    <h2>State Schema Design</h2>
+    <p>The state schema is the contract between all nodes. Design it carefully — a poorly designed state schema causes subtle bugs where nodes overwrite each other's work or produce incorrect behaviour when the graph branches.</p>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — State schema patterns for real agents</div></div>
+      <pre><span class="ck">from</span> typing <span class="ck">import</span> TypedDict, Annotated, Optional, List
+<span class="ck">from</span> langgraph.graph <span class="ck">import</span> StateGraph, END
+<span class="ck">import</span> operator
+
+<span class="cm"># ── Pattern 1: APPEND-ONLY lists ──────────────────────────────</span>
+<span class="cm"># Use Annotated[list, operator.add] for anything that should grow.</span>
+<span class="cm"># If two parallel nodes both return {"messages": [x]},</span>
+<span class="cm"># LangGraph merges them as [x1, x2] not x2 overwriting x1.</span>
+
+<span class="ck">class</span> <span class="ca">CodeReviewState</span>(TypedDict):
+    <span class="cm"># Immutable task inputs</span>
+    repo_url:       str
+    target_files:   List[str]
+
+    <span class="cm"># Accumulated outputs (append-only)</span>
+    messages:       Annotated[list, operator.add]
+    issues_found:   Annotated[List[dict], operator.add]  <span class="cm"># each node appends issues</span>
+    file_contents:  Annotated[dict, lambda a, b: {**a, **b}]  <span class="cm"># merge dicts</span>
+
+    <span class="cm"># Mutable control flow state (nodes overwrite these)</span>
+    current_file:   Optional[str]
+    step:           int
+    phase:          str   <span class="cm"># "clone" | "analyse" | "review" | "report"</span>
+    errors:         List[str]
+
+    <span class="cm"># Output</span>
+    final_report:   Optional[str]
+    approved:       Optional[bool]   <span class="cm"># set by human review node</span>
+
+<span class="cm"># ── Pattern 2: REDUCER FUNCTIONS ──────────────────────────────</span>
+<span class="cm"># Custom reducer: merge two dicts (for accumulating file contents)</span>
+<span class="ck">def</span> <span class="cf">merge_dicts</span>(existing: dict, update: dict) -> dict:
+    <span class="ck">return</span> {**existing, **update}
+
+<span class="cm"># Custom reducer: keep highest-severity issues only</span>
+<span class="ck">def</span> <span class="cf">keep_high_severity</span>(existing: List[dict], new: List[dict]) -> List[dict]:
+    combined = existing + new
+    <span class="ck">return</span> [i <span class="ck">for</span> i <span class="ck">in</span> combined <span class="ck">if</span> i.get(<span class="cs">"severity"</span>) <span class="ck">in</span> (<span class="cs">"high"</span>, <span class="cs">"critical"</span>)]
+
+<span class="cm"># Usage in schema:</span>
+<span class="cm"># issues: Annotated[List[dict], keep_high_severity]</span>
+
+<span class="cm"># ── Pattern 3: NESTED STATE ────────────────────────────────────</span>
+<span class="cm"># For complex state, nest TypedDicts</span>
+<span class="ck">class</span> <span class="ca">ReviewMetadata</span>(TypedDict):
+    start_time:   str
+    model_used:   str
+    total_tokens: int
+
+<span class="ck">class</span> <span class="ca">FullReviewState</span>(TypedDict):
+    repo_url:   str
+    issues:     Annotated[List[dict], operator.add]
+    metadata:   ReviewMetadata   <span class="cm"># nested TypedDict</span>
+    messages:   Annotated[list, operator.add]</pre>
+    </div>
+
+    <div class="tw">
+      <table>
+        <tr><th>State field type</th><th>Reducer annotation</th><th>When to use</th></tr>
+        <tr><td><strong>Messages list</strong></td><td><code>Annotated[list, operator.add]</code></td><td>Any accumulating list — standard for messages</td></tr>
+        <tr><td><strong>Dict merging</strong></td><td><code>Annotated[dict, lambda a,b: {**a,**b}]</code></td><td>File contents, metadata accumulation</td></tr>
+        <tr><td><strong>Simple overwrite</strong></td><td>No annotation</td><td>Control flags: step counter, phase, done bool</td></tr>
+        <tr><td><strong>Custom reducer</strong></td><td><code>Annotated[T, your_fn]</code></td><td>De-duplication, filtering, max/min selection</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       05 · CONDITIONAL ROUTING
+  ══════════════════════════════════ -->
+  <div class="sec" id="conditional">
+    <div class="snum">05</div>
+    <h2>Conditional Routing</h2>
+    <p>Conditional edges are the decision points of your agent. A router function reads the current state and returns the name of the next node (or <code>END</code>). Multiple outputs from one router create a branching agent.</p>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — Conditional routing patterns</div></div>
+      <pre><span class="ck">from</span> langgraph.graph <span class="ck">import</span> END
+
+<span class="cm"># ── Simple binary router ───────────────────────────────────────</span>
+<span class="ck">def</span> <span class="cf">should_use_tools</span>(state: <span class="ca">AgentState</span>) -> str:
+    last = state[<span class="cs">"messages"</span>][-<span class="cn">1</span>]
+    <span class="ck">if</span> hasattr(last, <span class="cs">"stop_reason"</span>) <span class="ck">and</span> last.stop_reason == <span class="cs">"tool_use"</span>:
+        <span class="ck">return</span> <span class="cs">"tools"</span>
+    <span class="ck">return</span> END
+
+<span class="cm"># ── Multi-branch router ────────────────────────────────────────</span>
+<span class="ck">def</span> <span class="cf">route_review_phase</span>(state: <span class="ca">CodeReviewState</span>) -> str:
+    phase = state[<span class="cs">"phase"</span>]
+    <span class="ck">if</span> phase == <span class="cs">"clone"</span>:     <span class="ck">return</span> <span class="cs">"read_files"</span>
+    <span class="ck">if</span> phase == <span class="cs">"analyse"</span>:  <span class="ck">return</span> <span class="cs">"llm_review"</span>
+    <span class="ck">if</span> phase == <span class="cs">"review"</span>:   <span class="ck">return</span> <span class="cs">"human_approval"</span>
+    <span class="ck">if</span> phase == <span class="cs">"report"</span>:   <span class="ck">return</span> END
+    <span class="ck">return</span> END  <span class="cm"># fallback</span>
+
+<span class="cm"># ── Safety router — always check for errors ───────────────────</span>
+<span class="ck">def</span> <span class="cf">route_with_error_check</span>(state: <span class="ca">AgentState</span>) -> str:
+    <span class="ck">if</span> state.get(<span class="cs">"errors"</span>):
+        <span class="ck">return</span> <span class="cs">"error_handler"</span>
+    <span class="ck">if</span> state[<span class="cs">"step"</span>] >= <span class="cn">15</span>:
+        <span class="ck">return</span> <span class="cs">"timeout_handler"</span>
+    last = state[<span class="cs">"messages"</span>][-<span class="cn">1</span>]
+    <span class="ck">if</span> hasattr(last, <span class="cs">"stop_reason"</span>) <span class="ck">and</span> last.stop_reason == <span class="cs">"tool_use"</span>:
+        <span class="ck">return</span> <span class="cs">"tools"</span>
+    <span class="ck">return</span> END
+
+<span class="cm"># ── Connecting edges to the graph ─────────────────────────────</span>
+graph = StateGraph(<span class="ca">AgentState</span>)
+graph.add_node(<span class="cs">"agent"</span>, agent_node)
+graph.add_node(<span class="cs">"tools"</span>, tools_node)
+graph.add_node(<span class="cs">"error_handler"</span>, error_handler_node)
+graph.add_node(<span class="cs">"timeout_handler"</span>, timeout_handler_node)
+
+graph.set_entry_point(<span class="cs">"agent"</span>)
+
+<span class="cm"># Conditional edge with explicit path_map</span>
+graph.add_conditional_edges(
+    <span class="cs">"agent"</span>,
+    route_with_error_check,
+    {
+        <span class="cs">"tools"</span>:           <span class="cs">"tools"</span>,
+        <span class="cs">"error_handler"</span>:   <span class="cs">"error_handler"</span>,
+        <span class="cs">"timeout_handler"</span>: <span class="cs">"timeout_handler"</span>,
+        END:               END,
+    }
+)
+graph.add_edge(<span class="cs">"tools"</span>,           <span class="cs">"agent"</span>)   <span class="cm"># always back to agent</span>
+graph.add_edge(<span class="cs">"error_handler"</span>,   END)       <span class="cm"># errors terminate</span>
+graph.add_edge(<span class="cs">"timeout_handler"</span>, END)</pre>
+    </div>
+
+    <div class="box pu">
+      <div class="bxt">Use path_map for safety</div>
+      <p>Always pass the optional <code>path_map</code> dict to <code>add_conditional_edges</code>. This forces an explicit mapping of every possible return value to a node name, making routing errors fail loudly at compile time rather than silently routing to the wrong node at runtime. It also serves as documentation — the graph topology is visible in one place.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       06 · STATE MANAGEMENT
+  ══════════════════════════════════ -->
+  <div class="sec" id="state-mgmt">
+    <div class="snum">06</div>
+    <h2>State Management in Long-Running Agents</h2>
+    <p>LangGraph's checkpointer persists state to storage at every node. This enables resumability after failure, branching timelines, and inspection of every intermediate state — all essential for production agents.</p>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — Checkpointing with SQLite and MemorySaver</div></div>
+      <pre><span class="ck">from</span> langgraph.checkpoint.sqlite <span class="ck">import</span> SqliteSaver
+<span class="ck">from</span> langgraph.checkpoint.memory <span class="ck">import</span> MemorySaver
+
+<span class="cm"># ── Development: in-memory checkpointer ───────────────────────</span>
+memory_checkpointer = MemorySaver()
+app_dev = graph.compile(checkpointer=memory_checkpointer)
+
+<span class="cm"># ── Production: SQLite checkpointer ───────────────────────────</span>
+<span class="ck">with</span> SqliteSaver.from_conn_string(<span class="cs">"./agent_state.db"</span>) <span class="ck">as</span> checkpointer:
+    app = graph.compile(checkpointer=checkpointer)
+
+    <span class="cm"># thread_id groups all turns of one conversation/task</span>
+    config = {<span class="cs">"configurable"</span>: {<span class="cs">"thread_id"</span>: <span class="cs">"review-abc123"</span>}}
+
+    <span class="cm"># First invocation</span>
+    result = app.invoke(initial_state, config=config)
+
+    <span class="cm"># Get the current state (snapshot after last node)</span>
+    snapshot = app.get_state(config)
+    <span class="cf">print</span>(snapshot.values)          <span class="cm"># full current state</span>
+    <span class="cf">print</span>(snapshot.next)            <span class="cm"># which node runs next</span>
+    <span class="cf">print</span>(snapshot.config)          <span class="cm"># thread_id + checkpoint_id</span>
+
+    <span class="cm"># Resume after failure or interruption</span>
+    resumed = app.invoke(<span class="cn">None</span>, config=config)   <span class="cm"># None = resume from checkpoint</span>
+
+    <span class="cm"># Update state mid-run (inject human decision, fix a bug)</span>
+    app.update_state(config, {<span class="cs">"approved"</span>: <span class="cn">True</span>, <span class="cs">"phase"</span>: <span class="cs">"report"</span>})
+
+    <span class="cm"># List all checkpoints for this thread (full history)</span>
+    <span class="ck">for</span> checkpoint <span class="ck">in</span> app.get_state_history(config):
+        <span class="cf">print</span>(checkpoint.config[<span class="cs">"configurable"</span>][<span class="cs">"checkpoint_id"</span>],
+              checkpoint.values.get(<span class="cs">"phase"</span>))
+
+<span class="cm"># ── Streaming state updates ────────────────────────────────────</span>
+<span class="ck">for</span> event <span class="ck">in</span> app.stream(initial_state, config=config, stream_mode=<span class="cs">"updates"</span>):
+    <span class="cm"># event is a dict: {node_name: state_update}</span>
+    <span class="ck">for</span> node_name, update <span class="ck">in</span> event.items():
+        <span class="cf">print</span>(<span class="cs">f"Node '{node_name}' updated: {list(update.keys())}"</span>)</pre>
+    </div>
+
+    <div class="box gr">
+      <div class="bxt">thread_id is your agent session key</div>
+      <p>Every unique <code>thread_id</code> is a separate agent "conversation" with its own checkpoint history. Use a UUID per task run, or a stable ID (like a GitHub PR number) to allow resuming the same task. Multiple threads can run concurrently — checkpointers are thread-safe. In production, use PostgreSQL or Redis checkpointers instead of SQLite for horizontal scaling.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       07 · HUMAN-IN-THE-LOOP
+  ══════════════════════════════════ -->
+  <div class="sec" id="hitl">
+    <div class="snum">07</div>
+    <h2>Human-in-the-Loop Checkpoints</h2>
+    <p>Human-in-the-loop (HITL) is one of the most powerful features of LangGraph. You can pause the agent at any node — before executing a destructive action, before sending an email, before deploying code — and wait for human approval. The agent state is persisted while waiting. When the human responds, the graph resumes from exactly where it stopped.</p>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — HITL with interrupt_before</div></div>
+      <pre><span class="ck">from</span> langgraph.checkpoint.memory <span class="ck">import</span> MemorySaver
+
+checkpointer = MemorySaver()
+
+<span class="cm"># Compile with interrupt_before: pause BEFORE these nodes run</span>
+app = graph.compile(
+    checkpointer=checkpointer,
+    interrupt_before=[<span class="cs">"human_approval"</span>],    <span class="cm"># pause here</span>
+    <span class="cm"># interrupt_after=["dangerous_action"]  # or pause after a node</span>
+)
+
+config = {<span class="cs">"configurable"</span>: {<span class="cs">"thread_id"</span>: <span class="cs">"task-001"</span>}}
+
+<span class="cm"># ── Step 1: Run until interrupt ────────────────────────────────</span>
+result = app.invoke(initial_state, config=config)
+<span class="cm"># Graph runs: clone_repo → analyse_files → llm_review</span>
+<span class="cm"># PAUSES before human_approval node</span>
+
+snapshot = app.get_state(config)
+<span class="cf">print</span>(<span class="cs">"Paused at:"</span>, snapshot.next)           <span class="cm"># ('human_approval',)</span>
+<span class="cf">print</span>(<span class="cs">"Issues found:"</span>, snapshot.values[<span class="cs">"issues_found"</span>])
+<span class="cm"># Agent is now waiting. Persist the config. Move on to other work.</span>
+
+<span class="cm"># ── Step 2: Human reviews and decides ────────────────────────</span>
+<span class="cm"># (minutes, hours, or days later...)</span>
+human_decision = {<span class="cs">"approved"</span>: <span class="cn">True</span>, <span class="cs">"human_comment"</span>: <span class="cs">"LGTM, proceed"</span>}
+app.update_state(config, human_decision)
+
+<span class="cm"># ── Step 3: Resume from where we paused ──────────────────────</span>
+final = app.invoke(<span class="cn">None</span>, config=config)   <span class="cm"># None = resume</span>
+<span class="cm"># Graph continues: human_approval → generate_report → END</span>
+<span class="cf">print</span>(final[<span class="cs">"final_report"</span>])
+
+<span class="cm"># ── FastAPI HITL endpoint pattern ─────────────────────────────</span>
+<span class="ck">from</span> fastapi <span class="ck">import</span> FastAPI
+<span class="ck">from</span> pydantic <span class="ck">import</span> BaseModel
+
+fastapi_app = FastAPI()
+
+<span class="ck">class</span> <span class="ca">ApprovalRequest</span>(BaseModel):
+    thread_id: str
+    approved:  bool
+    comment:   str = <span class="cs">""</span>
+
+<span class="ck">@fastapi_app.post</span>(<span class="cs">"/approve"</span>)
+<span class="ck">async def</span> <span class="cf">approve_action</span>(req: <span class="ca">ApprovalRequest</span>):
+    config = {<span class="cs">"configurable"</span>: {<span class="cs">"thread_id"</span>: req.thread_id}}
+    app.update_state(config, {<span class="cs">"approved"</span>: req.approved,
+                               <span class="cs">"human_comment"</span>: req.comment})
+    <span class="cm"># Resume in background</span>
+    <span class="ck">import</span> asyncio
+    asyncio.create_task(asyncio.to_thread(app.invoke, <span class="cn">None</span>, config))
+    <span class="ck">return</span> {<span class="cs">"status"</span>: <span class="cs">"resumed"</span>, <span class="cs">"thread_id"</span>: req.thread_id}</pre>
+    </div>
+
+    <div class="tw">
+      <table>
+        <tr><th>Pattern</th><th>When to use</th><th>LangGraph API</th></tr>
+        <tr><td><strong>interrupt_before</strong></td><td>Review before a dangerous/irreversible action</td><td><code>compile(interrupt_before=["node"])</code></td></tr>
+        <tr><td><strong>interrupt_after</strong></td><td>Review the output of a node before continuing</td><td><code>compile(interrupt_after=["node"])</code></td></tr>
+        <tr><td><strong>update_state</strong></td><td>Inject human decision into paused state</td><td><code>app.update_state(config, updates)</code></td></tr>
+        <tr><td><strong>resume</strong></td><td>Continue from checkpoint after human input</td><td><code>app.invoke(None, config)</code></td></tr>
+        <tr><td><strong>branch</strong></td><td>Create alternative timeline from a checkpoint</td><td><code>app.invoke(state, config_with_new_id)</code></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       08 · LANGSMITH TRACING
+  ══════════════════════════════════ -->
+  <div class="sec" id="langsmith">
+    <div class="snum">08</div>
+    <h2>Agent Tracing with LangSmith</h2>
+    <p>LangSmith gives you a visual trace of every LLM call, every tool call, every token, and every latency in your agent run. For debugging complex agent failures — especially the kind that only happen one in twenty runs — it's indispensable.</p>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — LangSmith setup and custom tracing</div></div>
+      <pre><span class="ck">import</span> os
+
+<span class="cm"># ── Setup: set env vars before any LangChain/LangGraph import ──</span>
+os.environ[<span class="cs">"LANGCHAIN_TRACING_V2"</span>]  = <span class="cs">"true"</span>
+os.environ[<span class="cs">"LANGCHAIN_API_KEY"</span>]       = <span class="cs">"ls__your_key"</span>
+os.environ[<span class="cs">"LANGCHAIN_PROJECT"</span>]        = <span class="cs">"code-reviewer-v1"</span>
+<span class="cm"># All LangGraph/LangChain calls now automatically traced to LangSmith</span>
+
+<span class="cm"># ── Run with trace metadata ────────────────────────────────────</span>
+<span class="ck">from</span> langsmith <span class="ck">import</span> traceable
+
+<span class="ck">@traceable</span>(run_type=<span class="cs">"chain"</span>, name=<span class="cs">"code_review_run"</span>)
+<span class="ck">def</span> <span class="cf">run_code_review</span>(repo_url: str) -> dict:
+    config = {<span class="cs">"configurable"</span>: {<span class="cs">"thread_id"</span>: str(uuid.uuid4())}}
+    result = app.invoke({
+        <span class="cs">"repo_url"</span>:      repo_url,
+        <span class="cs">"target_files"</span>:  [],
+        <span class="cs">"messages"</span>:      [],
+        <span class="cs">"issues_found"</span>:  [],
+        <span class="cs">"file_contents"</span>: {},
+        <span class="cs">"current_file"</span>:  <span class="cn">None</span>,
+        <span class="cs">"step"</span>:          <span class="cn">0</span>,
+        <span class="cs">"phase"</span>:         <span class="cs">"clone"</span>,
+        <span class="cs">"errors"</span>:        [],
+        <span class="cs">"final_report"</span>:  <span class="cn">None</span>,
+        <span class="cs">"approved"</span>:      <span class="cn">None</span>,
+    }, config=config)
+    <span class="ck">return</span> result
+
+<span class="cm"># ── Custom spans for non-LangChain code ───────────────────────</span>
+<span class="ck">from</span> langsmith <span class="ck">import</span> trace
+
+<span class="ck">@traceable</span>(run_type=<span class="cs">"tool"</span>, name=<span class="cs">"clone_repository"</span>)
+<span class="ck">def</span> <span class="cf">clone_repo_with_trace</span>(repo_url: str) -> str:
+    <span class="cm"># Your tool implementation — automatically traced</span>
+    <span class="ck">import</span> subprocess
+    result = subprocess.run(
+        [<span class="cs">"git"</span>, <span class="cs">"clone"</span>, <span class="cs">"--depth=1"</span>, repo_url, <span class="cs">"./tmp_repo"</span>],
+        capture_output=<span class="cn">True</span>, text=<span class="cn">True</span>
+    )
+    <span class="ck">if</span> result.returncode != <span class="cn">0</span>:
+        <span class="ck">raise</span> <span class="ca">RuntimeError</span>(<span class="cs">f"Git clone failed: {result.stderr}"</span>)
+    <span class="ck">return</span> <span class="cs">"./tmp_repo"</span>
+
+<span class="cm"># ── What LangSmith shows you ──────────────────────────────────</span>
+<span class="cm"># For each run:</span>
+<span class="cm"># - Full graph traversal (which nodes ran, in what order)</span>
+<span class="cm"># - Every LLM call: prompt, response, latency, token count</span>
+<span class="cm"># - Every tool call: input, output, latency, errors</span>
+<span class="cm"># - Total cost per run</span>
+<span class="cm"># - Waterfall timeline (see what's slow)</span>
+<span class="cm"># - Compare runs side-by-side</span>
+<span class="cm"># - Create eval datasets from production traces</span></pre>
+    </div>
+
+    <div class="box or">
+      <div class="bxt">Three things LangSmith is essential for</div>
+      <p><strong>1. Debugging flaky agents</strong> — agents that fail 1 in 10 runs are impossible to debug with print statements; LangSmith shows you exactly what the model said in that run. <strong>2. Cost optimization</strong> — see which node consumes the most tokens and optimize it. <strong>3. Eval dataset building</strong> — capture real production traces and convert them to eval cases for systematic testing.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       09 · CODE REVIEWER AGENT
+  ══════════════════════════════════ -->
+  <div class="sec" id="code-reviewer">
+    <div class="snum">09</div>
+    <h2>Code Reviewer Agent — Architecture</h2>
+    <p>Project 9 is a fully autonomous code reviewer: it clones a GitHub repo, reads files, analyses code quality, generates diff suggestions, and waits for human approval before finalizing the report.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 680 160" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+        <!-- nodes left to right -->
+        <circle cx="36" cy="80" r="14" fill="#0d0e17" stroke="rgba(34,197,94,.5)" stroke-width="1.5"/>
+        <text x="36" y="84" font-family="IBM Plex Mono,monospace" font-size="7" fill="rgba(34,197,94,.7)" text-anchor="middle">START</text>
+
+        <rect x="64"  y="60" width="88" height="40" rx="7" fill="#100e22" stroke="rgba(167,139,250,.4)" stroke-width="1"/>
+        <text x="108" y="76" font-family="IBM Plex Mono,monospace" font-size="8" fill="rgba(167,139,250,.5)" text-anchor="middle">clone_repo</text>
+        <text x="108" y="90" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(167,139,250,.7)" text-anchor="middle">git clone</text>
+
+        <rect x="168" y="60" width="88" height="40" rx="7" fill="#100e22" stroke="rgba(167,139,250,.4)" stroke-width="1"/>
+        <text x="212" y="76" font-family="IBM Plex Mono,monospace" font-size="8" fill="rgba(167,139,250,.5)" text-anchor="middle">read_files</text>
+        <text x="212" y="90" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(167,139,250,.7)" text-anchor="middle">parse AST</text>
+
+        <rect x="272" y="60" width="88" height="40" rx="7" fill="#100e22" stroke="rgba(34,211,238,.4)" stroke-width="1"/>
+        <text x="316" y="76" font-family="IBM Plex Mono,monospace" font-size="8" fill="rgba(34,211,238,.5)" text-anchor="middle">llm_review</text>
+        <text x="316" y="90" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(34,211,238,.7)" text-anchor="middle">find issues</text>
+
+        <rect x="376" y="60" width="102" height="40" rx="7" fill="#0e0c08" stroke="rgba(249,115,22,.4)" stroke-width="1"/>
+        <text x="427" y="76" font-family="IBM Plex Mono,monospace" font-size="8" fill="rgba(249,115,22,.5)" text-anchor="middle">human_approval</text>
+        <text x="427" y="90" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(249,115,22,.7)" text-anchor="middle">HITL pause</text>
+
+        <rect x="494" y="60" width="100" height="40" rx="7" fill="#100e22" stroke="rgba(167,139,250,.4)" stroke-width="1"/>
+        <text x="544" y="76" font-family="IBM Plex Mono,monospace" font-size="8" fill="rgba(167,139,250,.5)" text-anchor="middle">gen_report</text>
+        <text x="544" y="90" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(167,139,250,.7)" text-anchor="middle">diffs + fixes</text>
+
+        <circle cx="644" cy="80" r="14" fill="#0d0e17" stroke="rgba(244,63,94,.5)" stroke-width="1.5"/>
+        <text x="644" y="84" font-family="IBM Plex Mono,monospace" font-size="7" fill="rgba(244,63,94,.7)" text-anchor="middle">END</text>
+
+        <!-- arrows -->
+        <line x1="50" y1="80" x2="62" y2="80" stroke="rgba(255,255,255,.2)" stroke-width="1" marker-end="url(#arr2)"/>
+        <line x1="152" y1="80" x2="166" y2="80" stroke="rgba(255,255,255,.2)" stroke-width="1" marker-end="url(#arr2)"/>
+        <line x1="256" y1="80" x2="270" y2="80" stroke="rgba(255,255,255,.2)" stroke-width="1" marker-end="url(#arr2)"/>
+        <line x1="360" y1="80" x2="374" y2="80" stroke="rgba(255,255,255,.2)" stroke-width="1" marker-end="url(#arr2)"/>
+        <line x1="478" y1="80" x2="492" y2="80" stroke="rgba(255,255,255,.2)" stroke-width="1" marker-end="url(#arr2)"/>
+        <line x1="594" y1="80" x2="628" y2="80" stroke="rgba(255,255,255,.2)" stroke-width="1" marker-end="url(#arr2)"/>
+
+        <!-- LangSmith label -->
+        <text x="340" y="140" font-family="IBM Plex Mono,monospace" font-size="9" fill="rgba(167,139,250,.3)" text-anchor="middle">↑ LangSmith traces every node, every LLM call, every tool call in this graph</text>
+      </svg>
+    </div>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — code_reviewer.py (full implementation)</div></div>
+      <pre><span class="ck">import</span> os, subprocess, ast, uuid
+<span class="ck">from</span> pathlib <span class="ck">import</span> Path
+<span class="ck">from</span> typing <span class="ck">import</span> TypedDict, Annotated, List, Optional
+<span class="ck">import</span> operator
+<span class="ck">import</span> anthropic
+<span class="ck">from</span> langgraph.graph <span class="ck">import</span> StateGraph, END
+<span class="ck">from</span> langgraph.checkpoint.memory <span class="ck">import</span> MemorySaver
+<span class="ck">from</span> langsmith <span class="ck">import</span> traceable
+
+os.environ[<span class="cs">"LANGCHAIN_TRACING_V2"</span>] = <span class="cs">"true"</span>
+os.environ[<span class="cs">"LANGCHAIN_PROJECT"</span>]     = <span class="cs">"code-reviewer"</span>
+
+client = anthropic.Anthropic()
+
+<span class="cm"># ── STATE ─────────────────────────────────────────────────────</span>
+<span class="ck">class</span> <span class="ca">ReviewState</span>(TypedDict):
+    repo_url:       str
+    repo_path:      str
+    files_to_review:List[str]
+    file_contents:  Annotated[dict, <span class="ck">lambda</span> a, b: {**a, **b}]
+    issues:         Annotated[List[dict], operator.add]
+    messages:       Annotated[list, operator.add]
+    current_file:   Optional[str]
+    step:           int
+    phase:          str
+    errors:         List[str]
+    approved:       Optional[bool]
+    human_comment:  Optional[str]
+    final_report:   Optional[str]
+
+<span class="cm"># ── NODES ─────────────────────────────────────────────────────</span>
+<span class="ck">@traceable</span>(run_type=<span class="cs">"tool"</span>, name=<span class="cs">"clone_repo"</span>)
+<span class="ck">def</span> <span class="cf">clone_repo_node</span>(state: <span class="ca">ReviewState</span>) -> dict:
+    repo_path = <span class="cs">f"/tmp/review_{uuid.uuid4().hex[:8]}"</span>
+    result    = subprocess.run(
+        [<span class="cs">"git"</span>, <span class="cs">"clone"</span>, <span class="cs">"--depth=1"</span>, state[<span class="cs">"repo_url"</span>], repo_path],
+        capture_output=<span class="cn">True</span>, text=<span class="cn">True</span>
+    )
+    <span class="ck">if</span> result.returncode != <span class="cn">0</span>:
+        <span class="ck">return</span> {<span class="cs">"errors"</span>: [<span class="cs">f"Clone failed: {result.stderr}"</span>], <span class="cs">"phase"</span>: <span class="cs">"error"</span>}
+
+    <span class="cm"># Find .py files (limit to 10 for cost control)</span>
+    py_files = [str(p) <span class="ck">for</span> p <span class="ck">in</span> Path(repo_path).rglob(<span class="cs">"*.py"</span>)
+                <span class="ck">if</span> <span class="cs">".git"</span> <span class="ck">not</span> <span class="ck">in</span> str(p)][:10]
+    <span class="ck">return</span> {<span class="cs">"repo_path"</span>: repo_path, <span class="cs">"files_to_review"</span>: py_files, <span class="cs">"phase"</span>: <span class="cs">"read"</span>}
+
+<span class="ck">def</span> <span class="cf">read_files_node</span>(state: <span class="ca">ReviewState</span>) -> dict:
+    contents = {}
+    <span class="ck">for</span> fpath <span class="ck">in</span> state[<span class="cs">"files_to_review"</span>]:
+        <span class="ck">try</span>:
+            text = Path(fpath).read_text(encoding=<span class="cs">"utf-8"</span>, errors=<span class="cs">"ignore"</span>)
+            contents[fpath] = text[:<span class="cn">8000</span>]   <span class="cm"># truncate long files</span>
+        <span class="ck">except</span>: <span class="ck">pass</span>
+    <span class="ck">return</span> {<span class="cs">"file_contents"</span>: contents, <span class="cs">"phase"</span>: <span class="cs">"review"</span>}
+
+<span class="ck">def</span> <span class="cf">llm_review_node</span>(state: <span class="ca">ReviewState</span>) -> dict:
+    file_summaries = <span class="cs">"\n\n"</span>.join(
+        <span class="cs">f"### {path}\n{content[:2000]}"</span>
+        <span class="ck">for</span> path, content <span class="ck">in</span> state[<span class="cs">"file_contents"</span>].items()
+    )
+    resp = client.messages.create(
+        model=<span class="cs">"claude-sonnet-4-20250514"</span>, max_tokens=<span class="cn">4096</span>,
+        system=<span class="cs">"""You are a senior code reviewer. Identify:
+1. Security vulnerabilities (critical)
+2. Performance issues (high)
+3. Code quality issues (medium)
+4. Style violations (low)
+For each issue: file, line (estimate), severity, description, suggested fix."""</span>,
+        messages=[{<span class="cs">"role"</span>:<span class="cs">"user"</span>,
+                   <span class="cs">"content"</span>:<span class="cs">f"Review this code:\n\n{file_summaries}\n\nReturn JSON list of issues."</span>}]
+    )
+    <span class="ck">import</span> json, re
+    raw = resp.content[<span class="cn">0</span>].text
+    raw = re.sub(<span class="cs">r'^```json\s*|\s*```$'</span>, <span class="cs">''</span>, raw, flags=re.M)
+    <span class="ck">try</span>:
+        issues = json.loads(raw)
+    <span class="ck">except</span>:
+        issues = [{<span class="cs">"description"</span>: raw, <span class="cs">"severity"</span>: <span class="cs">"unknown"</span>}]
+    <span class="ck">return</span> {
+        <span class="cs">"issues"</span>:   issues,
+        <span class="cs">"messages"</span>: [resp],
+        <span class="cs">"phase"</span>:    <span class="cs">"approve"</span>,
+        <span class="cs">"step"</span>:     state[<span class="cs">"step"</span>] + <span class="cn">1</span>,
+    }
+
+<span class="ck">def</span> <span class="cf">human_approval_node</span>(state: <span class="ca">ReviewState</span>) -> dict:
+    <span class="cs">"""This node runs AFTER the human has approved via update_state."""</span>
+    <span class="ck">if not</span> state.get(<span class="cs">"approved"</span>):
+        <span class="ck">return</span> {<span class="cs">"phase"</span>: <span class="cs">"rejected"</span>}
+    <span class="ck">return</span> {<span class="cs">"phase"</span>: <span class="cs">"report"</span>}
+
+<span class="ck">def</span> <span class="cf">generate_report_node</span>(state: <span class="ca">ReviewState</span>) -> dict:
+    issues_text = <span class="cs">"\n"</span>.join(
+        <span class="cs">f"- [{i.get('severity','?').upper()}] {i.get('description','')}"</span>
+        <span class="ck">for</span> i <span class="ck">in</span> state[<span class="cs">"issues"</span>]
+    )
+    report = <span class="cs">f"""# Code Review: {state['repo_url']}
+
+## Summary
+Found {len(state['issues'])} issues in {len(state['files_to_review'])} files.
+
+## Issues
+{issues_text}
+
+## Human Review Note
+{state.get('human_comment', 'Approved.')}
+"""</span>
+    <span class="ck">return</span> {<span class="cs">"final_report"</span>: report, <span class="cs">"phase"</span>: <span class="cs">"done"</span>}
+
+<span class="ck">def</span> <span class="cf">error_node</span>(state: <span class="ca">ReviewState</span>) -> dict:
+    <span class="ck">return</span> {<span class="cs">"final_report"</span>: <span class="cs">f"Failed: {state['errors']}"</span>}
+
+<span class="cm"># ── ROUTING ───────────────────────────────────────────────────</span>
+<span class="ck">def</span> <span class="cf">route_phase</span>(state: <span class="ca">ReviewState</span>) -> str:
+    phase = state[<span class="cs">"phase"</span>]
+    <span class="ck">return</span> {
+        <span class="cs">"read"</span>:     <span class="cs">"read_files"</span>,
+        <span class="cs">"review"</span>:   <span class="cs">"llm_review"</span>,
+        <span class="cs">"approve"</span>:  <span class="cs">"human_approval"</span>,
+        <span class="cs">"report"</span>:   <span class="cs">"generate_report"</span>,
+        <span class="cs">"rejected"</span>: END,
+        <span class="cs">"done"</span>:     END,
+        <span class="cs">"error"</span>:    <span class="cs">"error_handler"</span>,
+    }.get(phase, END)
+
+<span class="cm"># ── BUILD GRAPH ───────────────────────────────────────────────</span>
+graph = StateGraph(<span class="ca">ReviewState</span>)
+<span class="ck">for</span> name, fn <span class="ck">in</span> [(<span class="cs">"clone_repo"</span>,clone_repo_node),(<span class="cs">"read_files"</span>,read_files_node),
+                   (<span class="cs">"llm_review"</span>,llm_review_node),(<span class="cs">"human_approval"</span>,human_approval_node),
+                   (<span class="cs">"generate_report"</span>,generate_report_node),(<span class="cs">"error_handler"</span>,error_node)]:
+    graph.add_node(name, fn)
+graph.set_entry_point(<span class="cs">"clone_repo"</span>)
+graph.add_conditional_edges(<span class="cs">"clone_repo"</span>,     route_phase)
+graph.add_conditional_edges(<span class="cs">"read_files"</span>,     route_phase)
+graph.add_conditional_edges(<span class="cs">"llm_review"</span>,     route_phase)
+graph.add_conditional_edges(<span class="cs">"human_approval"</span>, route_phase)
+graph.add_conditional_edges(<span class="cs">"generate_report"</span>,route_phase)
+graph.add_edge(<span class="cs">"error_handler"</span>, END)
+
+app = graph.compile(
+    checkpointer=MemorySaver(),
+    interrupt_before=[<span class="cs">"human_approval"</span>],
+)</pre>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       10 · PROJECT 9
+  ══════════════════════════════════ -->
+  <div class="sec" id="project9">
+    <div class="snum">10</div>
+    <h2>Project 9 — Autonomous Code Reviewer</h2>
+
+    <div class="proj">
+      <h4>Project 9 — Build Checklist</h4>
+      <p>Reads a GitHub repo, identifies issues, suggests improvements with diffs. Tools: file reader, shell executor, GitHub API. LangSmith tracing on every run.</p>
+
+      <div class="cb">
+        <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — run_review.py (entry point)</div></div>
+        <pre><span class="ck">from</span> code_reviewer <span class="ck">import</span> app, ReviewState
+<span class="ck">import</span> uuid
+
+INITIAL_STATE: <span class="ca">ReviewState</span> = {
+    <span class="cs">"repo_url"</span>:       <span class="cs">"https://github.com/psf/requests"</span>,   <span class="cm"># any public repo</span>
+    <span class="cs">"repo_path"</span>:       <span class="cs">""</span>,
+    <span class="cs">"files_to_review"</span>: [],
+    <span class="cs">"file_contents"</span>:   {},
+    <span class="cs">"issues"</span>:          [],
+    <span class="cs">"messages"</span>:        [],
+    <span class="cs">"current_file"</span>:    <span class="cn">None</span>,
+    <span class="cs">"step"</span>:            <span class="cn">0</span>,
+    <span class="cs">"phase"</span>:           <span class="cs">"read"</span>,
+    <span class="cs">"errors"</span>:          [],
+    <span class="cs">"approved"</span>:        <span class="cn">None</span>,
+    <span class="cs">"human_comment"</span>:   <span class="cn">None</span>,
+    <span class="cs">"final_report"</span>:    <span class="cn">None</span>,
+}
+
+config = {<span class="cs">"configurable"</span>: {<span class="cs">"thread_id"</span>: str(uuid.uuid4())}}
+
+<span class="cf">print</span>(<span class="cs">"Running code review... (will pause for human approval)"</span>)
+result = app.invoke(INITIAL_STATE, config=config)
+
+snapshot = app.get_state(config)
+<span class="cf">print</span>(<span class="cs">f"\nPaused at: {snapshot.next}"</span>)
+<span class="cf">print</span>(<span class="cs">f"Found {len(snapshot.values['issues'])} issues:"</span>)
+<span class="ck">for</span> issue <span class="ck">in</span> snapshot.values[<span class="cs">"issues"</span>][:5]:
+    <span class="cf">print</span>(<span class="cs">f"  [{issue.get('severity','?').upper()}] {issue.get('description','')[:80]}"</span>)
+
+<span class="cm"># Simulate human approval (in prod: this comes from a web UI)</span>
+approval = input(<span class="cs">"\nApprove? (y/n): "</span>)
+app.update_state(config, {
+    <span class="cs">"approved"</span>:      approval.lower() == <span class="cs">"y"</span>,
+    <span class="cs">"human_comment"</span>: input(<span class="cs">"Comment: "</span>),
+})
+
+<span class="cf">print</span>(<span class="cs">"\nResuming..."</span>)
+final = app.invoke(<span class="cn">None</span>, config=config)
+<span class="cf">print</span>(final[<span class="cs">"final_report"</span>])
+<span class="cf">print</span>(<span class="cs">f"\nView trace at: https://smith.langchain.com"</span>)</pre>
+      </div>
+
+      <ul class="psteps">
+        <li>Implement the 5-node graph from the <code>code_reviewer.py</code> above</li>
+        <li>Add a <code>diff_generator_node</code> that uses <code>subprocess.run(["diff", ...])</code> to show suggested changes</li>
+        <li>Set up LangSmith account (free) and verify traces appear for each run</li>
+        <li>Add GitHub API integration using PyGitHub — fetch PR diffs instead of cloning</li>
+        <li>Run <code>run_review.py</code> on 3 different public repos — save the reports</li>
+        <li>Push to GitHub — README must include a LangSmith trace screenshot and a sample report</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       11 · CHECKPOINT
+  ══════════════════════════════════ -->
+  <div class="sec" id="checkpoint">
+    <div class="snum">11</div>
+    <h2>Week 11 Checkpoint</h2>
+
+    <div class="ckpt">
+      <h4>✦ Mastery checklist</h4>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">LangGraph vs LangChain — explain the difference and when to use each
+          <span class="csub">Chains = linear pipelines; LangGraph = cyclic graphs with state and checkpointing</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">Nodes, edges, state — build a 3-node graph from scratch with a conditional edge
+          <span class="csub">StateGraph, add_node, add_conditional_edges, set_entry_point, compile, invoke</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">State schema — design a TypedDict with append-only lists and custom reducers
+          <span class="csub">Annotated[list, operator.add], lambda reducers for dict merging</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">Conditional routing — implement a multi-branch router with a path_map
+          <span class="csub">route function returns node name or END, path_map makes routing explicit</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">State management — use SqliteSaver checkpointer, inspect snapshots, resume after interruption
+          <span class="csub">thread_id, get_state, get_state_history, invoke(None, config) to resume</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">Human-in-the-loop — implement interrupt_before, human decision injection, and graph resumption
+          <span class="csub">compile(interrupt_before=[...]), update_state, invoke(None, config)</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">LangSmith tracing — set up tracing, view a full agent run with all nodes visible
+          <span class="csub">LANGCHAIN_TRACING_V2=true, LANGSMITH_API_KEY, @traceable decorator</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">Project 9 complete — code reviewer runs on a real repo, HITL works, LangSmith trace visible
+          <span class="csub">5 nodes, HITL pause, LangSmith screenshot, sample report in README</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="box gr">
+      <div class="bxt">Next — Weeks 12–13: Multi-Agent Systems</div>
+      <p>Orchestrator + worker pattern, agent message passing and shared state, role-based system prompts, CrewAI vs LangGraph for multi-agent systems, parallel vs sequential execution, and agent communication protocols. Plus Projects 10 and 11. Say <strong>"start Weeks 12–13 — multi-agent systems"</strong> to continue.</p>
+    </div>
+
+    <div class="insight">
+      <h4>🧠 Why you built agents from scratch before learning LangGraph</h4>
+      <p>You spent two weeks building agent loops manually before touching LangGraph. Now that you're using it, you understand exactly what it's doing: the state dict is your <code>messages</code> list; the conditional edges are your <code>if stop_reason == "tool_use"</code> checks; the checkpointer is your trace logger. LangGraph adds <strong>persistence, visualization, and human-in-the-loop</strong> on top of the pattern you already know. Engineers who skip straight to frameworks spend months debugging things they don't understand. You won't.</p>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+  const sections = document.querySelectorAll('.sec');
+  const navItems = document.querySelectorAll('.ni');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const id = e.target.id;
+        navItems.forEach(n => n.classList.toggle('active', n.getAttribute('href') === '#' + id));
+      }
+    });
+  }, { threshold: 0.2 });
+  sections.forEach(s => io.observe(s));
+</script>
+</body>
+</html>

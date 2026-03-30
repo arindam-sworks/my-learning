@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Engineer — Phase 3, Weeks 12–13: Multi-Agent Systems</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,300&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07090e;--bg2:#0d1018;--bg3:#131720;--bg4:#1a1f2a;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
+  --text:#e1ddd3;--text2:#8a8780;--text3:#44413c;
+  --rose:#f43f5e;--sky:#38bdf8;--amber:#f59e0b;
+  --violet:#a78bfa;--teal:#2dd4bf;--lime:#a3e635;
+  --mono:'IBM Plex Mono',monospace;--serif:'Fraunces',serif;--sans:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.75;}
+.layout{display:flex;min-height:100vh;}
+
+.sb{width:272px;min-width:272px;background:var(--bg2);border-right:1px solid var(--border);padding:28px 0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sb-top{padding:0 22px 22px;border-bottom:1px solid var(--border);margin-bottom:18px;}
+.sb-badge{display:inline-block;background:var(--rose);color:#1a0007;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.08em;padding:3px 8px;border-radius:3px;margin-bottom:8px;}
+.sb-top h1{font-family:var(--serif);font-weight:700;font-size:17px;line-height:1.3;}
+.sb-top p{font-size:12px;color:var(--text2);margin-top:4px;}
+.nav-s{padding:0 14px;margin-bottom:4px;}
+.nav-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--text3);padding:0 8px;margin-bottom:5px;text-transform:uppercase;}
+.ni{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;font-size:12.5px;color:var(--text2);transition:all .15s;text-decoration:none;border:1px solid transparent;}
+.ni:hover{background:var(--bg3);color:var(--text);}
+.ni.active{background:var(--bg3);color:var(--rose);border-color:var(--border);}
+.ndot{width:6px;height:6px;border-radius:50%;background:var(--text3);flex-shrink:0;}
+.ni.active .ndot{background:var(--rose);}
+
+.main{flex:1;max-width:900px;padding:48px 56px;}
+
+.hero{padding:40px 0 48px;border-bottom:1px solid var(--border);margin-bottom:48px;}
+.htag{font-family:var(--mono);font-size:11px;color:var(--rose);letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.htag::before{content:'';display:block;width:28px;height:1px;background:var(--rose);}
+.hero h1{font-family:var(--serif);font-size:50px;font-weight:700;line-height:1.06;letter-spacing:-.02em;margin-bottom:18px;}
+.hero h1 em{font-style:italic;color:var(--sky);}
+.hero p{font-size:16px;color:var(--text2);max-width:580px;line-height:1.7;}
+.hmeta{display:flex;gap:20px;margin-top:24px;flex-wrap:wrap;}
+.hm{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--text2);}
+.hm span{color:var(--lime);}
+
+.pcard{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:48px;}
+.prow{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:8px;}
+.pbar{height:3px;background:var(--bg4);border-radius:99px;overflow:hidden;}
+.pfill{height:100%;background:var(--rose);border-radius:99px;width:62%;}
+.ppills{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.ppill{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:99px;border:1px solid var(--border);color:var(--text3);}
+.ppill.done{border-color:var(--teal);color:var(--teal);}
+.ppill.active{border-color:var(--rose);color:var(--rose);background:rgba(244,63,94,.06);}
+.wpills{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.wp{font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:99px;border:1px solid var(--border);color:var(--text3);}
+.wp.done{border-color:var(--teal);color:var(--teal);}
+.wp.active{border-color:var(--rose);color:var(--rose);}
+
+.sec{margin-bottom:64px;scroll-margin-top:24px;}
+.snum{font-family:var(--mono);font-size:11px;color:var(--rose);letter-spacing:.1em;margin-bottom:8px;}
+.sec h2{font-family:var(--serif);font-size:32px;font-weight:700;line-height:1.2;margin-bottom:20px;}
+.sec h3{font-family:var(--serif);font-size:20px;font-weight:500;font-style:italic;margin-top:36px;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+p{margin-bottom:14px;color:var(--text2);}
+strong{color:var(--text);font-weight:500;}
+
+.cb{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden;}
+.cb-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg3);}
+.cb-lang{font-family:var(--mono);font-size:10px;color:var(--rose);letter-spacing:.08em;text-transform:uppercase;}
+.dots{display:flex;gap:5px;}
+.dot{width:8px;height:8px;border-radius:50%;}
+.dot:nth-child(1){background:rgba(244,63,94,.4);}
+.dot:nth-child(2){background:rgba(245,158,11,.4);}
+.dot:nth-child(3){background:rgba(45,212,191,.4);}
+pre{padding:20px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.7;color:#b3aea6;}
+.cm{color:#46433c;font-style:italic;}
+.ck{color:var(--violet);}
+.cf{color:var(--teal);}
+.cs{color:var(--amber);}
+.cn{color:#fb923c;}
+.ca{color:var(--sky);}
+code{font-family:var(--mono);font-size:12px;background:var(--bg3);border:1px solid var(--border);padding:1px 6px;border-radius:4px;color:var(--teal);}
+
+.formula{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px 24px;font-family:var(--mono);font-size:13px;color:var(--amber);margin:16px 0;text-align:center;line-height:2;}
+
+.box{border-left:3px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin:20px 0;background:var(--bg2);}
+.box.ro{border-color:var(--rose);}
+.box.sk{border-color:var(--sky);}
+.box.am{border-color:var(--amber);}
+.box.vi{border-color:var(--violet);}
+.box.te{border-color:var(--teal);}
+.box.li{border-color:var(--lime);}
+.bxt{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
+.box.ro .bxt{color:var(--rose);}
+.box.sk .bxt{color:var(--sky);}
+.box.am .bxt{color:var(--amber);}
+.box.vi .bxt{color:var(--violet);}
+.box.te .bxt{color:var(--teal);}
+.box.li .bxt{color:var(--lime);}
+.box p{margin:0;font-size:14px;line-height:1.6;}
+
+.insight{background:linear-gradient(135deg,#0e0a1e 0%,#07100d 100%);border:1px solid var(--violet);border-radius:12px;padding:22px 24px;margin:28px 0;}
+.insight h4{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--violet);margin-bottom:12px;}
+.insight p{color:var(--text2);font-size:14px;margin:0;line-height:1.65;}
+
+.tw{overflow-x:auto;margin:20px 0;border-radius:10px;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+th{background:var(--bg3);padding:11px 16px;text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);border-bottom:1px solid var(--border2);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--bg2);}
+td strong{color:var(--text);}
+td code{font-size:11px;}
+.g{color:var(--teal);font-weight:500;}
+.y{color:var(--amber);font-weight:500;}
+.r{color:var(--rose);font-weight:500;}
+
+.diagram{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;margin:20px 0;overflow-x:auto;}
+.diagram svg{width:100%;height:auto;display:block;}
+
+.ckpt{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;margin:28px 0;}
+.ckpt h4{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--rose);margin-bottom:16px;}
+.ci{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:14px;}
+.ci:last-child{border-bottom:none;}
+.cbox{width:16px;height:16px;border:1.5px solid var(--border2);border-radius:4px;flex-shrink:0;margin-top:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.cbox.chk{background:var(--teal);border-color:var(--teal);}
+.cbox.chk::after{content:'';width:4px;height:7px;border:1.5px solid #011a17;border-top:none;border-left:none;transform:rotate(45deg) translate(-1px,-1px);}
+.clbl{color:var(--text2);line-height:1.5;}
+.csub{font-style:normal;color:var(--text3);font-size:12px;display:block;margin-top:2px;}
+
+.proj{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:22px 24px;margin:24px 0;}
+.proj h4{font-family:var(--mono);font-size:11px;color:var(--amber);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;}
+.proj p{font-size:14px;color:var(--text2);margin-bottom:10px;}
+.psteps{list-style:none;padding:0;}
+.psteps li{font-size:13px;color:var(--text2);padding:4px 0 4px 20px;position:relative;}
+.psteps li::before{content:'○';position:absolute;left:0;color:var(--text3);font-size:10px;top:5px;}
+
+/* agent role cards */
+.agent-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0;}
+.agent-card{border-radius:10px;padding:14px 14px;text-align:center;}
+.agent-card.res{background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.25);}
+.agent-card.wri{background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.25);}
+.agent-card.edi{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);}
+.agent-card.fac{background:rgba(244,63,94,.07);border:1px solid rgba(244,63,94,.25);}
+.agent-card .role{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
+.agent-card.res .role{color:var(--sky);}
+.agent-card.wri .role{color:var(--violet);}
+.agent-card.edi .role{color:var(--amber);}
+.agent-card.fac .role{color:var(--rose);}
+.agent-card .desc{font-size:12px;color:var(--text2);line-height:1.4;}
+
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
+@media(max-width:768px){.sb{display:none;}.main{padding:28px 20px;}.hero h1{font-size:34px;}.agent-grid{grid-template-columns:1fr 1fr;}}
+@media print{.sb{display:none;}body{background:white;color:black;}}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="sb">
+  <div class="sb-top">
+    <div class="sb-badge">PHASE 3 · WEEKS 12–13</div>
+    <h1>Multi-Agent Systems</h1>
+    <p>AI Engineer Roadmap</p>
+  </div>
+  <div class="nav-s">
+    <div class="nav-lbl">Contents</div>
+    <a class="ni active" href="#orchestrator"><div class="ndot"></div>Orchestrator + worker</a>
+    <a class="ni" href="#message-passing"><div class="ndot"></div>Message passing</a>
+    <a class="ni" href="#shared-state"><div class="ndot"></div>Shared state</a>
+    <a class="ni" href="#role-prompts"><div class="ndot"></div>Role-based system prompts</a>
+    <a class="ni" href="#crewai-vs-langgraph"><div class="ndot"></div>CrewAI vs LangGraph</a>
+    <a class="ni" href="#parallel"><div class="ndot"></div>Parallel vs sequential</a>
+    <a class="ni" href="#protocols"><div class="ndot"></div>Communication protocols</a>
+    <a class="ni" href="#content-team"><div class="ndot"></div>Content team agent</a>
+    <a class="ni" href="#self-healing"><div class="ndot"></div>Self-healing pipeline</a>
+    <a class="ni" href="#projects"><div class="ndot"></div>Projects 10 &amp; 11</a>
+    <a class="ni" href="#checkpoint"><div class="ndot"></div>Checkpoint</a>
+  </div>
+</nav>
+
+<main class="main">
+
+  <div class="hero">
+    <div class="htag">AI Engineer Roadmap — Phase 3</div>
+    <h1>Weeks 12–13 —<br><em>Multi-Agent Systems</em></h1>
+    <p>Orchestrator + worker pattern, agent message passing and shared state, role-based system prompts, CrewAI vs LangGraph for multi-agent, parallel vs sequential execution, and agent communication protocols.</p>
+    <div class="hmeta">
+      <div class="hm">📅 <span>Weeks 12–13 of 20</span></div>
+      <div class="hm">🎯 <span>Agent teams that collaborate</span></div>
+      <div class="hm">🔨 <span>Projects 10 &amp; 11</span></div>
+    </div>
+  </div>
+
+  <div class="pcard">
+    <div class="prow"><span>Roadmap progress</span><span>Weeks 12–13 / 20</span></div>
+    <div class="pbar"><div class="pfill"></div></div>
+    <div class="ppills">
+      <div class="ppill done">Phase 1: ML Foundations ✓</div>
+      <div class="ppill done">Phase 2: LLMs &amp; Prompts ✓</div>
+      <div class="ppill active">Phase 3: Agents ←</div>
+      <div class="ppill">Phase 4: Production</div>
+    </div>
+    <div class="wpills">
+      <div class="wp done">W1–11 ✓</div>
+      <div class="wp active">W12–13 ←</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       01 · ORCHESTRATOR + WORKER
+  ══════════════════════════════════ -->
+  <div class="sec" id="orchestrator">
+    <div class="snum">01</div>
+    <h2>Orchestrator + Worker Pattern</h2>
+    <p>The most reliable multi-agent architecture. A single <strong>orchestrator</strong> agent decomposes the task, assigns subtasks to specialized <strong>worker</strong> agents, collects their outputs, and synthesizes the final result. Workers focus on one thing and do it well. The orchestrator focuses on coordination and quality control.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <!-- User -->
+        <rect x="10" y="80" width="80" height="40" rx="8" fill="#0d1018" stroke="rgba(56,189,248,.35)" stroke-width="1"/>
+        <text x="50" y="104" font-family="DM Sans,sans-serif" font-size="12" fill="rgba(56,189,248,.8)" text-anchor="middle">User task</text>
+        <!-- Orchestrator -->
+        <rect x="120" y="66" width="120" height="68" rx="10" fill="#0e0a1e" stroke="rgba(244,63,94,.5)" stroke-width="1.5"/>
+        <text x="180" y="90" font-family="IBM Plex Mono,monospace" font-size="9" fill="rgba(244,63,94,.6)" text-anchor="middle" letter-spacing=".5">ORCHESTRATOR</text>
+        <text x="180" y="105" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(244,63,94,.8)" text-anchor="middle">Decomposes</text>
+        <text x="180" y="120" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(244,63,94,.6)" text-anchor="middle">+ coordinates</text>
+        <!-- Workers -->
+        <rect x="290" y="20"  width="100" height="40" rx="8" fill="#0d1018" stroke="rgba(56,189,248,.35)" stroke-width="1"/>
+        <text x="340" y="44" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(56,189,248,.8)" text-anchor="middle">Researcher</text>
+        <rect x="290" y="70"  width="100" height="40" rx="8" fill="#0d1018" stroke="rgba(167,139,250,.35)" stroke-width="1"/>
+        <text x="340" y="94" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(167,139,250,.8)" text-anchor="middle">Writer</text>
+        <rect x="290" y="120" width="100" height="40" rx="8" fill="#0d1018" stroke="rgba(245,158,11,.35)" stroke-width="1"/>
+        <text x="340" y="144" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(245,158,11,.8)" text-anchor="middle">Editor</text>
+        <rect x="290" y="170" width="100" height="22" rx="6" fill="#0d1018" stroke="rgba(244,63,94,.3)" stroke-width=".5"/>
+        <text x="340" y="185" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(244,63,94,.6)" text-anchor="middle">Fact-checker</text>
+        <!-- Synthesiser -->
+        <rect x="440" y="66" width="110" height="68" rx="10" fill="#080e0d" stroke="rgba(45,212,191,.4)" stroke-width="1"/>
+        <text x="495" y="90" font-family="IBM Plex Mono,monospace" font-size="9" fill="rgba(45,212,191,.5)" text-anchor="middle" letter-spacing=".5">SYNTHESISE</text>
+        <text x="495" y="107" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(45,212,191,.7)" text-anchor="middle">Merge outputs</text>
+        <text x="495" y="122" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(45,212,191,.5)" text-anchor="middle">→ final result</text>
+        <!-- Output -->
+        <rect x="600" y="80" width="72" height="40" rx="8" fill="#0d1018" stroke="rgba(163,230,53,.3)" stroke-width=".5"/>
+        <text x="636" y="104" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(163,230,53,.7)" text-anchor="middle">Output</text>
+        <!-- Arrows -->
+        <line x1="90"  y1="100" x2="118" y2="100" stroke="rgba(255,255,255,.2)" stroke-width="1" marker-end="url(#arr)"/>
+        <line x1="240" y1="88"  x2="288" y2="40"  stroke="rgba(56,189,248,.3)"  stroke-width="1" marker-end="url(#arr)"/>
+        <line x1="240" y1="100" x2="288" y2="90"  stroke="rgba(167,139,250,.3)" stroke-width="1" marker-end="url(#arr)"/>
+        <line x1="240" y1="112" x2="288" y2="140" stroke="rgba(245,158,11,.3)"  stroke-width="1" marker-end="url(#arr)"/>
+        <line x1="240" y1="118" x2="288" y2="178" stroke="rgba(244,63,94,.2)"   stroke-width="1" marker-end="url(#arr)"/>
+        <line x1="390" y1="40"  x2="438" y2="80"  stroke="rgba(255,255,255,.15)" stroke-width="1" marker-end="url(#arr)"/>
+        <line x1="390" y1="90"  x2="438" y2="95"  stroke="rgba(255,255,255,.15)" stroke-width="1" marker-end="url(#arr)"/>
+        <line x1="390" y1="140" x2="438" y2="110" stroke="rgba(255,255,255,.15)" stroke-width="1" marker-end="url(#arr)"/>
+        <line x1="390" y1="181" x2="438" y2="125" stroke="rgba(255,255,255,.1)"  stroke-width="1" marker-end="url(#arr)"/>
+        <line x1="550" y1="100" x2="598" y2="100" stroke="rgba(255,255,255,.2)"  stroke-width="1" marker-end="url(#arr)"/>
+      </svg>
+    </div>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — Orchestrator pattern (pure Python)</div></div>
+      <pre><span class="ck">import</span> anthropic, json
+client = anthropic.Anthropic()
+
+<span class="ck">class</span> <span class="ca">Orchestrator</span>:
+    <span class="cs">"""Decomposes tasks and assigns them to specialized workers."""</span>
+    <span class="ck">def</span> <span class="cf">decompose</span>(self, task: str) -> list[dict]:
+        resp = client.messages.create(
+            model=<span class="cs">"claude-sonnet-4-20250514"</span>, max_tokens=<span class="cn">1024</span>,
+            system=<span class="cs">"""You are a task orchestrator. Break the given task into
+subtasks. Each subtask should be assigned to one of:
+researcher, writer, editor, fact_checker.
+Return JSON: [{"agent": "...", "task": "...", "depends_on": []}]"""</span>,
+            messages=[{<span class="cs">"role"</span>:<span class="cs">"user"</span>, <span class="cs">"content"</span>: task}]
+        )
+        <span class="ck">return</span> json.loads(resp.content[<span class="cn">0</span>].text)
+
+    <span class="ck">def</span> <span class="cf">synthesize</span>(self, task: str, outputs: dict[str, str]) -> str:
+        outputs_text = <span class="cs">"\n\n"</span>.join(
+            <span class="cs">f"[{agent.upper()}]\n{output}"</span>
+            <span class="ck">for</span> agent, output <span class="ck">in</span> outputs.items()
+        )
+        resp = client.messages.create(
+            model=<span class="cs">"claude-sonnet-4-20250514"</span>, max_tokens=<span class="cn">2048</span>,
+            system=<span class="cs">"Synthesize these agent outputs into a coherent final result."</span>,
+            messages=[{<span class="cs">"role"</span>:<span class="cs">"user"</span>,
+                       <span class="cs">"content"</span>: <span class="cs">f"Original task: {task}\n\nAgent outputs:\n{outputs_text}"</span>}]
+        )
+        <span class="ck">return</span> resp.content[<span class="cn">0</span>].text
+
+<span class="ck">class</span> <span class="ca">WorkerAgent</span>:
+    <span class="ck">def</span> <span class="cf">__init__</span>(self, role: str, system_prompt: str):
+        self.role   = role
+        self.system = system_prompt
+
+    <span class="ck">def</span> <span class="cf">execute</span>(self, task: str, context: str = <span class="cs">""</span>) -> str:
+        content = task
+        <span class="ck">if</span> context:
+            content = <span class="cs">f"Context from prior agents:\n{context}\n\nYour task: {task}"</span>
+        resp = client.messages.create(
+            model=<span class="cs">"claude-sonnet-4-20250514"</span>, max_tokens=<span class="cn">2048</span>,
+            system=self.system,
+            messages=[{<span class="cs">"role"</span>:<span class="cs">"user"</span>, <span class="cs">"content"</span>: content}]
+        )
+        <span class="ck">return</span> resp.content[<span class="cn">0</span>].text
+
+<span class="cm"># Run the pipeline</span>
+<span class="ck">def</span> <span class="cf">run_pipeline</span>(task: str, workers: dict[str, <span class="ca">WorkerAgent</span>]) -> str:
+    orch = <span class="ca">Orchestrator</span>()
+    plan = orch.decompose(task)
+    outputs = {}
+
+    <span class="ck">for</span> step <span class="ck">in</span> plan:
+        agent_name = step[<span class="cs">"agent"</span>]
+        worker     = workers[agent_name]
+        deps       = step.get(<span class="cs">"depends_on"</span>, [])
+        context    = <span class="cs">"\n\n"</span>.join(outputs[d] <span class="ck">for</span> d <span class="ck">in</span> deps <span class="ck">if</span> d <span class="ck">in</span> outputs)
+        outputs[agent_name] = worker.execute(step[<span class="cs">"task"</span>], context)
+
+    <span class="ck">return</span> orch.synthesize(task, outputs)</pre>
+    </div>
+
+    <div class="insight">
+      <h4>🧠 Why the orchestrator pattern is reliable</h4>
+      <p>Single-agent systems that try to do everything — research, write, edit, fact-check — get confused and produce mediocre output. The orchestrator pattern succeeds because <strong>each agent has a narrow, focused role</strong>. The researcher doesn't worry about writing style. The editor doesn't search the web. Each agent's system prompt makes it expert at exactly one thing. The orchestrator is the only agent that needs to reason about the whole task. Divide cognitive labor the way you'd divide human labor.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       02 · MESSAGE PASSING
+  ══════════════════════════════════ -->
+  <div class="sec" id="message-passing">
+    <div class="snum">02</div>
+    <h2>Agent Message Passing</h2>
+    <p>Agents communicate by passing structured messages. The key design decision: <strong>what format do messages take?</strong> Raw text is flexible but hard to parse. Typed structs are reliable but rigid. A good message envelope includes content, sender, recipient, message type, and a correlation ID for tracing.</p>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — Typed message envelope</div></div>
+      <pre><span class="ck">from</span> dataclasses <span class="ck">import</span> dataclass, field
+<span class="ck">from</span> typing <span class="ck">import</span> Any, Optional
+<span class="ck">from</span> datetime <span class="ck">import</span> datetime
+<span class="ck">import</span> uuid
+
+<span class="ck">@dataclass</span>
+<span class="ck">class</span> <span class="ca">AgentMessage</span>:
+    <span class="cm"># Identity</span>
+    id:          str  = field(default_factory=<span class="ck">lambda</span>: str(uuid.uuid4())[:8])
+    sender:      str  = <span class="cs">""</span>
+    recipient:   str  = <span class="cs">""</span>
+    msg_type:    str  = <span class="cs">"task"</span>     <span class="cm"># task | result | error | feedback | done</span>
+    timestamp:   str  = field(default_factory=<span class="ck">lambda</span>: datetime.utcnow().isoformat())
+    <span class="cm"># Content</span>
+    content:     Any  = <span class="cn">None</span>
+    metadata:    dict = field(default_factory=dict)
+    <span class="cm"># Threading</span>
+    reply_to:    Optional[str] = <span class="cn">None</span>   <span class="cm"># ID of message this replies to</span>
+    thread_id:   str  = field(default_factory=<span class="ck">lambda</span>: str(uuid.uuid4())[:8])
+
+<span class="ck">class</span> <span class="ca">MessageBus</span>:
+    <span class="cs">"""In-process message bus. Replace with Redis pub/sub for distributed systems."""</span>
+    <span class="ck">def</span> <span class="cf">__init__</span>(self):
+        self._inbox:   dict[str, list[<span class="ca">AgentMessage</span>]] = {}
+        self._history: list[<span class="ca">AgentMessage</span>]            = []
+
+    <span class="ck">def</span> <span class="cf">send</span>(self, msg: <span class="ca">AgentMessage</span>):
+        self._inbox.setdefault(msg.recipient, []).append(msg)
+        self._history.append(msg)
+
+    <span class="ck">def</span> <span class="cf">receive</span>(self, agent_name: str) -> list[<span class="ca">AgentMessage</span>]:
+        msgs = self._inbox.pop(agent_name, [])
+        <span class="ck">return</span> sorted(msgs, key=<span class="ck">lambda</span> m: m.timestamp)
+
+    <span class="ck">def</span> <span class="cf">wait_for</span>(self, agent_name: str, msg_type: str, timeout: float = <span class="cn">60.0</span>) -> Optional[<span class="ca">AgentMessage</span>]:
+        <span class="ck">import</span> time
+        deadline = time.time() + timeout
+        <span class="ck">while</span> time.time() < deadline:
+            <span class="ck">for</span> msg <span class="ck">in</span> self._inbox.get(agent_name, []):
+                <span class="ck">if</span> msg.msg_type == msg_type:
+                    self._inbox[agent_name].remove(msg)
+                    <span class="ck">return</span> msg
+            time.sleep(<span class="cn">0.1</span>)
+        <span class="ck">return</span> <span class="cn">None</span>
+
+    <span class="ck">def</span> <span class="cf">conversation_log</span>(self) -> str:
+        <span class="cs">"""Human-readable log of all messages for debugging."""</span>
+        lines = []
+        <span class="ck">for</span> m <span class="ck">in</span> self._history:
+            lines.append(<span class="cs">f"[{m.timestamp[:19]}] {m.sender:12} → {m.recipient:12} | {m.msg_type:10} | {str(m.content)[:60]}"</span>)
+        <span class="ck">return</span> <span class="cs">"\n"</span>.join(lines)
+
+<span class="cm"># Usage</span>
+bus = <span class="ca">MessageBus</span>()
+bus.send(<span class="ca">AgentMessage</span>(
+    sender=<span class="cs">"orchestrator"</span>, recipient=<span class="cs">"researcher"</span>,
+    msg_type=<span class="cs">"task"</span>,
+    content=<span class="cs">"Research the latest advances in LLM context windows for 2024-2025"</span>,
+    metadata={<span class="cs">"priority"</span>: <span class="cs">"high"</span>, <span class="cs">"deadline_steps"</span>: <span class="cn">3</span>}
+))
+incoming = bus.receive(<span class="cs">"researcher"</span>)  <span class="cm"># returns list of AgentMessage</span></pre>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       03 · SHARED STATE
+  ══════════════════════════════════ -->
+  <div class="sec" id="shared-state">
+    <div class="snum">03</div>
+    <h2>Shared State</h2>
+    <p>Shared state is the "whiteboard" all agents write to and read from. In LangGraph this is the typed <code>StateGraph</code> state. In pure Python it can be a dataclass or a dict. The key rule: <strong>define clear ownership</strong> — which agent writes which fields, and when.</p>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — Shared state for content team (LangGraph)</div></div>
+      <pre><span class="ck">from</span> typing <span class="ck">import</span> TypedDict, Annotated, List, Optional
+<span class="ck">from</span> langgraph.graph <span class="ck">import</span> StateGraph, END
+<span class="ck">import</span> operator
+
+<span class="ck">class</span> <span class="ca">ContentTeamState</span>(TypedDict):
+    <span class="cm"># ── Task input (immutable once set) ──────────────────────────</span>
+    topic:         str
+    target_length: int    <span class="cm"># word count</span>
+    audience:      str
+
+    <span class="cm"># ── Agent outputs (each agent writes its own field) ──────────</span>
+    research_notes:  Optional[str]   <span class="cm"># written by: researcher</span>
+    draft:           Optional[str]   <span class="cm"># written by: writer</span>
+    edited_draft:    Optional[str]   <span class="cm"># written by: editor</span>
+    fact_issues:     List[str]       <span class="cm"># written by: fact_checker</span>
+    final_article:   Optional[str]   <span class="cm"># written by: orchestrator</span>
+
+    <span class="cm"># ── Control flow (orchestrator manages) ──────────────────────</span>
+    current_agent:  str
+    revision_count: int
+    max_revisions:  int
+    passed_qa:      bool
+
+    <span class="cm"># ── Shared conversation log (all agents append) ───────────────</span>
+    messages: Annotated[List[dict], operator.add]
+
+<span class="cm"># ── State ownership contract (document explicitly) ───────────</span>
+STATE_OWNERSHIP = {
+    <span class="cs">"research_notes"</span>: <span class="cs">"researcher"</span>,
+    <span class="cs">"draft"</span>:          <span class="cs">"writer"</span>,
+    <span class="cs">"edited_draft"</span>:   <span class="cs">"editor"</span>,
+    <span class="cs">"fact_issues"</span>:    <span class="cs">"fact_checker"</span>,
+    <span class="cs">"final_article"</span>:  <span class="cs">"orchestrator"</span>,
+    <span class="cs">"current_agent"</span>:  <span class="cs">"orchestrator"</span>,
+    <span class="cs">"passed_qa"</span>:      <span class="cs">"fact_checker"</span>,
+    <span class="cs">"revision_count"</span>: <span class="cs">"orchestrator"</span>,
+}
+<span class="cm"># Agents should ONLY update their own fields.</span>
+<span class="cm"># The orchestrator is the exception — it manages control fields.</span></pre>
+    </div>
+
+    <div class="box sk">
+      <div class="bxt">Shared state design rules</div>
+      <p>1. <strong>One owner per field.</strong> If two agents can write to the same field, you'll have race conditions or silent overwrites. 2. <strong>Use append-only lists for accumulation.</strong> Fact issues, messages, and log entries should accumulate — never overwrite. 3. <strong>Immutable inputs.</strong> The original task fields should never change after the graph starts. 4. <strong>Document ownership explicitly</strong> — a simple dict like <code>STATE_OWNERSHIP</code> prevents confusion as the system grows.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       04 · ROLE-BASED SYSTEM PROMPTS
+  ══════════════════════════════════ -->
+  <div class="sec" id="role-prompts">
+    <div class="snum">04</div>
+    <h2>Role-Based System Prompts</h2>
+    <p>Each agent in a multi-agent system needs a system prompt that makes it expert at exactly one thing. The prompt defines what the agent does, what it should NOT do (boundary enforcement), what format it outputs, and how it collaborates with the team.</p>
+
+    <div class="agent-grid">
+      <div class="agent-card res"><div class="role">Researcher</div><div class="desc">Finds facts, cites sources, flags uncertainty. Never writes prose.</div></div>
+      <div class="agent-card wri"><div class="role">Writer</div><div class="desc">Drafts engaging content from notes. Never invents facts.</div></div>
+      <div class="agent-card edi"><div class="role">Editor</div><div class="desc">Improves clarity, flow, style. Never changes facts.</div></div>
+      <div class="agent-card fac"><div class="role">Fact-checker</div><div class="desc">Verifies every claim. Never edits prose. Reports issues only.</div></div>
+    </div>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — Four production-quality system prompts</div></div>
+      <pre>RESEARCHER_SYSTEM = <span class="cs">"""You are a specialist research agent on a content team.
+
+## Your job
+Search for and synthesize factual information on the assigned topic.
+Return structured research notes, not prose.
+
+## Rules
+- Cite every fact with a source (website, paper, or "general knowledge")
+- Mark uncertain facts with [UNCERTAIN]
+- Do NOT write paragraphs or narrative — bullet points only
+- Flag any contradictory sources you find
+- If you cannot find reliable information on a subtopic, say so explicitly
+
+## Output format
+Return your notes as:
+FACT: [claim] | SOURCE: [source] | CONFIDENCE: [high/medium/low]
+...
+GAPS: [topics you could not find reliable info on]"""</span>
+
+WRITER_SYSTEM = <span class="cs">"""You are a specialist writing agent on a content team.
+
+## Your job
+Transform research notes into engaging, readable content.
+You write first drafts only — an editor will refine your work.
+
+## Rules
+- Use ONLY facts from the research notes provided — never add your own
+- Write for the specified audience and length
+- Structure with clear headers and logical flow
+- Write naturally — avoid jargon unless the audience expects it
+- Mark any place where you wanted a fact but couldn't find it in the notes: [MISSING FACT: ...]
+
+## Input
+You will receive: research notes + audience + target length"""</span>
+
+EDITOR_SYSTEM = <span class="cs">"""You are a specialist editing agent on a content team.
+
+## Your job
+Improve clarity, flow, style, and structure of the draft.
+
+## Rules
+- NEVER change facts, add information, or remove cited claims
+- Fix: passive voice, run-on sentences, jargon, weak transitions
+- Improve: paragraph structure, headline strength, opening hook
+- Ensure the writing matches the specified audience
+- Return the full edited draft, not just the changes
+- Add a one-line note at the end: EDITOR_NOTE: [what you changed]"""</span>
+
+FACT_CHECKER_SYSTEM = <span class="cs">"""You are a specialist fact-checking agent on a content team.
+
+## Your job
+Verify every factual claim in the article against the research notes.
+You are the quality gate — nothing ships without your approval.
+
+## Rules
+- Check every statistic, date, name, and causal claim
+- Compare claims in the article against the research notes
+- Flag: claims not in research notes, claims contradicting sources,
+  vague claims that need sourcing, outdated information
+- Do NOT edit prose — only report issues
+
+## Output format
+Return JSON:
+{
+  "passed": true/false,
+  "issues": [
+    {"claim": "...", "issue": "not in research notes", "severity": "high/medium/low"},
+    ...
+  ],
+  "approval_note": "Approved with 0 issues" or "Failed: X issues found"
+}"""</span></pre>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       05 · CREWAI VS LANGGRAPH
+  ══════════════════════════════════ -->
+  <div class="sec" id="crewai-vs-langgraph">
+    <div class="snum">05</div>
+    <h2>CrewAI vs LangGraph for Multi-Agent</h2>
+    <p>Both frameworks solve multi-agent orchestration, but from different angles. CrewAI is high-level and role-focused — great for getting started fast. LangGraph is low-level and graph-focused — great for precise control and production systems.</p>
+
+    <div class="tw">
+      <table>
+        <tr><th>Dimension</th><th>CrewAI</th><th>LangGraph</th></tr>
+        <tr><td><strong>Abstraction level</strong></td><td>High — Crew, Agent, Task objects</td><td>Low — nodes, edges, state schema</td></tr>
+        <tr><td><strong>Setup speed</strong></td><td>Very fast (5 lines of config)</td><td>More verbose but explicit</td></tr>
+        <tr><td><strong>Execution model</strong></td><td>Sequential or hierarchical (built-in)</td><td>Fully custom graph topology</td></tr>
+        <tr><td><strong>State management</strong></td><td>Automatic (opaque)</td><td>Explicit TypedDict — you see everything</td></tr>
+        <tr><td><strong>Checkpointing</strong></td><td>Limited</td><td>First-class with SqliteSaver/Redis</td></tr>
+        <tr><td><strong>Human-in-loop</strong></td><td>Basic support</td><td>First-class interrupt_before/after</td></tr>
+        <tr><td><strong>Debugging</strong></td><td>Harder (black box)</td><td>Every state transition visible</td></tr>
+        <tr><td><strong>Best for</strong></td><td>Prototyping, simple pipelines</td><td>Production, complex control flow</td></tr>
+      </table>
+    </div>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — Same team in CrewAI (for comparison)</div></div>
+      <pre><span class="cm"># pip install crewai crewai-tools</span>
+<span class="ck">from</span> crewai <span class="ck">import</span> Agent, Task, Crew, Process
+<span class="ck">from</span> langchain_anthropic <span class="ck">import</span> ChatAnthropic
+
+llm = ChatAnthropic(model=<span class="cs">"claude-sonnet-4-20250514"</span>)
+
+<span class="cm"># ── Define agents ─────────────────────────────────────────────</span>
+researcher = Agent(
+    role=<span class="cs">"Research Specialist"</span>,
+    goal=<span class="cs">"Find accurate, well-sourced information on any topic"</span>,
+    backstory=<span class="cs">"Expert researcher who always cites sources"</span>,
+    llm=llm, verbose=<span class="cn">True</span>
+)
+writer = Agent(
+    role=<span class="cs">"Content Writer"</span>,
+    goal=<span class="cs">"Write engaging content from research notes"</span>,
+    backstory=<span class="cs">"Experienced writer who transforms notes into articles"</span>,
+    llm=llm, verbose=<span class="cn">True</span>
+)
+fact_checker = Agent(
+    role=<span class="cs">"Fact Checker"</span>,
+    goal=<span class="cs">"Verify every claim in the article"</span>,
+    backstory=<span class="cs">"Detail-oriented editor who catches every factual error"</span>,
+    llm=llm, verbose=<span class="cn">True</span>
+)
+
+<span class="cm"># ── Define tasks (sequential — each depends on previous) ──────</span>
+research_task = Task(
+    description=<span class="cs">"Research: {topic}. Find key facts, stats, examples."</span>,
+    expected_output=<span class="cs">"Bullet-point research notes with sources"</span>,
+    agent=researcher
+)
+write_task = Task(
+    description=<span class="cs">"Write a {word_count}-word article from the research notes."</span>,
+    expected_output=<span class="cs">"Full article draft in markdown"</span>,
+    agent=writer,
+    context=[research_task]
+)
+check_task = Task(
+    description=<span class="cs">"Verify all claims in the article against the research."</span>,
+    expected_output=<span class="cs">"Fact-check report: PASSED or list of issues"</span>,
+    agent=fact_checker,
+    context=[research_task, write_task]
+)
+
+<span class="cm"># ── Assemble and run ──────────────────────────────────────────</span>
+crew = Crew(
+    agents=[researcher, writer, fact_checker],
+    tasks=[research_task, write_task, check_task],
+    process=Process.sequential,   <span class="cm"># or Process.hierarchical</span>
+    verbose=<span class="cn">True</span>
+)
+result = crew.kickoff(inputs={<span class="cs">"topic"</span>: <span class="cs">"RAG systems in 2025"</span>, <span class="cs">"word_count"</span>: <span class="cn">500</span>})</pre>
+    </div>
+
+    <div class="box am">
+      <div class="bxt">When to choose which</div>
+      <p>Use <strong>CrewAI</strong> when: you need a working multi-agent system in under an hour, the pipeline is linear, you're prototyping. Use <strong>LangGraph</strong> when: you need checkpointing and resumability, the control flow is complex (loops, conditional branching, HITL), you're going to production, or you need full visibility into every state transition for debugging. For Project 10, implement it in both — the contrast is instructive.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       06 · PARALLEL VS SEQUENTIAL
+  ══════════════════════════════════ -->
+  <div class="sec" id="parallel">
+    <div class="snum">06</div>
+    <h2>Parallel vs Sequential Execution</h2>
+    <p>Sequential execution is simple but slow — total time = sum of all agent times. Parallel execution is faster but requires careful state design — parallel agents must not write to the same fields.</p>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — Sequential vs parallel agent execution</div></div>
+      <pre><span class="ck">import</span> asyncio, time
+
+<span class="cm"># ── Sequential (simple, clear dependencies) ───────────────────</span>
+<span class="ck">def</span> <span class="cf">run_sequential</span>(topic: str, workers: dict) -> dict:
+    t0      = time.time()
+    notes   = workers[<span class="cs">"researcher"</span>].execute(topic)
+    draft   = workers[<span class="cs">"writer"</span>].execute(topic, context=notes)
+    edited  = workers[<span class="cs">"editor"</span>].execute(draft)
+    checked = workers[<span class="cs">"fact_checker"</span>].execute(edited, context=notes)
+    <span class="cf">print</span>(<span class="cs">f"Sequential: {time.time()-t0:.1f}s"</span>)
+    <span class="ck">return</span> {<span class="cs">"notes"</span>:notes,<span class="cs">"draft"</span>:draft,<span class="cs">"edited"</span>:edited,<span class="cs">"checked"</span>:checked}
+
+<span class="cm"># ── Parallel (fan-out then merge) ─────────────────────────────</span>
+<span class="cm"># Pattern: run independent agents concurrently, then merge</span>
+<span class="ck">async def</span> <span class="cf">run_parallel_research</span>(topic: str, workers: dict) -> dict:
+    <span class="cs">"""
+    Researcher + fact_searcher run in parallel on the same topic.
+    Writer must wait for both before drafting.
+    """</span>
+    <span class="ck">async def</span> <span class="cf">run_async</span>(worker, task, context=<span class="cs">""</span>):
+        <span class="cm"># Wrap sync worker in thread to avoid blocking event loop</span>
+        <span class="ck">return</span> <span class="ck">await</span> asyncio.to_thread(worker.execute, task, context)
+
+    <span class="cm"># Fan out: researcher + fact_searcher run simultaneously</span>
+    research_task  = asyncio.create_task(run_async(workers[<span class="cs">"researcher"</span>],  topic))
+    stats_task     = asyncio.create_task(run_async(workers[<span class="cs">"stat_finder"</span>], topic))
+
+    <span class="cm"># Wait for both before proceeding</span>
+    research_notes, stats = <span class="ck">await</span> asyncio.gather(research_task, stats_task)
+    combined_context = research_notes + <span class="cs">"\n\nSTATISTICS:\n"</span> + stats
+
+    <span class="cm"># Sequential from here: writer needs all context</span>
+    draft  = <span class="ck">await</span> run_async(workers[<span class="cs">"writer"</span>], topic, combined_context)
+    edited = <span class="ck">await</span> run_async(workers[<span class="cs">"editor"</span>], draft)
+    <span class="ck">return</span> {<span class="cs">"draft"</span>: edited, <span class="cs">"research"</span>: combined_context}
+
+<span class="cm"># ── LangGraph parallel nodes (Send API) ───────────────────────</span>
+<span class="ck">from</span> langgraph.constants <span class="ck">import</span> Send
+
+<span class="ck">def</span> <span class="cf">fan_out_to_reviewers</span>(state: <span class="ca">ContentTeamState</span>) -> list:
+    <span class="cs">"""Fan out to multiple independent reviewers simultaneously."""</span>
+    <span class="ck">return</span> [
+        <span class="ca">Send</span>(<span class="cs">"style_reviewer"</span>,  {**state, <span class="cs">"review_type"</span>: <span class="cs">"style"</span>}),
+        <span class="ca">Send</span>(<span class="cs">"fact_checker"</span>,    {**state, <span class="cs">"review_type"</span>: <span class="cs">"facts"</span>}),
+        <span class="ca">Send</span>(<span class="cs">"seo_reviewer"</span>,    {**state, <span class="cs">"review_type"</span>: <span class="cs">"seo"</span>}),
+    ]
+<span class="cm"># All three run in parallel and their outputs merge back into state</span>
+graph.add_conditional_edges(<span class="cs">"writer"</span>, fan_out_to_reviewers)</pre>
+    </div>
+
+    <div class="tw">
+      <table>
+        <tr><th>Strategy</th><th>When to use</th><th>LangGraph implementation</th></tr>
+        <tr><td><strong>Sequential</strong></td><td>Each step depends on the previous output</td><td>Linked nodes with direct edges</td></tr>
+        <tr><td><strong>Parallel fan-out</strong></td><td>Independent subtasks that can run simultaneously</td><td><code>Send</code> API in conditional edge</td></tr>
+        <tr><td><strong>Parallel + merge</strong></td><td>Multiple independent analyses, then synthesize</td><td>Fan-out + a merge node with <code>operator.add</code> reducer</td></tr>
+        <tr><td><strong>Conditional branch</strong></td><td>Route to different agents based on content type</td><td>Conditional edge returning node name</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       07 · COMMUNICATION PROTOCOLS
+  ══════════════════════════════════ -->
+  <div class="sec" id="protocols">
+    <div class="snum">07</div>
+    <h2>Agent Communication Protocols</h2>
+    <p>As agent systems grow, you need conventions for how agents communicate — structured formats that prevent misunderstandings and enable automated routing and error handling.</p>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — Structured agent protocols</div></div>
+      <pre><span class="ck">from</span> enum <span class="ck">import</span> Enum
+<span class="ck">from</span> pydantic <span class="ck">import</span> BaseModel
+<span class="ck">from</span> typing <span class="ck">import</span> List, Optional, Any
+
+<span class="ck">class</span> <span class="ca">MessageType</span>(<span class="ca">Enum</span>):
+    TASK       = <span class="cs">"task"</span>       <span class="cm"># assign work to an agent</span>
+    RESULT     = <span class="cs">"result"</span>     <span class="cm"># return completed work</span>
+    FEEDBACK   = <span class="cs">"feedback"</span>   <span class="cm"># request revision</span>
+    ERROR      = <span class="cs">"error"</span>      <span class="cm"># report failure</span>
+    ESCALATE   = <span class="cs">"escalate"</span>   <span class="cm"># request human / supervisor</span>
+    DONE       = <span class="cs">"done"</span>       <span class="cm"># task complete, no further work needed</span>
+
+<span class="ck">class</span> <span class="ca">AgentProtocolMessage</span>(<span class="ca">BaseModel</span>):
+    msg_id:       str
+    thread_id:    str
+    sender:       str
+    recipient:    str
+    msg_type:     <span class="ca">MessageType</span>
+    payload:      Any
+    context:      Optional[str] = <span class="cn">None</span>   <span class="cm"># prior work passed for context</span>
+    revision_of:  Optional[str] = <span class="cn">None</span>   <span class="cm"># ID of message being revised</span>
+    max_revisions: int = <span class="cn">3</span>
+
+<span class="cm"># ── Feedback loop protocol ─────────────────────────────────────</span>
+<span class="ck">def</span> <span class="cf">handle_fact_check_result</span>(
+    result: <span class="ca">AgentProtocolMessage</span>,
+    state:  <span class="ca">ContentTeamState</span>,
+    bus:    <span class="ca">MessageBus</span>,
+) -> <span class="cn">None</span>:
+    payload = result.payload   <span class="cm"># {"passed": bool, "issues": [...]}</span>
+
+    <span class="ck">if</span> payload[<span class="cs">"passed"</span>]:
+        <span class="cm"># Approve: signal done to orchestrator</span>
+        bus.send(<span class="ca">AgentMessage</span>(
+            sender=<span class="cs">"fact_checker"</span>, recipient=<span class="cs">"orchestrator"</span>,
+            msg_type=<span class="cs">"done"</span>,
+            content={<span class="cs">"article"</span>: state[<span class="cs">"edited_draft"</span>], <span class="cs">"issues"</span>: []}
+        ))
+    <span class="ck">elif</span> state[<span class="cs">"revision_count"</span>] < state[<span class="cs">"max_revisions"</span>]:
+        <span class="cm"># Feedback: send issues back to writer for revision</span>
+        issues_text = <span class="cs">"\n"</span>.join(<span class="cs">f"- {i['issue']}: {i['claim']}"</span>
+                                <span class="ck">for</span> i <span class="ck">in</span> payload[<span class="cs">"issues"</span>])
+        bus.send(<span class="ca">AgentMessage</span>(
+            sender=<span class="cs">"fact_checker"</span>, recipient=<span class="cs">"writer"</span>,
+            msg_type=<span class="cs">"feedback"</span>,
+            content=<span class="cs">f"Revise the following issues:\n{issues_text}"</span>,
+            metadata={<span class="cs">"revision_num"</span>: state[<span class="cs">"revision_count"</span>] + <span class="cn">1</span>}
+        ))
+    <span class="ck">else</span>:
+        <span class="cm"># Escalate: too many revisions, need human</span>
+        bus.send(<span class="ca">AgentMessage</span>(
+            sender=<span class="cs">"fact_checker"</span>, recipient=<span class="cs">"orchestrator"</span>,
+            msg_type=<span class="cs">"escalate"</span>,
+            content=<span class="cs">f"Failed after {state['max_revisions']} revisions. Issues:\n{payload['issues']}"</span>,
+            metadata={<span class="cs">"requires_human"</span>: <span class="cn">True</span>}
+        ))</pre>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       08 · CONTENT TEAM (FULL IMPL)
+  ══════════════════════════════════ -->
+  <div class="sec" id="content-team">
+    <div class="snum">08</div>
+    <h2>Multi-Agent Content Team — Full LangGraph Implementation</h2>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — content_team.py (complete)</div></div>
+      <pre><span class="ck">import</span> anthropic, json, re
+<span class="ck">from</span> typing <span class="ck">import</span> TypedDict, Annotated, List, Optional
+<span class="ck">from</span> langgraph.graph <span class="ck">import</span> StateGraph, END
+<span class="ck">from</span> langgraph.checkpoint.memory <span class="ck">import</span> MemorySaver
+<span class="ck">import</span> operator
+
+client = anthropic.Anthropic()
+
+<span class="ck">class</span> <span class="ca">TeamState</span>(TypedDict):
+    topic:           str
+    audience:        str
+    word_count:      int
+    research_notes:  Optional[str]
+    draft:           Optional[str]
+    edited_draft:    Optional[str]
+    fact_issues:     List[str]
+    passed_qa:       bool
+    final_article:   Optional[str]
+    revision_count:  int
+    messages:        Annotated[List[dict], operator.add]
+
+<span class="ck">def</span> <span class="cf">_call</span>(system: str, user: str, max_tokens: int = <span class="cn">2048</span>) -> str:
+    <span class="ck">return</span> client.messages.create(
+        model=<span class="cs">"claude-sonnet-4-20250514"</span>, max_tokens=max_tokens,
+        system=system, messages=[{<span class="cs">"role"</span>:<span class="cs">"user"</span>,<span class="cs">"content"</span>:user}]
+    ).content[<span class="cn">0</span>].text
+
+<span class="cm"># ── RESEARCHER ────────────────────────────────────────────────</span>
+<span class="ck">def</span> <span class="cf">researcher_node</span>(state: <span class="ca">TeamState</span>) -> dict:
+    notes = _call(RESEARCHER_SYSTEM,
+                  <span class="cs">f"Research topic: {state['topic']}\nAudience: {state['audience']}"</span>)
+    <span class="ck">return</span> {
+        <span class="cs">"research_notes"</span>: notes,
+        <span class="cs">"messages"</span>: [{<span class="cs">"role"</span>:<span class="cs">"researcher"</span>,<span class="cs">"content"</span>:notes[:<span class="cn">200</span>]}]
+    }
+
+<span class="cm"># ── WRITER ────────────────────────────────────────────────────</span>
+<span class="ck">def</span> <span class="cf">writer_node</span>(state: <span class="ca">TeamState</span>) -> dict:
+    user = (
+        <span class="cs">f"Research notes:\n{state['research_notes']}\n\n"</span>
+        <span class="cs">f"Write a {state['word_count']}-word article for: {state['audience']}\n"</span>
+        <span class="cs">f"Topic: {state['topic']}"</span>
+    )
+    draft = _call(WRITER_SYSTEM, user)
+    <span class="ck">return</span> {
+        <span class="cs">"draft"</span>: draft,
+        <span class="cs">"messages"</span>: [{<span class="cs">"role"</span>:<span class="cs">"writer"</span>,<span class="cs">"content"</span>:draft[:<span class="cn">200</span>]}]
+    }
+
+<span class="cm"># ── EDITOR ────────────────────────────────────────────────────</span>
+<span class="ck">def</span> <span class="cf">editor_node</span>(state: <span class="ca">TeamState</span>) -> dict:
+    user = (
+        <span class="cs">f"Audience: {state['audience']}\n\n"</span>
+        <span class="cs">f"Draft to edit:\n{state['draft']}"</span>
+    )
+    edited = _call(EDITOR_SYSTEM, user)
+    <span class="ck">return</span> {
+        <span class="cs">"edited_draft"</span>: edited,
+        <span class="cs">"messages"</span>: [{<span class="cs">"role"</span>:<span class="cs">"editor"</span>,<span class="cs">"content"</span>:edited[:<span class="cn">200</span>]}]
+    }
+
+<span class="cm"># ── FACT-CHECKER ──────────────────────────────────────────────</span>
+<span class="ck">def</span> <span class="cf">fact_checker_node</span>(state: <span class="ca">TeamState</span>) -> dict:
+    user = (
+        <span class="cs">f"Research notes (ground truth):\n{state['research_notes']}\n\n"</span>
+        <span class="cs">f"Article to fact-check:\n{state['edited_draft']}"</span>
+    )
+    result = _call(FACT_CHECKER_SYSTEM, user, max_tokens=<span class="cn">1024</span>)
+    <span class="cm"># Strip markdown fences and parse JSON</span>
+    cleaned = re.sub(<span class="cs">r'^```json\s*|\s*```$'</span>, <span class="cs">''</span>, result, flags=re.M)
+    <span class="ck">try</span>:
+        data   = json.loads(cleaned)
+        passed = data.get(<span class="cs">"passed"</span>, <span class="cn">False</span>)
+        issues = [i.get(<span class="cs">"claim"</span>,<span class="cs">""</span>) + <span class="cs">": "</span> + i.get(<span class="cs">"issue"</span>,<span class="cs">""</span>) <span class="ck">for</span> i <span class="ck">in</span> data.get(<span class="cs">"issues"</span>,[])]
+    <span class="ck">except</span>:
+        passed = <span class="cs">"passed"</span> <span class="ck">in</span> result.lower()
+        issues = [result] <span class="ck">if not</span> passed <span class="ck">else</span> []
+    <span class="ck">return</span> {
+        <span class="cs">"fact_issues"</span>:    issues,
+        <span class="cs">"passed_qa"</span>:      passed,
+        <span class="cs">"revision_count"</span>: state[<span class="cs">"revision_count"</span>] + <span class="cn">1</span>,
+        <span class="cs">"messages"</span>: [{<span class="cs">"role"</span>:<span class="cs">"fact_checker"</span>,<span class="cs">"content"</span>:
+                       <span class="cs">f"passed={passed}, issues={len(issues)}"</span>}]
+    }
+
+<span class="cm"># ── FINALIZE ──────────────────────────────────────────────────</span>
+<span class="ck">def</span> <span class="cf">finalize_node</span>(state: <span class="ca">TeamState</span>) -> dict:
+    <span class="ck">return</span> {<span class="cs">"final_article"</span>: state[<span class="cs">"edited_draft"</span>]}
+
+<span class="cm"># ── ROUTING ───────────────────────────────────────────────────</span>
+<span class="ck">def</span> <span class="cf">route_after_fact_check</span>(state: <span class="ca">TeamState</span>) -> str:
+    <span class="ck">if</span> state[<span class="cs">"passed_qa"</span>]:
+        <span class="ck">return</span> <span class="cs">"finalize"</span>
+    <span class="ck">if</span> state[<span class="cs">"revision_count"</span>] >= <span class="cn">3</span>:
+        <span class="ck">return</span> <span class="cs">"finalize"</span>   <span class="cm"># escalate: deliver best effort</span>
+    <span class="ck">return</span> <span class="cs">"writer"</span>        <span class="cm"># loop back for revision</span>
+
+<span class="cm"># ── GRAPH ─────────────────────────────────────────────────────</span>
+graph = StateGraph(<span class="ca">TeamState</span>)
+<span class="ck">for</span> name, fn <span class="ck">in</span> [(<span class="cs">"researcher"</span>,researcher_node),(<span class="cs">"writer"</span>,writer_node),
+                   (<span class="cs">"editor"</span>,editor_node),(<span class="cs">"fact_checker"</span>,fact_checker_node),
+                   (<span class="cs">"finalize"</span>,finalize_node)]:
+    graph.add_node(name, fn)
+
+graph.set_entry_point(<span class="cs">"researcher"</span>)
+graph.add_edge(<span class="cs">"researcher"</span>, <span class="cs">"writer"</span>)
+graph.add_edge(<span class="cs">"writer"</span>,     <span class="cs">"editor"</span>)
+graph.add_edge(<span class="cs">"editor"</span>,     <span class="cs">"fact_checker"</span>)
+graph.add_conditional_edges(<span class="cs">"fact_checker"</span>, route_after_fact_check)
+graph.add_edge(<span class="cs">"finalize"</span>,   END)
+
+app = graph.compile(checkpointer=MemorySaver())</pre>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       09 · SELF-HEALING PIPELINE
+  ══════════════════════════════════ -->
+  <div class="sec" id="self-healing">
+    <div class="snum">09</div>
+    <h2>Self-Healing Data Pipeline Agent</h2>
+    <p>A single agent that reads error logs from a broken ETL pipeline, hypothesises the cause, attempts a fix, verifies with a test query, and escalates if it can't fix in 3 attempts. This demonstrates agentic reasoning loops with real consequences.</p>
+
+    <div class="cb">
+      <div class="cb-hdr"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="cb-lang">Python — self_healing_agent.py (complete)</div></div>
+      <pre><span class="ck">import</span> anthropic, sqlite3, json, random, time
+<span class="ck">from</span> typing <span class="ck">import</span> TypedDict, Annotated, List, Optional
+<span class="ck">from</span> langgraph.graph <span class="ck">import</span> StateGraph, END
+<span class="ck">from</span> langgraph.checkpoint.memory <span class="ck">import</span> MemorySaver
+<span class="ck">import</span> operator
+
+client = anthropic.Anthropic()
+
+<span class="cm"># ── SIMULATED BROKEN PIPELINE ────────────────────────────────</span>
+DB_PATH = <span class="cs">"/tmp/pipeline_test.db"</span>
+
+BUGS = {
+    <span class="cs">"missing_column"</span>: <span class="cs">"ALTER TABLE sales DROP COLUMN revenue"</span>,
+    <span class="cs">"type_mismatch"</span>:  <span class="cs">"UPDATE sales SET date = 'not-a-date' WHERE id = 1"</span>,
+    <span class="cs">"null_violation"</span>: <span class="cs">"UPDATE sales SET customer_id = NULL WHERE id <= 5"</span>,
+}
+FIXES = {
+    <span class="cs">"missing_column"</span>: <span class="cs">"ALTER TABLE sales ADD COLUMN revenue REAL DEFAULT 0"</span>,
+    <span class="cs">"type_mismatch"</span>:  <span class="cs">"UPDATE sales SET date = '2025-01-01' WHERE date = 'not-a-date'"</span>,
+    <span class="cs">"null_violation"</span>: <span class="cs">"UPDATE sales SET customer_id = 1 WHERE customer_id IS NULL"</span>,
+}
+
+<span class="ck">def</span> <span class="cf">setup_pipeline</span>() -> str:
+    <span class="cs">"""Create a working DB then inject a random bug."""</span>
+    conn = sqlite3.connect(DB_PATH)
+    conn.executescript(<span class="cs">"""
+        DROP TABLE IF EXISTS sales;
+        CREATE TABLE sales (
+            id INTEGER PRIMARY KEY, customer_id INTEGER NOT NULL,
+            revenue REAL, date TEXT
+        );
+        INSERT INTO sales VALUES (1,101,500.0,'2025-01-01'),
+                                  (2,102,750.0,'2025-01-02');
+    """</span>)
+    conn.commit(); conn.close()
+    bug_name = random.choice(<span class="cf">list</span>(BUGS))
+    <span class="ck">try</span>:
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute(BUGS[bug_name]); conn.commit(); conn.close()
+    <span class="ck">except</span>: <span class="ck">pass</span>
+    <span class="ck">return</span> bug_name
+
+<span class="cm"># ── TOOLS ─────────────────────────────────────────────────────</span>
+<span class="ck">def</span> <span class="cf">read_error_log</span>() -> str:
+    <span class="cs">"""Simulate reading pipeline error logs."""</span>
+    <span class="ck">try</span>:
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute(<span class="cs">"SELECT id, customer_id, revenue, date FROM sales LIMIT 5"</span>)
+        conn.close()
+        <span class="ck">return</span> <span class="cs">"Query OK — no obvious errors"</span>
+    <span class="ck">except</span> sqlite3.OperationalError <span class="ck">as</span> e:
+        <span class="ck">return</span> <span class="cs">f"PIPELINE ERROR: {e}\nFailed query: SELECT id, customer_id, revenue, date FROM sales"</span>
+
+<span class="ck">def</span> <span class="cf">get_schema</span>() -> str:
+    conn = sqlite3.connect(DB_PATH)
+    schema = conn.execute(<span class="cs">"SELECT sql FROM sqlite_master WHERE type='table'"</span>).fetchall()
+    sample = conn.execute(<span class="cs">"SELECT * FROM sales LIMIT 3"</span>).fetchall()
+    conn.close()
+    <span class="ck">return</span> <span class="cs">f"Schema: {schema}\nSample rows: {sample}"</span>
+
+<span class="ck">def</span> <span class="cf">apply_fix</span>(sql: str) -> str:
+    <span class="ck">try</span>:
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute(sql); conn.commit(); conn.close()
+        <span class="ck">return</span> <span class="cs">f"Fix applied: {sql}"</span>
+    <span class="ck">except</span> sqlite3.Error <span class="ck">as</span> e:
+        <span class="ck">return</span> <span class="cs">f"Fix FAILED: {e}"</span>
+
+<span class="ck">def</span> <span class="cf">verify_pipeline</span>() -> str:
+    <span class="ck">try</span>:
+        conn  = sqlite3.connect(DB_PATH)
+        rows  = conn.execute(<span class="cs">"SELECT COUNT(*), SUM(revenue) FROM sales WHERE customer_id IS NOT NULL"</span>).fetchone()
+        conn.close()
+        <span class="ck">return</span> <span class="cs">f"Verification PASSED: {rows[0]} rows, revenue total={rows[1]}"</span>
+    <span class="ck">except</span> sqlite3.Error <span class="ck">as</span> e:
+        <span class="ck">return</span> <span class="cs">f"Verification FAILED: {e}"</span>
+
+<span class="cm"># ── STATE + AGENT ─────────────────────────────────────────────</span>
+<span class="ck">class</span> <span class="ca">HealingState</span>(TypedDict):
+    error_log:     str
+    hypothesis:    Optional[str]
+    fix_attempted: Optional[str]
+    attempts:      int
+    fixed:         bool
+    escalated:     bool
+    messages:      Annotated[List[dict], operator.add]
+
+TOOLS = [
+    {<span class="cs">"name"</span>:<span class="cs">"read_error_log"</span>,<span class="cs">"description"</span>:<span class="cs">"Read current pipeline error log"</span>,
+     <span class="cs">"input_schema"</span>:{<span class="cs">"type"</span>:<span class="cs">"object"</span>,<span class="cs">"properties"</span>:{},<span class="cs">"required"</span>:[]}},
+    {<span class="cs">"name"</span>:<span class="cs">"get_schema"</span>,<span class="cs">"description"</span>:<span class="cs">"Get database schema and sample rows"</span>,
+     <span class="cs">"input_schema"</span>:{<span class="cs">"type"</span>:<span class="cs">"object"</span>,<span class="cs">"properties"</span>:{},<span class="cs">"required"</span>:[]}},
+    {<span class="cs">"name"</span>:<span class="cs">"apply_fix"</span>,<span class="cs">"description"</span>:<span class="cs">"Apply SQL fix to the pipeline database"</span>,
+     <span class="cs">"input_schema"</span>:{<span class="cs">"type"</span>:<span class="cs">"object"</span>,<span class="cs">"properties"</span>:{<span class="cs">"sql"</span>:{<span class="cs">"type"</span>:<span class="cs">"string"</span>}},<span class="cs">"required"</span>:[<span class="cs">"sql"</span>]}},
+    {<span class="cs">"name"</span>:<span class="cs">"verify_pipeline"</span>,<span class="cs">"description"</span>:<span class="cs">"Run verification query to confirm fix worked"</span>,
+     <span class="cs">"input_schema"</span>:{<span class="cs">"type"</span>:<span class="cs">"object"</span>,<span class="cs">"properties"</span>:{},<span class="cs">"required"</span>:[]}},
+]
+
+<span class="ck">def</span> <span class="cf">healing_agent_node</span>(state: <span class="ca">HealingState</span>) -> dict:
+    system = <span class="cs">"""You are a data pipeline repair agent.
+Diagnose broken ETL pipelines and fix them autonomously.
+Steps: 1) Read error log 2) Check schema 3) Hypothesise cause
+4) Apply minimal SQL fix 5) Verify with test query.
+Be surgical — minimum changes only."""</span>
+    messages = state[<span class="cs">"messages"</span>] + [{<span class="cs">"role"</span>:<span class="cs">"user"</span>,<span class="cs">"content"</span>:
+        <span class="cs">f"Fix the pipeline. Attempt {state['attempts']+1}/3. Error: {state['error_log']}"</span>}]
+
+    resp = client.messages.create(
+        model=<span class="cs">"claude-sonnet-4-20250514"</span>, max_tokens=<span class="cn">2048</span>,
+        system=system, tools=TOOLS, messages=messages
+    )
+
+    new_msgs = [resp]; results = []
+    <span class="ck">for</span> block <span class="ck">in</span> resp.content:
+        <span class="ck">if</span> block.type != <span class="cs">"tool_use"</span>: <span class="ck">continue</span>
+        fn   = {<span class="cs">"read_error_log"</span>:read_error_log,<span class="cs">"get_schema"</span>:get_schema,
+                <span class="cs">"apply_fix"</span>:apply_fix,<span class="cs">"verify_pipeline"</span>:verify_pipeline}.get(block.name)
+        out  = fn(**block.input) <span class="ck">if</span> fn <span class="ck">else</span> <span class="cs">f"Unknown tool: {block.name}"</span>
+        results.append({<span class="cs">"type"</span>:<span class="cs">"tool_result"</span>,<span class="cs">"tool_use_id"</span>:block.id,<span class="cs">"content"</span>:out})
+
+    <span class="ck">if</span> results:
+        new_msgs.append({<span class="cs">"role"</span>:<span class="cs">"user"</span>,<span class="cs">"content"</span>:results})
+
+    fixed     = <span class="cf">any</span>(<span class="cs">"PASSED"</span> <span class="ck">in</span> str(r.get(<span class="cs">"content"</span>,<span class="cs">""</span>)) <span class="ck">for</span> r <span class="ck">in</span> results)
+    <span class="ck">return</span> {<span class="cs">"messages"</span>:new_msgs,<span class="cs">"fixed"</span>:fixed,<span class="cs">"attempts"</span>:state[<span class="cs">"attempts"</span>]+<span class="cn">1</span>}
+
+<span class="ck">def</span> <span class="cf">escalate_node</span>(state: <span class="ca">HealingState</span>) -> dict:
+    <span class="ck">return</span> {<span class="cs">"escalated"</span>:<span class="cn">True</span>,<span class="cs">"messages"</span>:[{<span class="cs">"role"</span>:<span class="cs">"system"</span>,<span class="cs">"content"</span>:<span class="cs">"ESCALATED to human ops team"</span>}]}
+
+<span class="ck">def</span> <span class="cf">route_healing</span>(state: <span class="ca">HealingState</span>) -> str:
+    <span class="ck">if</span> state[<span class="cs">"fixed"</span>]:      <span class="ck">return</span> END
+    <span class="ck">if</span> state[<span class="cs">"attempts"</span>] >= <span class="cn">3</span>: <span class="ck">return</span> <span class="cs">"escalate"</span>
+    <span class="ck">return</span> <span class="cs">"healing_agent"</span>
+
+g = StateGraph(<span class="ca">HealingState</span>)
+g.add_node(<span class="cs">"healing_agent"</span>, healing_agent_node)
+g.add_node(<span class="cs">"escalate"</span>, escalate_node)
+g.set_entry_point(<span class="cs">"healing_agent"</span>)
+g.add_conditional_edges(<span class="cs">"healing_agent"</span>, route_healing)
+g.add_edge(<span class="cs">"escalate"</span>, END)
+healing_app = g.compile(checkpointer=MemorySaver())</pre>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       10 · PROJECTS 10 & 11
+  ══════════════════════════════════ -->
+  <div class="sec" id="projects">
+    <div class="snum">10</div>
+    <h2>Projects 10 &amp; 11</h2>
+
+    <div class="proj">
+      <h4>Project 10 — Multi-Agent Content Team</h4>
+      <p>4 agents: Researcher → Writer → Editor → Fact-checker. Orchestrator assigns tasks. Agents pass work via shared LangGraph state. Output must pass fact-checker before delivery.</p>
+      <ul class="psteps">
+        <li>Use the <code>content_team.py</code> implementation above — wire all 4 agents as LangGraph nodes</li>
+        <li>Run on 3 different topics (e.g. "RAG systems", "transformer architecture", "LLM fine-tuning")</li>
+        <li>Implement the revision loop — fact-checker can send the writer back for up to 3 revisions</li>
+        <li>Also implement it in CrewAI (5 lines) and compare output quality and debuggability</li>
+        <li>Visualize the agent conversation log as a timeline (sender, recipient, message type, timestamp)</li>
+        <li>Push to GitHub — README must include: conversation log screenshot, final article, revision history</li>
+      </ul>
+    </div>
+
+    <div class="proj">
+      <h4>Project 11 — Self-Healing Data Pipeline Agent</h4>
+      <p>Simulate a broken ETL pipeline. Agent reads error logs, hypothesises cause, attempts fix, verifies with test query. Escalates to human if can't fix in 3 attempts.</p>
+      <ul class="psteps">
+        <li>Use the <code>self_healing_agent.py</code> above — it already has the broken DB simulation</li>
+        <li>Add two more bug types: <code>duplicate_primary_key</code> and <code>missing_index</code></li>
+        <li>Add a <code>rollback</code> tool that undoes the last SQL change if a fix makes things worse</li>
+        <li>Track: which bugs the agent fixed on attempt 1 vs 2 vs 3 vs escalated</li>
+        <li>Add LangSmith tracing — view the hypothesis + fix reasoning in the trace</li>
+        <li>Push to GitHub — README must include: bug success rate table, LangSmith trace screenshot</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       11 · CHECKPOINT
+  ══════════════════════════════════ -->
+  <div class="sec" id="checkpoint">
+    <div class="snum">11</div>
+    <h2>Weeks 12–13 Checkpoint</h2>
+
+    <div class="ckpt">
+      <h4>✦ Mastery checklist</h4>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">Orchestrator + worker — implement the pattern with decompose, execute, synthesize
+          <span class="csub">Orchestrator breaks task, workers have narrow roles, orchestrator synthesizes</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">Message passing — implement AgentMessage envelope with typed message bus
+          <span class="csub">id, sender, recipient, msg_type, payload, thread_id, MessageBus.send/receive/wait_for</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">Shared state — design a ContentTeamState with clear field ownership and append-only lists
+          <span class="csub">STATE_OWNERSHIP dict, Annotated[List, operator.add] for messages/issues</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">Role-based system prompts — write prompts that enforce narrow roles and explicit boundaries
+          <span class="csub">Each prompt says what agent CANNOT do; fact-checker system prompt is the strictest</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">CrewAI vs LangGraph — implement the same pipeline in both and explain the tradeoffs
+          <span class="csub">CrewAI = fast + opaque; LangGraph = verbose + full control + checkpointing</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">Parallel execution — fan-out with Send API in LangGraph, asyncio.gather in pure Python
+          <span class="csub">Independent agents run concurrently, outputs merge via reducers</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">Communication protocols — implement TASK/RESULT/FEEDBACK/ERROR/ESCALATE message types
+          <span class="csub">Feedback loop for revisions, escalate after max_revisions exceeded</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">Project 10 — 4-agent content team runs end-to-end with revision loop, pushed to GitHub
+          <span class="csub">Conversation log, fact-check revision history, final article in README</span>
+        </div>
+      </div>
+      <div class="ci">
+        <div class="cbox" onclick="this.classList.toggle('chk')"></div>
+        <div class="clbl">Project 11 — self-healing agent fixes simulated pipeline bugs, escalates correctly
+          <span class="csub">3-attempt loop, rollback tool, LangSmith trace, bug success rate table</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="box te">
+      <div class="bxt">Next — Weeks 14–15: MCP &amp; Production Agents</div>
+      <p>Model Context Protocol (MCP) — what it is and why it matters, MCP server setup and tool registration, tool discovery at runtime, agent-to-agent communication, auth and security, and sandboxed code execution. Plus Project 12: MCP-Powered Agent Hub. Say <strong>"start Weeks 14–15 — MCP and production agents"</strong> to continue.</p>
+    </div>
+
+    <div class="insight">
+      <h4>🧠 The scaling law of agents</h4>
+      <p>A single agent trying to research, write, edit, and fact-check produces mediocre output on all four. Four specialized agents each doing one thing produce excellent output on their own task. This is not a coincidence — it mirrors how human organizations work. The orchestrator pattern is the software embodiment of Conway's Law: the structure of the system reflects the structure of the communication. Design your agent team the way you'd design a human team: narrow roles, clear interfaces, one owner per responsibility, and a coordinator who sees the whole picture.</p>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+  const sections = document.querySelectorAll('.sec');
+  const navItems = document.querySelectorAll('.ni');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const id = e.target.id;
+        navItems.forEach(n => n.classList.toggle('active', n.getAttribute('href') === '#' + id));
+      }
+    });
+  }, { threshold: 0.2 });
+  sections.forEach(s => io.observe(s));
+</script>
+</body>
+</html>
