@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Engineer Roadmap — Syllabus &amp; Progress Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,300&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060809;--bg2:#0a0d11;--bg3:#101418;--bg4:#171c22;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
+  --text:#ddd9cf;--text2:#868380;--text3:#3f3d38;
+  --p1:#3b82f6;    /* blue  — Phase 1 */
+  --p2:#8b5cf6;    /* violet — Phase 2 */
+  --p3:#f43f5e;    /* rose  — Phase 3 */
+  --p4:#f59e0b;    /* amber — Phase 4 */
+  --done:#22c55e;
+  --mono:'IBM Plex Mono',monospace;
+  --serif:'Fraunces',serif;
+  --sans:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.75;min-height:100vh;}
+
+/* ══ HEADER ══ */
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:28px 40px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.header-left h1{font-family:var(--serif);font-size:22px;font-weight:700;letter-spacing:-.01em;}
+.header-left h1 span{background:linear-gradient(90deg,var(--p1),var(--p2),var(--p3),var(--p4));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.header-left p{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-top:3px;}
+.header-right{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.overall-progress{display:flex;align-items:center;gap:10px;}
+.op-bar-bg{width:180px;height:4px;background:var(--bg4);border-radius:99px;overflow:hidden;}
+.op-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--p1),var(--p2),var(--p3),var(--p4));transition:width .5s;}
+.op-label{font-family:var(--mono);font-size:11px;color:var(--text2);}
+
+/* ══ LAYOUT ══ */
+.page{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 73px);}
+
+/* ══ SIDEBAR ══ */
+.sb{background:var(--bg2);border-right:1px solid var(--border);padding:24px 0;position:sticky;top:73px;height:calc(100vh - 73px);overflow-y:auto;}
+.sb-section{margin-bottom:4px;}
+.sb-phase{display:flex;align-items:center;gap:8px;padding:8px 18px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);cursor:pointer;transition:all .15s;border-left:2px solid transparent;text-decoration:none;}
+.sb-phase:hover{color:var(--text2);background:var(--bg3);}
+.sb-phase.p1{color:var(--p1);border-color:var(--p1);}
+.sb-phase.p2{color:var(--p2);border-color:var(--p2);}
+.sb-phase.p3{color:var(--p3);border-color:var(--p3);}
+.sb-phase.p4{color:var(--p4);border-color:var(--p4);}
+.sb-week{display:flex;align-items:center;gap:8px;padding:5px 18px 5px 30px;font-size:12.5px;color:var(--text3);cursor:pointer;transition:all .15s;text-decoration:none;}
+.sb-week:hover{color:var(--text2);}
+.sb-week.active{color:var(--text);}
+.sb-divider{height:1px;background:var(--border);margin:12px 18px;}
+.sb-item{display:flex;align-items:center;gap:8px;padding:5px 18px;font-size:12.5px;color:var(--text3);cursor:pointer;transition:all .15s;text-decoration:none;}
+.sb-item:hover{color:var(--text2);}
+
+/* ══ MAIN ══ */
+.main{padding:40px 48px;max-width:860px;}
+
+/* ══ HERO ══ */
+.hero{margin-bottom:48px;padding-bottom:40px;border-bottom:1px solid var(--border);}
+.hero h2{font-family:var(--serif);font-size:42px;font-weight:700;line-height:1.08;letter-spacing:-.02em;margin-bottom:14px;}
+.hero-meta{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:24px;}
+.hm{font-family:var(--mono);font-size:11px;color:var(--text2);display:flex;align-items:center;gap:6px;}
+.hm strong{color:var(--text);}
+
+/* phase overview cards */
+.phase-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.pc{border-radius:10px;padding:16px;cursor:pointer;transition:transform .15s,box-shadow .15s;}
+.pc:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.4);}
+.pc.p1{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);}
+.pc.p2{background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.25);}
+.pc.p3{background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.25);}
+.pc.p4{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);}
+.pc-num{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;}
+.pc.p1 .pc-num{color:var(--p1);}
+.pc.p2 .pc-num{color:var(--p2);}
+.pc.p3 .pc-num{color:var(--p3);}
+.pc.p4 .pc-num{color:var(--p4);}
+.pc-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px;line-height:1.3;}
+.pc-weeks{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:10px;}
+.pc-bar-bg{height:3px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;}
+.pc-bar-fill{height:100%;border-radius:99px;transition:width .5s;}
+.p1 .pc-bar-fill{background:var(--p1);}
+.p2 .pc-bar-fill{background:var(--p2);}
+.p3 .pc-bar-fill{background:var(--p3);}
+.p4 .pc-bar-fill{background:var(--p4);}
+.pc-stat{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:6px;}
+
+/* focus this week */
+.focus-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:40px;}
+.fc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.fc-title{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);}
+.fc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fc-field label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:4px;}
+.fc-field input,.fc-field select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-family:var(--sans);font-size:13px;color:var(--text);outline:none;transition:border-color .15s;}
+.fc-field input:focus,.fc-field select:focus{border-color:var(--border2);}
+.fc-field input::placeholder{color:var(--text3);}
+
+/* ══ SECTION TITLE ══ */
+.sec{margin-bottom:56px;scroll-margin-top:90px;}
+.phase-banner{border-radius:10px;padding:20px 24px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.pb.p1{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);}
+.pb.p2{background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.2);}
+.pb.p3{background:rgba(244,63,94,.07);border:1px solid rgba(244,63,94,.2);}
+.pb.p4{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);}
+.pb-left{}
+.pb-badge{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:3px;margin-bottom:8px;display:inline-block;}
+.p1 .pb-badge{background:rgba(59,130,246,.2);color:var(--p1);}
+.p2 .pb-badge{background:rgba(139,92,246,.2);color:var(--p2);}
+.p3 .pb-badge{background:rgba(244,63,94,.2);color:var(--p3);}
+.p4 .pb-badge{background:rgba(245,158,11,.2);color:var(--p4);}
+.pb-title{font-family:var(--serif);font-size:22px;font-weight:700;}
+.pb-goal{font-size:13px;color:var(--text2);margin-top:4px;max-width:480px;}
+.pb-right{text-align:right;}
+.pb-weeks{font-family:var(--mono);font-size:11px;color:var(--text2);}
+
+/* week block */
+.week-block{background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden;}
+.wb-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;user-select:none;}
+.wb-header:hover{background:var(--bg3);}
+.wb-left{display:flex;align-items:center;gap:12px;}
+.wb-num{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
+.wb-title{font-size:14px;font-weight:500;color:var(--text);}
+.wb-meta{font-size:12px;color:var(--text3);}
+.wb-right{display:flex;align-items:center;gap:10px;}
+.wb-prog{font-family:var(--mono);font-size:11px;color:var(--text3);}
+.wb-chevron{color:var(--text3);transition:transform .2s;font-size:12px;}
+.wb-chevron.open{transform:rotate(90deg);}
+.wb-body{padding:0 20px 20px;display:none;}
+.wb-body.open{display:block;}
+
+/* topics grid */
+.topics-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:20px;}
+.topic-item{display:flex;align-items:flex-start;gap:8px;font-size:13px;}
+.tc{width:15px;height:15px;border:1.5px solid var(--border2);border-radius:3px;flex-shrink:0;margin-top:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.tc.chk{background:var(--done);border-color:var(--done);}
+.tc.chk::after{content:'';width:4px;height:7px;border:1.5px solid #010f05;border-top:none;border-left:none;transform:rotate(45deg) translate(-1px,-1px);}
+.topic-text{color:var(--text2);line-height:1.4;}
+
+/* project card */
+.project-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px;}
+.proj-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:8px;}
+.proj-name{font-size:14px;font-weight:500;color:var(--text);}
+.proj-badge{font-family:var(--mono);font-size:9px;letter-spacing:.07em;text-transform:uppercase;padding:2px 8px;border-radius:3px;flex-shrink:0;}
+.proj-desc{font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.5;}
+.proj-steps{list-style:none;}
+.proj-step{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);padding:3px 0;}
+.proj-link{margin-top:10px;}
+.proj-link label{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:3px;}
+.proj-link input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:5px 9px;font-family:var(--mono);font-size:12px;color:var(--text);outline:none;}
+.proj-link input::placeholder{color:var(--text3);}
+
+/* resources */
+.resources-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px 16px;}
+.res-title{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;}
+.res-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);padding:3px 0;}
+
+/* section divider label */
+.sec-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;margin-top:20px;}
+
+/* phase complete card */
+.phase-complete{background:var(--bg3);border-radius:8px;padding:14px 16px;margin-top:16px;border:1px solid var(--border);}
+.phase-complete .sec-label{margin-top:0;}
+
+/* full-width table */
+.wide-table{width:100%;border-radius:8px;overflow:hidden;border:1px solid var(--border);margin:12px 0;}
+.wide-table table{width:100%;border-collapse:collapse;font-size:13px;}
+.wide-table th{background:var(--bg3);padding:9px 14px;text-align:left;font-family:var(--mono);font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--text2);border-bottom:1px solid var(--border2);}
+.wide-table td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;}
+.wide-table tr:last-child td{border-bottom:none;}
+.wide-table tr:hover td{background:var(--bg2);}
+.wide-table td input{background:transparent;border:none;width:100%;color:var(--text2);font-family:var(--sans);font-size:13px;outline:none;}
+.wide-table td input::placeholder{color:var(--text3);}
+
+/* concepts */
+.concepts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
+.concept-group{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px 16px;}
+.cg-title{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;}
+.cg-item{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text2);padding:3px 0;}
+
+/* weekly log */
+.log-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:12px;}
+.log-week{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.log-week input{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-family:var(--mono);font-size:10px;color:var(--text2);outline:none;width:130px;}
+.log-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.log-field label{font-family:var(--mono);font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:4px;}
+.log-field textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-family:var(--sans);font-size:13px;color:var(--text);outline:none;resize:vertical;min-height:56px;}
+.log-field textarea::placeholder{color:var(--text3);}
+.log-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;flex-wrap:wrap;gap:8px;}
+.streak-toggle{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--text2);cursor:pointer;}
+.streak-btn{padding:4px 12px;border-radius:4px;font-family:var(--mono);font-size:11px;border:1px solid var(--border);cursor:pointer;transition:all .15s;}
+.streak-btn.yes{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.35);color:#22c55e;}
+.streak-btn.no{background:rgba(244,63,94,.15);border-color:rgba(244,63,94,.35);color:#f43f5e;}
+
+/* job tracker */
+.job-tracker{margin-top:8px;}
+
+/* save button */
+.save-bar{position:fixed;bottom:24px;right:28px;z-index:200;}
+.save-btn{background:var(--done);color:#010f05;font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:10px 20px;border-radius:8px;border:none;cursor:pointer;font-weight:600;box-shadow:0 4px 20px rgba(34,197,94,.3);transition:all .2s;}
+.save-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(34,197,94,.4);}
+.save-btn.saved{background:var(--bg3);color:var(--done);border:1px solid rgba(34,197,94,.3);}
+
+/* tags */
+.tag{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;margin-right:4px;}
+.tag.p1{background:rgba(59,130,246,.15);color:var(--p1);}
+.tag.p2{background:rgba(139,92,246,.15);color:var(--p2);}
+.tag.p3{background:rgba(244,63,94,.15);color:var(--p3);}
+.tag.p4{background:rgba(245,158,11,.15);color:var(--p4);}
+.tag.done{background:rgba(34,197,94,.15);color:var(--done);}
+
+p{margin-bottom:12px;color:var(--text2);}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
+@media(max-width:768px){
+  .page{grid-template-columns:1fr;}
+  .sb{display:none;}
+  .main{padding:24px 20px;}
+  .phase-grid{grid-template-columns:1fr 1fr;}
+  .topics-grid,.fc-grid,.log-grid,.concepts-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header class="header">
+  <div class="header-left">
+    <h1>🤖 <span>AI Engineer Roadmap</span></h1>
+    <p>Progress Tracker · 20 Weeks · 4 Phases · 13 Projects</p>
+  </div>
+  <div class="header-right">
+    <div class="overall-progress">
+      <span class="op-label">Overall</span>
+      <div class="op-bar-bg"><div class="op-bar-fill" id="overall-bar" style="width:0%"></div></div>
+      <span class="op-label" id="overall-pct">0%</span>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- ══ SIDEBAR ══ -->
+  <nav class="sb">
+    <a class="sb-phase p1" href="#phase1">Phase 1 — ML Foundations</a>
+    <a class="sb-week" href="#w1">↳ Week 1 · ML Math</a>
+    <a class="sb-week" href="#w2">↳ Week 2 · Pipelines</a>
+    <div class="sb-divider"></div>
+    <a class="sb-phase p2" href="#phase2">Phase 2 — LLMs &amp; Prompts</a>
+    <a class="sb-week" href="#w3">↳ Week 3 · LLM Fundamentals</a>
+    <a class="sb-week" href="#w4">↳ Week 4 · Prompt Engineering</a>
+    <a class="sb-week" href="#w56">↳ Weeks 5–6 · Measurement</a>
+    <a class="sb-week" href="#w78">↳ Weeks 7–8 · RAG Systems</a>
+    <div class="sb-divider"></div>
+    <a class="sb-phase p3" href="#phase3">Phase 3 — Agents</a>
+    <a class="sb-week" href="#w9">↳ Week 9 · ReAct Agents</a>
+    <a class="sb-week" href="#w10">↳ Week 10 · RAG + Memory</a>
+    <a class="sb-week" href="#w11">↳ Week 11 · LangGraph</a>
+    <a class="sb-week" href="#w1213">↳ Weeks 12–13 · Multi-Agent</a>
+    <a class="sb-week" href="#w1415">↳ Weeks 14–15 · MCP</a>
+    <a class="sb-week" href="#w16">↳ Week 16 · Evaluation</a>
+    <div class="sb-divider"></div>
+    <a class="sb-phase p4" href="#phase4">Phase 4 — Production</a>
+    <a class="sb-week" href="#w1718">↳ Weeks 17–18 · LLMOps</a>
+    <a class="sb-week" href="#w1920">↳ Weeks 19–20 · Portfolio</a>
+    <div class="sb-divider"></div>
+    <a class="sb-item" href="#concepts">🧠 Key Concepts</a>
+    <a class="sb-item" href="#resources">📚 Resources</a>
+    <a class="sb-item" href="#jobs">💼 Job Tracker</a>
+    <a class="sb-item" href="#log">📓 Weekly Log</a>
+  </nav>
+
+  <!-- ══ MAIN ══ -->
+  <main class="main">
+
+    <!-- HERO -->
+    <div class="hero">
+      <h2>AI Engineer<br>Roadmap Tracker</h2>
+      <div class="hero-meta">
+        <div class="hm">🎯 <strong>Goal:</strong> AI Engineer (LLMs · Agents · Agentic AI)</div>
+        <div class="hm">⏱ <strong>Timeline:</strong> 7–8 months</div>
+        <div class="hm">📅 <strong>Started:</strong> <input id="start-date" style="background:transparent;border:none;border-bottom:1px solid var(--border);padding:1px 4px;font-family:var(--mono);font-size:11px;color:var(--text);outline:none;width:110px;" placeholder="___________"></div>
+      </div>
+
+      <!-- Phase overview -->
+      <div class="phase-grid">
+        <a class="pc p1" href="#phase1">
+          <div class="pc-num">Phase 1</div>
+          <div class="pc-name">ML Foundations</div>
+          <div class="pc-weeks">Weeks 1–2 · 2 projects</div>
+          <div class="pc-bar-bg"><div class="pc-bar-fill" id="p1bar" style="width:0%"></div></div>
+          <div class="pc-stat" id="p1stat">0% complete</div>
+        </a>
+        <a class="pc p2" href="#phase2">
+          <div class="pc-num">Phase 2</div>
+          <div class="pc-name">LLMs &amp; Prompt Engineering</div>
+          <div class="pc-weeks">Weeks 3–8 · 6 projects</div>
+          <div class="pc-bar-bg"><div class="pc-bar-fill" id="p2bar" style="width:0%"></div></div>
+          <div class="pc-stat" id="p2stat">0% complete</div>
+        </a>
+        <a class="pc p3" href="#phase3">
+          <div class="pc-num">Phase 3</div>
+          <div class="pc-name">AI Agents &amp; Agentic Systems</div>
+          <div class="pc-weeks">Weeks 9–16 · 8 projects</div>
+          <div class="pc-bar-bg"><div class="pc-bar-fill" id="p3bar" style="width:0%"></div></div>
+          <div class="pc-stat" id="p3stat">0% complete</div>
+        </a>
+        <a class="pc p4" href="#phase4">
+          <div class="pc-num">Phase 4</div>
+          <div class="pc-name">Production AI + Portfolio</div>
+          <div class="pc-weeks">Weeks 17–20 · Portfolio polish</div>
+          <div class="pc-bar-bg"><div class="pc-bar-fill" id="p4bar" style="width:0%"></div></div>
+          <div class="pc-stat" id="p4stat">0% complete</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- FOCUS THIS WEEK -->
+    <div class="focus-card">
+      <div class="fc-header">
+        <span class="fc-title">🚀 This week's focus — update every Monday</span>
+        <span class="tag p1" id="week-badge">Week —</span>
+      </div>
+      <div class="fc-grid">
+        <div class="fc-field"><label>Current week #</label><input id="cur-week" placeholder="e.g. 5" oninput="document.getElementById('week-badge').textContent='Week '+(this.value||'—')"></div>
+        <div class="fc-field"><label>Main goal this week</label><input id="cur-goal" placeholder="e.g. Build eval harness"></div>
+        <div class="fc-field"><label>Project I'm building</label><input id="cur-project" placeholder="e.g. Prompt A/B Framework"></div>
+        <div class="fc-field"><label>Blocker / question</label><input id="cur-blocker" placeholder="e.g. Async rate limiting unclear"></div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         PHASE 1
+    ════════════════════════════════ -->
+    <div class="sec" id="phase1">
+      <div class="phase-banner pb p1">
+        <div class="pb-left">
+          <div class="pb-badge">Phase 1</div>
+          <div class="pb-title">ML Foundations (Fast-track)</div>
+          <div class="pb-goal">Understand gradient descent, loss functions, and classical ML well enough to reason about LLM training.</div>
+        </div>
+        <div class="pb-right">
+          <div class="pb-weeks">Weeks 1–2</div>
+          <div class="pb-weeks" style="color:var(--p1)">2 projects · 2 weeks max</div>
+        </div>
+      </div>
+
+      <!-- Week 1 -->
+      <div class="week-block" id="w1">
+        <div class="wb-header" onclick="toggleWeek(this)">
+          <div class="wb-left">
+            <span class="wb-num" style="color:var(--p1)">Week 1</span>
+            <div><div class="wb-title">ML Math &amp; Classical ML</div><div class="wb-meta">Gradient descent · sklearn · decision trees</div></div>
+          </div>
+          <div class="wb-right">
+            <span class="wb-prog" id="prog-w1">0/7</span>
+            <span class="wb-chevron">›</span>
+          </div>
+        </div>
+        <div class="wb-body">
+          <div class="sec-label">Topics</div>
+          <div class="topics-grid" data-phase="p1" data-week="w1">
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p1')"></div><span class="topic-text">Vectors, matrices, dot products (NumPy)</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p1')"></div><span class="topic-text">Derivatives, chain rule, partial derivatives</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p1')"></div><span class="topic-text">Gradient descent — implement from scratch</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p1')"></div><span class="topic-text">Probability basics: distributions, Bayes</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p1')"></div><span class="topic-text">Linear regression, logistic regression (sklearn)</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p1')"></div><span class="topic-text">Decision trees, random forests</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p1')"></div><span class="topic-text">Train/val/test splits, overfitting, regularisation</span></div>
+          </div>
+
+          <div class="project-card">
+            <div class="proj-header">
+              <span class="proj-name">Project — Gradient Descent Visualiser</span>
+              <span class="proj-badge tag p1">W1 · Project</span>
+            </div>
+            <div class="proj-desc">Implement gradient descent in pure NumPy on a 2D loss surface. Plot the steps. Push to GitHub.</div>
+            <ul class="proj-steps">
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p1')"></div>Project started</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p1')"></div>Core logic working</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p1')"></div>Pushed to GitHub</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p1')"></div>README written</li>
+            </ul>
+            <div class="proj-link"><label>GitHub link</label><input placeholder="https://github.com/..."></div>
+          </div>
+
+          <div class="resources-box">
+            <div class="res-title">Resources</div>
+            <div class="res-item"><div class="tc" onclick="toggleCheck(this,'p1')"></div>3Blue1Brown — Essence of Calculus (YouTube)</div>
+            <div class="res-item"><div class="tc" onclick="toggleCheck(this,'p1')"></div>Khan Academy — Linear Algebra</div>
+            <div class="res-item"><div class="tc" onclick="toggleCheck(this,'p1')"></div>fast.ai Practical ML (skim)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Week 2 -->
+      <div class="week-block" id="w2">
+        <div class="wb-header" onclick="toggleWeek(this)">
+          <div class="wb-left">
+            <span class="wb-num" style="color:var(--p1)">Week 2</span>
+            <div><div class="wb-title">Evaluation, Pipelines &amp; Deep Learning Intro</div><div class="wb-meta">sklearn · PyTorch · Kaggle</div></div>
+          </div>
+          <div class="wb-right">
+            <span class="wb-prog" id="prog-w2">0/6</span>
+            <span class="wb-chevron">›</span>
+          </div>
+        </div>
+        <div class="wb-body">
+          <div class="sec-label">Topics</div>
+          <div class="topics-grid" data-phase="p1" data-week="w2">
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p1')"></div><span class="topic-text">Cross-validation, precision/recall/F1/AUC</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p1')"></div><span class="topic-text">sklearn Pipeline with preprocessing</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p1')"></div><span class="topic-text">Hyperparameter tuning (GridSearchCV)</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p1')"></div><span class="topic-text">Pandas advanced — groupby, merge, pivot</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p1')"></div><span class="topic-text">Neural network basics — forward pass, backprop</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p1')"></div><span class="topic-text">PyTorch tensors &amp; autograd</span></div>
+          </div>
+
+          <div class="project-card">
+            <div class="proj-header">
+              <span class="proj-name">Project — Kaggle Classifier</span>
+              <span class="proj-badge tag p1">W2 · Project</span>
+            </div>
+            <div class="proj-desc">Full sklearn pipeline with cross-validation and a tuned random forest on any beginner Kaggle dataset.</div>
+            <ul class="proj-steps">
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p1')"></div>Project started</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p1')"></div>sklearn pipeline built</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p1')"></div>Eval metrics computed</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p1')"></div>Submitted to Kaggle</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p1')"></div>Pushed to GitHub</li>
+            </ul>
+            <div class="proj-link"><label>GitHub link</label><input placeholder="https://github.com/..."></div>
+            <div class="proj-link"><label>Kaggle score</label><input placeholder="e.g. 0.847"></div>
+          </div>
+
+          <div class="phase-complete">
+            <div class="sec-label">Phase 1 Complete? ✅</div>
+            <div class="res-item"><div class="tc" onclick="toggleCheck(this,'p1')"></div>Understand gradient descent intuitively</div>
+            <div class="res-item"><div class="tc" onclick="toggleCheck(this,'p1')"></div>Can build an sklearn pipeline from scratch</div>
+            <div class="res-item"><div class="tc" onclick="toggleCheck(this,'p1')"></div>Know what overfitting looks like and how to fix it</div>
+            <div class="res-item"><div class="tc" onclick="toggleCheck(this,'p1')"></div>2 projects on GitHub</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         PHASE 2
+    ════════════════════════════════ -->
+    <div class="sec" id="phase2">
+      <div class="phase-banner pb p2">
+        <div class="pb-left">
+          <div class="pb-badge">Phase 2</div>
+          <div class="pb-title">LLMs &amp; Prompt Engineering</div>
+          <div class="pb-goal">Call LLMs confidently, engineer prompts that are reliable and measurable, build a RAG system with evaluation.</div>
+        </div>
+        <div class="pb-right">
+          <div class="pb-weeks">Weeks 3–8</div>
+          <div class="pb-weeks" style="color:var(--p2)">6 projects · 6 weeks</div>
+        </div>
+      </div>
+
+      <!-- W3 -->
+      <div class="week-block" id="w3">
+        <div class="wb-header" onclick="toggleWeek(this)">
+          <div class="wb-left"><span class="wb-num" style="color:var(--p2)">Week 3</span><div><div class="wb-title">LLM Fundamentals</div><div class="wb-meta">Transformers · tokenisation · context windows · 2 projects</div></div></div>
+          <div class="wb-right"><span class="wb-chevron">›</span></div>
+        </div>
+        <div class="wb-body">
+          <div class="topics-grid" data-phase="p2">
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Transformer architecture — attention, positional encoding</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Tokenisation — BPE, token-to-text mapping</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Context windows — limits per model, cost implications</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Temperature, top_p, max_tokens — what they do</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">System vs user vs assistant roles</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Streaming responses</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Token counting &amp; cost estimation</span></div>
+          </div>
+          <div class="project-card">
+            <div class="proj-header"><span class="proj-name">Project 1 — LLM API Explorer</span><span class="proj-badge tag p2">P1</span></div>
+            <div class="proj-desc">Call Claude, GPT-4, and Gemini with the same 10 prompts. Log: response, latency, token count, cost. Output a comparison CSV.</div>
+            <ul class="proj-steps">
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Claude API integrated</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>OpenAI API integrated</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Gemini API integrated</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Comparison CSV generated</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Pushed to GitHub with README</li>
+            </ul>
+            <div class="proj-link"><label>GitHub link</label><input placeholder="https://github.com/..."></div>
+          </div>
+          <div class="project-card">
+            <div class="proj-header"><span class="proj-name">Project 2 — Tokenisation Visualiser</span><span class="proj-badge tag p2">P2</span></div>
+            <div class="proj-desc">Streamlit app: paste any text, see each token highlighted in colour with token ID. Shows count, cost estimate, flags expensive patterns.</div>
+            <ul class="proj-steps">
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>tiktoken / tokenizer integrated</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Colour highlighting working</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Cost estimate calculated</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Deployed to Streamlit Cloud</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Pushed to GitHub</li>
+            </ul>
+            <div class="proj-link"><label>GitHub link</label><input placeholder="https://github.com/..."></div>
+            <div class="proj-link"><label>Live demo</label><input placeholder="https://share.streamlit.io/..."></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- W4 -->
+      <div class="week-block" id="w4">
+        <div class="wb-header" onclick="toggleWeek(this)">
+          <div class="wb-left"><span class="wb-num" style="color:var(--p2)">Week 4</span><div><div class="wb-title">Prompt Engineering Fundamentals</div><div class="wb-meta">Zero-shot · CoT · structured outputs · Project 3</div></div></div>
+          <div class="wb-right"><span class="wb-chevron">›</span></div>
+        </div>
+        <div class="wb-body">
+          <div class="topics-grid" data-phase="p2">
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Zero-shot vs few-shot vs chain-of-thought</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">System prompt design principles</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">XML / JSON structured outputs</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Prompt prefilling trick (Claude)</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Hallucination causes and mitigation</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Role prompting and persona design</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Negative examples in prompts</span></div>
+          </div>
+          <div class="project-card">
+            <div class="proj-header"><span class="proj-name">Project 3 — Structured Output Engine</span><span class="proj-badge tag p2">P3</span></div>
+            <div class="proj-desc">Extract Pydantic models from unstructured text (news articles, job postings, receipts). Handle JSON refusals, extra text, nested objects, retry on validation failure.</div>
+            <ul class="proj-steps">
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Pydantic schemas defined</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Extraction working for 3 document types</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Retry logic implemented</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Pushed to GitHub</li>
+            </ul>
+            <div class="proj-link"><label>GitHub link</label><input placeholder="https://github.com/..."></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- W5-6 -->
+      <div class="week-block" id="w56">
+        <div class="wb-header" onclick="toggleWeek(this)">
+          <div class="wb-left"><span class="wb-num" style="color:var(--p2)">Weeks 5–6</span><div><div class="wb-title">Prompt Engineering — Measurement</div><div class="wb-meta">LLM-as-judge · A/B testing · async · Projects 4 &amp; 5</div></div></div>
+          <div class="wb-right"><span class="wb-chevron">›</span></div>
+        </div>
+        <div class="wb-body">
+          <div class="topics-grid" data-phase="p2">
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">LLM-as-judge pattern</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Designing eval sets with ground truth</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">A/B testing prompt variants systematically</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Async parallel LLM calls (asyncio)</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Prompt chaining — when and how</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Self-critique and refinement loops</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Statistical significance in evals</span></div>
+          </div>
+          <div class="project-card">
+            <div class="proj-header"><span class="proj-name">Project 4 — Prompt A/B Testing Framework</span><span class="proj-badge tag p2">P4</span></div>
+            <div class="proj-desc">Test 5 prompt variants on 20 inputs. Score with LLM judge (1–5). Plot leaderboard.</div>
+            <ul class="proj-steps">
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>5 prompt variants written</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>20 test cases with ground truth</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>LLM-as-judge scoring implemented</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Leaderboard chart generated</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Pushed to GitHub</li>
+            </ul>
+            <div class="proj-link"><label>GitHub link</label><input placeholder="https://github.com/..."></div>
+            <div class="proj-link"><label>Best prompt score (out of 5)</label><input placeholder="e.g. 4.2 / 5"></div>
+          </div>
+          <div class="project-card">
+            <div class="proj-header"><span class="proj-name">Project 5 — Multi-step Prompt Pipeline</span><span class="proj-badge tag p2">P5</span></div>
+            <div class="proj-desc">Chain 4 specialised prompts: extract requirements → research → draft → critique &amp; rewrite.</div>
+            <ul class="proj-steps">
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Step 1 (extraction) working</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Step 2 (research) working</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Step 3 (draft) working</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Step 4 (critique + rewrite) working</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Pushed to GitHub</li>
+            </ul>
+            <div class="proj-link"><label>GitHub link</label><input placeholder="https://github.com/..."></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- W7-8 -->
+      <div class="week-block" id="w78">
+        <div class="wb-header" onclick="toggleWeek(this)">
+          <div class="wb-left"><span class="wb-num" style="color:var(--p2)">Weeks 7–8</span><div><div class="wb-title">RAG Systems</div><div class="wb-meta">Embeddings · ChromaDB · hybrid search · reranking · RAGAS · Project 6</div></div></div>
+          <div class="wb-right"><span class="wb-chevron">›</span></div>
+        </div>
+        <div class="wb-body">
+          <div class="topics-grid" data-phase="p2">
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Vector embeddings — what they are, how to generate</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Cosine similarity and nearest neighbour search</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Chunking strategies: fixed, recursive, semantic</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Vector databases: ChromaDB, Pinecone, Weaviate</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Hybrid search: BM25 + vector</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Reranking with cross-encoder / Cohere</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">RAG evaluation: faithfulness, relevance, context recall</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p2')"></div><span class="topic-text">Context window management in RAG</span></div>
+          </div>
+          <div class="project-card">
+            <div class="proj-header"><span class="proj-name">Project 6 — Production RAG System</span><span class="proj-badge tag p2">P6</span></div>
+            <div class="proj-desc">Ingest 50+ pages of docs. Semantic search + BM25 + reranker. FastAPI endpoint. Citations. RAGAS scores.</div>
+            <ul class="proj-steps">
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Document ingestion pipeline built</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>ChromaDB vector store set up</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>BM25 keyword search added</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Reranker integrated</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>FastAPI endpoint live</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>RAGAS evaluation run</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Deployed (HF Spaces / Railway)</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p2')"></div>Pushed to GitHub with eval scores in README</li>
+            </ul>
+            <div class="proj-link"><label>GitHub link</label><input placeholder="https://github.com/..."></div>
+            <div class="proj-link"><label>Live demo</label><input placeholder="https://..."></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px;">
+              <div class="proj-link"><label>RAGAS Faithfulness</label><input placeholder="e.g. 0.87"></div>
+              <div class="proj-link"><label>Answer Relevance</label><input placeholder="e.g. 0.83"></div>
+              <div class="proj-link"><label>Context Recall</label><input placeholder="e.g. 0.81"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         PHASE 3
+    ════════════════════════════════ -->
+    <div class="sec" id="phase3">
+      <div class="phase-banner pb p3">
+        <div class="pb-left">
+          <div class="pb-badge">Phase 3</div>
+          <div class="pb-title">AI Agents &amp; Agentic Systems</div>
+          <div class="pb-goal">Build agents from scratch, multi-agent systems, and MCP-connected tools. Make non-deterministic systems reliable.</div>
+        </div>
+        <div class="pb-right">
+          <div class="pb-weeks">Weeks 9–16</div>
+          <div class="pb-weeks" style="color:var(--p3)">8 projects · 8 weeks</div>
+        </div>
+      </div>
+
+      <!-- quick week blocks for Phase 3 -->
+      <!-- W9 -->
+      <div class="week-block" id="w9">
+        <div class="wb-header" onclick="toggleWeek(this)">
+          <div class="wb-left"><span class="wb-num" style="color:var(--p3)">Week 9</span><div><div class="wb-title">ReAct Agent From Scratch</div><div class="wb-meta">ReAct loop · tool use · stopping conditions · Project 7</div></div></div>
+          <div class="wb-right"><span class="wb-chevron">›</span></div>
+        </div>
+        <div class="wb-body">
+          <div class="topics-grid" data-phase="p3">
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">ReAct pattern: Thought → Action → Observation loop</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Parsing LLM output to detect tool calls</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Tool definitions and dispatch</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Stopping conditions and max step limits</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Error handling in agent loops</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Logging agent reasoning traces</span></div>
+          </div>
+          <div class="project-card">
+            <div class="proj-header"><span class="proj-name">Project 7 — ReAct Agent (Pure Python, No Framework)</span><span class="proj-badge tag p3">P7</span></div>
+            <div class="proj-desc">Build the loop manually. Tools: calculator + web search. Test: "How many seconds has Elon Musk been alive?"</div>
+            <ul class="proj-steps">
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Tool parsing logic working</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Calculator tool implemented</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Search tool implemented</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Loop with stopping condition</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Pushed to GitHub</li>
+            </ul>
+            <div class="proj-link"><label>GitHub link</label><input placeholder="https://github.com/..."></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- W10 -->
+      <div class="week-block" id="w10">
+        <div class="wb-header" onclick="toggleWeek(this)">
+          <div class="wb-left"><span class="wb-num" style="color:var(--p3)">Week 10</span><div><div class="wb-title">RAG Agent With Memory</div><div class="wb-meta">STM · LTM · episodic · context management · Project 8</div></div></div>
+          <div class="wb-right"><span class="wb-chevron">›</span></div>
+        </div>
+        <div class="wb-body">
+          <div class="topics-grid" data-phase="p3">
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Short-term memory (conversation history)</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Long-term memory (vector store)</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Episodic memory patterns</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Context window management across turns</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Memory consolidation strategies</span></div>
+          </div>
+          <div class="project-card">
+            <div class="proj-header"><span class="proj-name">Project 8 — RAG Agent With Memory</span><span class="proj-badge tag p3">P8</span></div>
+            <div class="proj-desc">Feed it your own PDF notes. Ask multi-turn questions connecting facts across pages. Must cite sources and remember prior turns.</div>
+            <ul class="proj-steps">
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Document ingestion working</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Short-term memory implemented</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Long-term memory implemented</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Multi-turn Q&A working</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Source citations included</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Pushed to GitHub</li>
+            </ul>
+            <div class="proj-link"><label>GitHub link</label><input placeholder="https://github.com/..."></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- W11 -->
+      <div class="week-block" id="w11">
+        <div class="wb-header" onclick="toggleWeek(this)">
+          <div class="wb-left"><span class="wb-num" style="color:var(--p3)">Week 11</span><div><div class="wb-title">LangGraph &amp; Agent Frameworks</div><div class="wb-meta">Nodes · edges · state · HITL · LangSmith · Project 9</div></div></div>
+          <div class="wb-right"><span class="wb-chevron">›</span></div>
+        </div>
+        <div class="wb-body">
+          <div class="topics-grid" data-phase="p3">
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">LangGraph: nodes, edges, state, conditional routing</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Difference from LangChain chains</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">State management in long-running agents</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Human-in-the-loop checkpoints</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Agent tracing with LangSmith</span></div>
+          </div>
+          <div class="project-card">
+            <div class="proj-header"><span class="proj-name">Project 9 — Autonomous Code Reviewer</span><span class="proj-badge tag p3">P9</span></div>
+            <div class="proj-desc">Reads a GitHub repo, identifies issues, suggests improvements with diffs. Tools: file reader, shell executor, GitHub API.</div>
+            <ul class="proj-steps">
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>GitHub repo cloning tool built</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>File reading &amp; parsing working</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Code analysis logic implemented</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Diff/suggestion output formatted</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>LangSmith tracing added</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Pushed to GitHub</li>
+            </ul>
+            <div class="proj-link"><label>GitHub link</label><input placeholder="https://github.com/..."></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- W12-13 -->
+      <div class="week-block" id="w1213">
+        <div class="wb-header" onclick="toggleWeek(this)">
+          <div class="wb-left"><span class="wb-num" style="color:var(--p3)">Weeks 12–13</span><div><div class="wb-title">Multi-Agent Systems</div><div class="wb-meta">Orchestrator · message passing · CrewAI · Projects 10 &amp; 11</div></div></div>
+          <div class="wb-right"><span class="wb-chevron">›</span></div>
+        </div>
+        <div class="wb-body">
+          <div class="topics-grid" data-phase="p3">
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Orchestrator + worker pattern</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Agent message passing and shared state</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Role-based system prompts</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">CrewAI vs LangGraph for multi-agent</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Parallel vs sequential agent execution</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Agent communication protocols</span></div>
+          </div>
+          <div class="project-card">
+            <div class="proj-header"><span class="proj-name">Project 10 — Multi-Agent Content Team</span><span class="proj-badge tag p3">P10</span></div>
+            <div class="proj-desc">4 agents: Researcher → Writer → Editor → Fact-checker. Orchestrator assigns tasks. Output must pass fact-checker.</div>
+            <ul class="proj-steps">
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Orchestrator logic built</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>All 4 agents implemented</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Agent conversation log visualised</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Pushed to GitHub</li>
+            </ul>
+            <div class="proj-link"><label>GitHub link</label><input placeholder="https://github.com/..."></div>
+          </div>
+          <div class="project-card">
+            <div class="proj-header"><span class="proj-name">Project 11 — Self-Healing Data Pipeline Agent</span><span class="proj-badge tag p3">P11</span></div>
+            <div class="proj-desc">Simulate a broken ETL pipeline. Agent reads error logs, hypothesises cause, attempts fix, verifies. Escalates if can't fix in 3 attempts.</div>
+            <ul class="proj-steps">
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Broken pipeline simulation built</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Log reading tool implemented</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Hypothesis + fix loop working</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Escalation logic added</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Pushed to GitHub</li>
+            </ul>
+            <div class="proj-link"><label>GitHub link</label><input placeholder="https://github.com/..."></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- W14-15 -->
+      <div class="week-block" id="w1415">
+        <div class="wb-header" onclick="toggleWeek(this)">
+          <div class="wb-left"><span class="wb-num" style="color:var(--p3)">Weeks 14–15</span><div><div class="wb-title">MCP &amp; Production Agents</div><div class="wb-meta">Model Context Protocol · A2A · auth · Docker sandbox · Project 12</div></div></div>
+          <div class="wb-right"><span class="wb-chevron">›</span></div>
+        </div>
+        <div class="wb-body">
+          <div class="topics-grid" data-phase="p3">
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Model Context Protocol — what it is and why it matters</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">MCP server setup and tool registration</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Tool discovery at runtime</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Agent-to-agent (A2A) communication</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Auth and security for agent tools</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Sandboxed code execution (Docker)</span></div>
+          </div>
+          <div class="project-card">
+            <div class="proj-header"><span class="proj-name">Project 12 — MCP-Powered Agent Hub</span><span class="proj-badge tag p3">P12</span></div>
+            <div class="proj-desc">Agent connects to real tools via MCP: Slack, GitHub, calendar, Notion. Takes a single NL command and coordinates across services.</div>
+            <ul class="proj-steps">
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>MCP Python SDK set up</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>At least 2 MCP tool servers connected</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>NL → multi-tool routing working</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Auth handling implemented</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Pushed to GitHub</li>
+            </ul>
+            <div class="proj-link"><label>GitHub link</label><input placeholder="https://github.com/..."></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- W16 -->
+      <div class="week-block" id="w16">
+        <div class="wb-header" onclick="toggleWeek(this)">
+          <div class="wb-left"><span class="wb-num" style="color:var(--p3)">Week 16</span><div><div class="wb-title">Agent Evaluation Framework</div><div class="wb-meta">Trajectory vs outcome · safety · observability · Project 13</div></div></div>
+          <div class="wb-right"><span class="wb-chevron">›</span></div>
+        </div>
+        <div class="wb-body">
+          <div class="topics-grid" data-phase="p3">
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Evals design for agents (trajectory vs outcome)</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">LLM-as-judge for agent outputs</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Regression testing for agents</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Safety evaluation: hallucinated tool calls, prompt injection</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div><span class="topic-text">Observability: tracing, latency, cost per run</span></div>
+          </div>
+          <div class="project-card">
+            <div class="proj-header"><span class="proj-name">Project 13 — Agent Evaluation Harness</span><span class="proj-badge tag p3">P13</span></div>
+            <div class="proj-desc">50+ test cases with ground truth. Score: final answer correctness, tool call efficiency, safety. Generate a score dashboard.</div>
+            <ul class="proj-steps">
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>50+ test cases written</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Correctness scoring implemented</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Tool efficiency metric implemented</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Safety checks implemented</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Score dashboard built</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Pushed to GitHub</li>
+            </ul>
+            <div class="proj-link"><label>GitHub link</label><input placeholder="https://github.com/..."></div>
+          </div>
+          <div class="phase-complete">
+            <div class="sec-label">Phase 3 Complete? ✅</div>
+            <div class="res-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Built a ReAct agent without a framework</div>
+            <div class="res-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Built a multi-agent system with 3+ agents</div>
+            <div class="res-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Connected an agent to real external tools via MCP</div>
+            <div class="res-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div>Have an eval harness for at least one agent project</div>
+            <div class="res-item"><div class="tc" onclick="toggleCheck(this,'p3')"></div>LangSmith tracing set up on main projects</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         PHASE 4
+    ════════════════════════════════ -->
+    <div class="sec" id="phase4">
+      <div class="phase-banner pb p4">
+        <div class="pb-left">
+          <div class="pb-badge">Phase 4</div>
+          <div class="pb-title">Production AI + Portfolio Polish</div>
+          <div class="pb-goal">Make your projects production-grade, polish your portfolio, and start applying.</div>
+        </div>
+        <div class="pb-right">
+          <div class="pb-weeks">Weeks 17–20</div>
+          <div class="pb-weeks" style="color:var(--p4)">Run alongside job applications</div>
+        </div>
+      </div>
+
+      <!-- W17-18 -->
+      <div class="week-block" id="w1718">
+        <div class="wb-header" onclick="toggleWeek(this)">
+          <div class="wb-left"><span class="wb-num" style="color:var(--p4)">Weeks 17–18</span><div><div class="wb-title">Production AI Engineering</div><div class="wb-meta">LLMOps · guardrails · Docker · cost monitoring</div></div></div>
+          <div class="wb-right"><span class="wb-chevron">›</span></div>
+        </div>
+        <div class="wb-body">
+          <div class="topics-grid" data-phase="p4">
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">LLMOps: model versioning, deployment, monitoring</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">Observability: LangSmith, Phoenix, tracing</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">Cost monitoring and optimisation</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">Async queues and streaming at scale</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">Rate limiting and retry strategies</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">Output validation and guardrails</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">Prompt injection defence</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">A/B testing prompts in production</span></div>
+          </div>
+          <div class="project-card">
+            <div class="proj-header"><span class="proj-name">Production Checklist</span><span class="proj-badge tag p4">W17–18</span></div>
+            <div class="proj-desc">Make the top 3 portfolio projects production-grade.</div>
+            <ul class="proj-steps">
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p4')"></div>LangSmith tracing on all 3 portfolio projects</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p4')"></div>Cost dashboard built for main RAG app</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p4')"></div>Guardrails / output validation added</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p4')"></div>Docker Compose setup for main project</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p4')"></div>Error monitoring (Sentry or similar) added</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- W19-20 -->
+      <div class="week-block" id="w1920">
+        <div class="wb-header" onclick="toggleWeek(this)">
+          <div class="wb-left"><span class="wb-num" style="color:var(--p4)">Weeks 19–20</span><div><div class="wb-title">Portfolio Polish</div><div class="wb-meta">GitHub · LinkedIn · blog posts · interview prep</div></div></div>
+          <div class="wb-right"><span class="wb-chevron">›</span></div>
+        </div>
+        <div class="wb-body">
+          <div class="sec-label">GitHub Profile</div>
+          <div class="topics-grid" data-phase="p4">
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">Professional headshot and real name</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">Bio: "AI Engineer" + key skills</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">6 repos pinned — only AI/ML projects</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">Every repo has live demo OR video</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">Topic tags: llm rag langchain agents python</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">Commit history tells an iterative story</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">Every README: description, demo, diagram, eval scores, "what didn't work"</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">All projects runnable in 2 commands</span></div>
+          </div>
+
+          <div class="sec-label" style="margin-top:20px;">LinkedIn</div>
+          <div class="topics-grid" data-phase="p4">
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">Headline says "AI Engineer" not "Software Engineer"</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">Projects section links to 3 best GitHub repos</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">Posting 1 technical update per week</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">Connected with 5+ AI engineers at target companies</span></div>
+          </div>
+
+          <div class="sec-label" style="margin-top:20px;">Content</div>
+          <div class="project-card">
+            <ul class="proj-steps">
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p4')"></div>Blog post 1 published</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p4')"></div>Blog post 2 published</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p4')"></div>Model or dataset published to Hugging Face Hub</li>
+              <li class="proj-step"><div class="tc" onclick="toggleCheck(this,'p4')"></div>Active in one AI community (Discord / Slack / Reddit)</li>
+            </ul>
+            <div class="proj-link"><label>Blog post 1</label><input placeholder="https://..."></div>
+            <div class="proj-link"><label>Blog post 2</label><input placeholder="https://..."></div>
+          </div>
+
+          <div class="sec-label">Interview Prep</div>
+          <div class="topics-grid" data-phase="p4">
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">Can explain every project in 2 minutes with metrics</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">Prepared "what failed and what I'd do differently"</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">System design prep: "design a RAG chatbot for a bank"</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">Common AI engineer interview questions practiced</span></div>
+            <div class="topic-item"><div class="tc" onclick="toggleCheck(this,'p4')"></div><span class="topic-text">LLM internals: attention, tokenisation, context windows</span></div>
+          </div>
+
+          <!-- 3 must-haves -->
+          <div class="sec-label" style="margin-top:20px;">3 Must-Have Portfolio Projects</div>
+          <div class="wide-table">
+            <table>
+              <tr><th>Project</th><th>Live Demo</th><th>Eval Scores</th><th>Video</th><th>README ✓</th><th>GitHub link</th></tr>
+              <tr>
+                <td>RAG application</td>
+                <td><div class="tc" onclick="toggleCheck(this,'p4')" style="margin:0 auto;"></div></td>
+                <td><div class="tc" onclick="toggleCheck(this,'p4')" style="margin:0 auto;"></div></td>
+                <td><div class="tc" onclick="toggleCheck(this,'p4')" style="margin:0 auto;"></div></td>
+                <td><div class="tc" onclick="toggleCheck(this,'p4')" style="margin:0 auto;"></div></td>
+                <td><input placeholder="https://github.com/..."></td>
+              </tr>
+              <tr>
+                <td>AI agent with tools</td>
+                <td><div class="tc" onclick="toggleCheck(this,'p4')" style="margin:0 auto;"></div></td>
+                <td><div class="tc" onclick="toggleCheck(this,'p4')" style="margin:0 auto;"></div></td>
+                <td><div class="tc" onclick="toggleCheck(this,'p4')" style="margin:0 auto;"></div></td>
+                <td><div class="tc" onclick="toggleCheck(this,'p4')" style="margin:0 auto;"></div></td>
+                <td><input placeholder="https://github.com/..."></td>
+              </tr>
+              <tr>
+                <td>Prompt benchmark</td>
+                <td><div class="tc" onclick="toggleCheck(this,'p4')" style="margin:0 auto;"></div></td>
+                <td><div class="tc" onclick="toggleCheck(this,'p4')" style="margin:0 auto;"></div></td>
+                <td><div class="tc" onclick="toggleCheck(this,'p4')" style="margin:0 auto;"></div></td>
+                <td><div class="tc" onclick="toggleCheck(this,'p4')" style="margin:0 auto;"></div></td>
+                <td><input placeholder="https://github.com/..."></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         KEY CONCEPTS
+    ════════════════════════════════ -->
+    <div class="sec" id="concepts">
+      <div style="font-family:var(--serif);font-size:26px;font-weight:700;margin-bottom:8px;">🧠 Key Concepts to Master</div>
+      <p style="margin-bottom:20px;">Tick when you can explain it confidently to someone else — without notes.</p>
+      <div class="concepts-grid">
+        <div class="concept-group">
+          <div class="cg-title" style="color:var(--p2);">LLM Internals</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>How attention mechanism works</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>What tokenisation is and why it affects cost</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>What a context window is and its limits</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>Why temperature affects output randomness</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>How RLHF shapes model behaviour</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>Difference between base model and instruction-tuned</div>
+        </div>
+        <div class="concept-group">
+          <div class="cg-title" style="color:var(--p2);">Prompt Engineering</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>Zero-shot vs few-shot vs CoT — when to use each</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>Why structured outputs improve reliability</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>What prompt injection is and how to defend</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>Why prompts degrade with longer contexts</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>How to design a ground-truth eval set</div>
+        </div>
+        <div class="concept-group">
+          <div class="cg-title" style="color:var(--p2);">RAG &amp; Retrieval</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>Why chunking strategy affects retrieval quality</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>What embedding models do and how to choose one</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>Why hybrid search beats pure vector search</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>What RAGAS metrics actually measure</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>The "lost in the middle" problem</div>
+        </div>
+        <div class="concept-group">
+          <div class="cg-title" style="color:var(--p3);">Agents</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>How the ReAct loop works</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>What "tool use" means and how LLMs call tools</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>Why agents hallucinate tool arguments</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>Difference between orchestrator and worker agents</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>What MCP is and why it matters</div>
+          <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>Trajectory eval vs final output eval</div>
+        </div>
+        <div class="concept-group" style="grid-column:1/-1;">
+          <div class="cg-title" style="color:var(--p4);">Production</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+            <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>What LLMOps means vs MLOps</div>
+            <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>Why tracing is essential for debugging agents</div>
+            <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>How to estimate and control LLM API costs</div>
+            <div class="cg-item"><div class="tc" onclick="toggleCheck(this,'all')"></div>What guardrails are and how to implement them</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         RESOURCES
+    ════════════════════════════════ -->
+    <div class="sec" id="resources">
+      <div style="font-family:var(--serif);font-size:26px;font-weight:700;margin-bottom:20px;">📚 Master Resource List</div>
+
+      <div class="sec-label">Courses &amp; Videos</div>
+      <div class="wide-table">
+        <table>
+          <tr><th>Resource</th><th>Topic</th><th>Done</th></tr>
+          <tr><td>Andrej Karpathy — Intro to LLMs (YouTube)</td><td style="color:var(--text2);">LLM fundamentals</td><td><div class="tc" onclick="toggleCheck(this,'res')" style="margin:0 auto;"></div></td></tr>
+          <tr><td>Andrej Karpathy — micrograd</td><td style="color:var(--text2);">Backprop from scratch</td><td><div class="tc" onclick="toggleCheck(this,'res')" style="margin:0 auto;"></div></td></tr>
+          <tr><td>Andrej Karpathy — makemore</td><td style="color:var(--text2);">Character-level LM</td><td><div class="tc" onclick="toggleCheck(this,'res')" style="margin:0 auto;"></div></td></tr>
+          <tr><td>3Blue1Brown — Neural Networks series</td><td style="color:var(--text2);">Deep learning intuition</td><td><div class="tc" onclick="toggleCheck(this,'res')" style="margin:0 auto;"></div></td></tr>
+          <tr><td>fast.ai Part 1</td><td style="color:var(--text2);">Practical DL / PyTorch</td><td><div class="tc" onclick="toggleCheck(this,'res')" style="margin:0 auto;"></div></td></tr>
+          <tr><td>Hugging Face NLP Course</td><td style="color:var(--text2);">Transformers / fine-tuning</td><td><div class="tc" onclick="toggleCheck(this,'res')" style="margin:0 auto;"></div></td></tr>
+          <tr><td>DeepLearning.AI — LangChain for LLM App Dev</td><td style="color:var(--text2);">LangChain basics</td><td><div class="tc" onclick="toggleCheck(this,'res')" style="margin:0 auto;"></div></td></tr>
+          <tr><td>DeepLearning.AI — AI Agents in LangGraph</td><td style="color:var(--text2);">LangGraph agents</td><td><div class="tc" onclick="toggleCheck(this,'res')" style="margin:0 auto;"></div></td></tr>
+        </table>
+      </div>
+
+      <div class="sec-label" style="margin-top:20px;">Documentation (bookmark these)</div>
+      <div class="wide-table">
+        <table>
+          <tr><th>Resource</th><th>URL</th></tr>
+          <tr><td>Anthropic API docs</td><td><code style="color:var(--teal,#14b8a6);">docs.anthropic.com</code></td></tr>
+          <tr><td>Anthropic Prompt Engineering</td><td><code style="color:var(--teal,#14b8a6);font-size:12px;">docs.anthropic.com/en/docs/build-with-claude/prompt-engineering</code></td></tr>
+          <tr><td>Anthropic MCP</td><td><code style="color:var(--teal,#14b8a6);">modelcontextprotocol.io</code></td></tr>
+          <tr><td>LangChain docs</td><td><code style="color:var(--teal,#14b8a6);">python.langchain.com</code></td></tr>
+          <tr><td>LangGraph docs</td><td><code style="color:var(--teal,#14b8a6);">langchain-ai.github.io/langgraph</code></td></tr>
+          <tr><td>Hugging Face docs</td><td><code style="color:var(--teal,#14b8a6);">huggingface.co/docs</code></td></tr>
+          <tr><td>RAGAS docs</td><td><code style="color:var(--teal,#14b8a6);">docs.ragas.io</code></td></tr>
+          <tr><td>LangSmith docs</td><td><code style="color:var(--teal,#14b8a6);">docs.smith.langchain.com</code></td></tr>
+        </table>
+      </div>
+
+      <div class="sec-label" style="margin-top:20px;">Books</div>
+      <div class="wide-table">
+        <table>
+          <tr><th>Book</th><th>Done</th></tr>
+          <tr><td>Hands-On Machine Learning (Géron) — ch 1–10</td><td><div class="tc" onclick="toggleCheck(this,'res')" style="margin:0 auto;"></div></td></tr>
+          <tr><td>Fluent Python (Ramalho) — ch 1–6</td><td><div class="tc" onclick="toggleCheck(this,'res')" style="margin:0 auto;"></div></td></tr>
+          <tr><td>Designing Machine Learning Systems (Huyen)</td><td><div class="tc" onclick="toggleCheck(this,'res')" style="margin:0 auto;"></div></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         JOB TRACKER
+    ════════════════════════════════ -->
+    <div class="sec" id="jobs">
+      <div style="font-family:var(--serif);font-size:26px;font-weight:700;margin-bottom:8px;">💼 Job Application Tracker</div>
+      <p style="margin-bottom:16px;">Track applications and interviews in one place.</p>
+
+      <div class="sec-label">Target Companies</div>
+      <div class="wide-table">
+        <table>
+          <tr><th>Company</th><th>Role</th><th>Applied</th><th>Status</th><th>Notes</th></tr>
+          <tr><td><input placeholder="Company name"></td><td><input placeholder="AI Engineer"></td><td><input placeholder="YYYY-MM-DD" style="width:100px;"></td><td><input placeholder="Applied / Screen / Interview"></td><td><input placeholder="Notes..."></td></tr>
+          <tr><td><input placeholder="Company name"></td><td><input placeholder="AI Engineer"></td><td><input placeholder="YYYY-MM-DD" style="width:100px;"></td><td><input placeholder="Applied / Screen / Interview"></td><td><input placeholder="Notes..."></td></tr>
+          <tr><td><input placeholder="Company name"></td><td><input placeholder="AI Engineer"></td><td><input placeholder="YYYY-MM-DD" style="width:100px;"></td><td><input placeholder="Applied / Screen / Interview"></td><td><input placeholder="Notes..."></td></tr>
+          <tr><td><input placeholder="Company name"></td><td><input placeholder="AI Engineer"></td><td><input placeholder="YYYY-MM-DD" style="width:100px;"></td><td><input placeholder="Applied / Screen / Interview"></td><td><input placeholder="Notes..."></td></tr>
+          <tr><td><input placeholder="Company name"></td><td><input placeholder="AI Engineer"></td><td><input placeholder="YYYY-MM-DD" style="width:100px;"></td><td><input placeholder="Applied / Screen / Interview"></td><td><input placeholder="Notes..."></td></tr>
+        </table>
+      </div>
+
+      <div class="sec-label" style="margin-top:20px;">Interview Log</div>
+      <div class="wide-table">
+        <table>
+          <tr><th>Company</th><th>Stage</th><th>Date</th><th>Result</th><th>What to improve</th></tr>
+          <tr><td><input placeholder="Company"></td><td><input placeholder="Phone / Technical / Onsite"></td><td><input placeholder="YYYY-MM-DD" style="width:100px;"></td><td><input placeholder="Pass / Reject / Pending"></td><td><input placeholder="..."></td></tr>
+          <tr><td><input placeholder="Company"></td><td><input placeholder="Phone / Technical / Onsite"></td><td><input placeholder="YYYY-MM-DD" style="width:100px;"></td><td><input placeholder="Pass / Reject / Pending"></td><td><input placeholder="..."></td></tr>
+          <tr><td><input placeholder="Company"></td><td><input placeholder="Phone / Technical / Onsite"></td><td><input placeholder="YYYY-MM-DD" style="width:100px;"></td><td><input placeholder="Pass / Reject / Pending"></td><td><input placeholder="..."></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         WEEKLY LOG
+    ════════════════════════════════ -->
+    <div class="sec" id="log">
+      <div style="font-family:var(--serif);font-size:26px;font-weight:700;margin-bottom:8px;">📓 Weekly Log</div>
+      <p style="margin-bottom:20px;">Update every week. Short, honest entries compound over 20 weeks.</p>
+      <div id="weekly-logs">
+        <!-- 4 default log cards -->
+      </div>
+      <button onclick="addLogCard()" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 20px;font-family:var(--mono);font-size:11px;color:var(--text2);cursor:pointer;transition:all .15s;margin-top:4px;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text2)'">+ Add week entry</button>
+    </div>
+
+  </main>
+</div>
+
+<!-- Save button -->
+<div class="save-bar">
+  <button class="save-btn" id="save-btn" onclick="saveProgress()">💾 Save progress</button>
+</div>
+
+<script>
+// ══════════════════════════════
+// CHECKBOX LOGIC
+// ══════════════════════════════
+function toggleCheck(el, phase) {
+  el.classList.toggle('chk');
+  updateProgress();
+  scheduleSave();
+}
+
+function updateProgress() {
+  const phases = ['p1','p2','p3','p4'];
+  let totalAll = 0, doneAll = 0;
+
+  phases.forEach(ph => {
+    const all  = document.querySelectorAll(`.tc[onclick*="'${ph}'"]`);
+    const done = document.querySelectorAll(`.tc.chk[onclick*="'${ph}'"]`);
+    const pct  = all.length ? Math.round(done.length / all.length * 100) : 0;
+    const bar  = document.getElementById(ph + 'bar');
+    const stat = document.getElementById(ph + 'stat');
+    if (bar)  bar.style.width = pct + '%';
+    if (stat) stat.textContent = pct + '% complete';
+    totalAll += all.length;
+    doneAll  += done.length;
+  });
+
+  // include 'all' and 'res' checks
+  const allOther = document.querySelectorAll(`.tc[onclick*="'all'"], .tc[onclick*="'res'"]`);
+  const doneOther= document.querySelectorAll(`.tc.chk[onclick*="'all'"], .tc.chk[onclick*="'res'"]`);
+  totalAll += allOther.length;
+  doneAll  += doneOther.length;
+
+  const overall = totalAll ? Math.round(doneAll / totalAll * 100) : 0;
+  const bar  = document.getElementById('overall-bar');
+  const pct  = document.getElementById('overall-pct');
+  if (bar) bar.style.width = overall + '%';
+  if (pct) pct.textContent = overall + '%';
+}
+
+// ══════════════════════════════
+// ACCORDION
+// ══════════════════════════════
+function toggleWeek(header) {
+  const body    = header.nextElementSibling;
+  const chevron = header.querySelector('.wb-chevron');
+  const isOpen  = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chevron.classList.toggle('open', !isOpen);
+}
+
+// ══════════════════════════════
+// WEEKLY LOG
+// ══════════════════════════════
+function addLogCard(data = {}) {
+  const container = document.getElementById('weekly-logs');
+  const card = document.createElement('div');
+  card.className = 'log-card';
+  card.innerHTML = `
+    <div class="log-week">
+      <span>Week</span>
+      <input placeholder="___" value="${data.week||''}" style="width:50px;">
+      <span>— Date:</span>
+      <input placeholder="YYYY-MM-DD" value="${data.date||''}">
+    </div>
+    <div class="log-grid">
+      <div class="log-field"><label>What I built</label><textarea placeholder="e.g. Finished the eval harness...">${data.built||''}</textarea></div>
+      <div class="log-field"><label>What I learned</label><textarea placeholder="e.g. Statistical significance needs 50+ cases...">${data.learned||''}</textarea></div>
+      <div class="log-field"><label>What broke &amp; how I fixed it</label><textarea placeholder="e.g. Async rate limit bug — used semaphore...">${data.broke||''}</textarea></div>
+      <div class="log-field"><label>Next week's focus</label><textarea placeholder="e.g. Start LangGraph week...">${data.next||''}</textarea></div>
+    </div>
+    <div class="log-footer">
+      <div class="streak-toggle">
+        <span>Streak:</span>
+        <button class="streak-btn yes ${data.streak==='yes'?'active':''}" onclick="setStreak(this,'yes')">✅ Yes</button>
+        <button class="streak-btn no ${data.streak==='no'?'active':''}" onclick="setStreak(this,'no')">❌ No</button>
+      </div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text3);">
+        GitHub commits: <input value="${data.commits||''}" placeholder="0" style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:2px 6px;font-family:var(--mono);font-size:11px;color:var(--text);outline:none;width:40px;">
+      </div>
+    </div>
+  `;
+  container.appendChild(card);
+}
+
+function setStreak(btn, val) {
+  const footer = btn.closest('.log-footer');
+  footer.querySelectorAll('.streak-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// Add 4 default log cards
+for (let i = 0; i < 4; i++) addLogCard();
+
+// ══════════════════════════════
+// SAVE / LOAD (localStorage)
+// ══════════════════════════════
+let saveTimer;
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveProgress, 1500);
+}
+
+function saveProgress() {
+  const state = {};
+
+  // checkboxes
+  state.checks = [];
+  document.querySelectorAll('.tc').forEach((el, i) => {
+    state.checks.push({ i, chk: el.classList.contains('chk') });
+  });
+
+  // inputs
+  state.inputs = {};
+  document.querySelectorAll('input, textarea').forEach((el, i) => {
+    if (el.value) state.inputs[i] = el.value;
+  });
+
+  localStorage.setItem('ai_roadmap_v2', JSON.stringify(state));
+
+  const btn = document.getElementById('save-btn');
+  btn.textContent = '✓ Saved';
+  btn.classList.add('saved');
+  setTimeout(() => { btn.textContent = '💾 Save progress'; btn.classList.remove('saved'); }, 2000);
+}
+
+function loadProgress() {
+  const raw = localStorage.getItem('ai_roadmap_v2');
+  if (!raw) return;
+  try {
+    const state = JSON.parse(raw);
+    const boxes = document.querySelectorAll('.tc');
+    (state.checks||[]).forEach(({ i, chk }) => {
+      if (boxes[i]) boxes[i].classList.toggle('chk', chk);
+    });
+    const inputs = document.querySelectorAll('input, textarea');
+    Object.entries(state.inputs||{}).forEach(([i, v]) => {
+      if (inputs[i]) inputs[i].value = v;
+    });
+    // sync week badge
+    const cw = document.getElementById('cur-week');
+    if (cw && cw.value) document.getElementById('week-badge').textContent = 'Week ' + cw.value;
+  } catch(e) {}
+  updateProgress();
+}
+
+// Auto-save on any input
+document.addEventListener('input', scheduleSave);
+
+// Load on start
+window.addEventListener('DOMContentLoaded', () => {
+  loadProgress();
+  updateProgress();
+});
+
+// Active sidebar link on scroll
+const sections = document.querySelectorAll('[id]');
+const navLinks  = document.querySelectorAll('.sb-week, .sb-phase, .sb-item');
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      navLinks.forEach(n => n.classList.toggle('active', n.getAttribute('href') === '#' + id));
+    }
+  });
+}, { threshold: 0.15, rootMargin: '-80px 0px -60% 0px' });
+sections.forEach(s => io.observe(s));
+</script>
+</body>
+</html>
