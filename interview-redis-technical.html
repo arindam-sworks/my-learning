@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en-IN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redis Interview Prep — Technical Q&amp;A</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,300&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
+<script>try{var k='my-learning-theme',t=localStorage.getItem(k);document.documentElement.setAttribute('data-theme',t==='light'||t==='dark'?t:'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}</script>
+<link rel="stylesheet" href="assets/theme-ui.css">
+<link rel="stylesheet" href="assets/theme-docs.css">
+<style>
+:root{
+  --bg:#07080c;--bg2:#0e0f14;--bg3:#14161c;--bg4:#1b1d25;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.14);
+  --text:#e3e0d6;--text2:#8c8880;--text3:#46433e;
+  --emerald:#10b981;--indigo:#818cf8;--amber:#f59e0b;
+  --sky:#38bdf8;--rose:#f43f5e;--lime:#84cc16;--redis:#d82c20;
+  --mono:'IBM Plex Mono',monospace;--serif:'Fraunces',serif;--sans:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.75;}
+.layout{display:flex;min-height:100vh;}
+
+/* ── SIDEBAR ── */
+.sb{width:268px;min-width:268px;background:var(--bg2);border-right:1px solid var(--border);padding:28px 0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sb-top{padding:0 22px 22px;border-bottom:1px solid var(--border);margin-bottom:10px;}
+.sb-badge{display:inline-block;background:var(--redis);color:#fff;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.08em;padding:3px 8px;border-radius:3px;margin-bottom:8px;}
+.sb-top h1{font-family:var(--serif);font-weight:700;font-size:17px;line-height:1.3;}
+.sb-top p{font-size:12px;color:var(--text2);margin-top:4px;}
+.nav-s{padding:0 14px;margin-bottom:4px;}
+.nav-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--text3);padding:0 8px;margin-bottom:5px;text-transform:uppercase;}
+.ni{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;font-size:12px;color:var(--text2);transition:all .15s;text-decoration:none;border:1px solid transparent;}
+.ni:hover{background:var(--bg3);color:var(--text);}
+.ni.active{background:var(--bg3);color:var(--emerald);border-color:var(--border);}
+.ndot{width:6px;height:6px;border-radius:50%;background:var(--text3);flex-shrink:0;}
+.ni.active .ndot{background:var(--emerald);}
+.sb-home{display:block;padding:10px 24px;color:var(--text2);text-decoration:none;font-family:var(--mono);font-size:11px;letter-spacing:.06em;border-bottom:1px solid var(--border);transition:color .15s;}
+.sb-home:hover{color:var(--text);}
+
+/* ── MAIN ── */
+.main{flex:1;max-width:920px;padding:48px 56px;}
+
+/* ── HERO ── */
+.hero{padding:40px 0 48px;border-bottom:1px solid var(--border);margin-bottom:48px;scroll-margin-top:24px;}
+.htag{font-family:var(--mono);font-size:11px;color:var(--redis);letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.htag::before{content:'';display:block;width:28px;height:1px;background:var(--redis);}
+.hero h1{font-family:var(--serif);font-size:50px;font-weight:700;line-height:1.06;letter-spacing:-.02em;margin-bottom:18px;}
+.hero h1 em{font-style:italic;color:var(--indigo);}
+.hero p{font-size:16px;color:var(--text2);max-width:580px;line-height:1.7;}
+.hmeta{display:flex;gap:20px;margin-top:24px;flex-wrap:wrap;}
+.hm{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--text2);}
+.hm span,.hm a{color:var(--lime);}
+.hm a{text-decoration:none;}
+.hm a:hover{text-decoration:underline;}
+
+/* ── PROGRESS ── */
+.pcard{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:48px;}
+.prow{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:8px;}
+.pbar{height:3px;background:var(--bg4);border-radius:99px;overflow:hidden;}
+.pfill{height:100%;background:linear-gradient(90deg,var(--redis),var(--amber));border-radius:99px;width:100%;}
+
+/* ── SECTIONS ── */
+.sec{margin-bottom:64px;scroll-margin-top:24px;}
+.snum{font-family:var(--mono);font-size:11px;color:var(--redis);letter-spacing:.1em;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.snum-badges{display:flex;gap:6px;}
+.sbadge{font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 8px;border-radius:10px;letter-spacing:.05em;text-transform:uppercase;}
+.sbadge.new{background:rgba(16,185,129,.1);color:var(--emerald);border:1px solid rgba(16,185,129,.28);}
+.sbadge.adv{background:rgba(244,63,94,.1);color:var(--rose);border:1px solid rgba(244,63,94,.28);}
+.sbadge.mid{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.3);}
+.sec h2{font-family:var(--serif);font-size:28px;font-weight:700;line-height:1.2;margin-bottom:18px;}
+p{margin-bottom:14px;color:var(--text2);}
+strong{color:var(--text);font-weight:500;}
+
+/* ── CALLOUT BOXES ── */
+.box{border-left:3px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0;background:var(--bg2);}
+.box.em{border-color:var(--emerald);}
+.box.in{border-color:var(--indigo);}
+.box.am{border-color:var(--amber);}
+.box.sk{border-color:var(--sky);}
+.box.ro{border-color:var(--rose);}
+.box.rd{border-color:var(--redis);}
+.bxt{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}
+.box.em .bxt{color:var(--emerald);}
+.box.in .bxt{color:var(--indigo);}
+.box.am .bxt{color:var(--amber);}
+.box.sk .bxt{color:var(--sky);}
+.box.ro .bxt{color:var(--rose);}
+.box.rd .bxt{color:var(--redis);}
+.box p{margin:0;font-size:14px;line-height:1.65;}
+
+/* ── INSIGHT ── */
+.insight{background:linear-gradient(135deg,#0d0b1e 0%,#0c0606 100%);border:1px solid var(--indigo);border-radius:12px;padding:18px 20px;margin:20px 0;}
+.insight h4{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--indigo);margin-bottom:8px;}
+.insight p{color:var(--text2);font-size:13.5px;margin:0;line-height:1.65;}
+
+/* ── CODE BLOCKS ── */
+.cb{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden;}
+.cb-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg3);}
+.cb-lang{font-family:var(--mono);font-size:10px;color:var(--emerald);letter-spacing:.08em;text-transform:uppercase;}
+.dots{display:flex;gap:5px;}
+.dot{width:8px;height:8px;border-radius:50%;}
+.dot:nth-child(1){background:rgba(244,63,94,.4);}
+.dot:nth-child(2){background:rgba(245,158,11,.4);}
+.dot:nth-child(3){background:rgba(16,185,129,.4);}
+pre{padding:20px;overflow-x:auto;font-family:var(--mono);font-size:12px;line-height:1.8;color:#b5b0a8;white-space:pre-wrap;word-break:break-word;}
+code{font-family:var(--mono);font-size:12px;background:var(--bg3);border:1px solid var(--border);padding:1px 6px;border-radius:4px;color:var(--emerald);}
+.ck{color:var(--indigo);}
+.cf{color:var(--emerald);}
+.cs{color:var(--amber);}
+.cn{color:#fb923c;}
+.ct{color:var(--sky);}
+.cc{color:#47443d;font-style:italic;}
+.cg{color:#4ade80;}
+.cr{color:var(--rose);}
+
+/* ── TABLE ── */
+.tw{overflow-x:auto;margin:18px 0;border-radius:10px;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:var(--bg3);padding:10px 14px;text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);border-bottom:1px solid var(--border2);}
+td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;line-height:1.55;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--bg2);}
+td strong{color:var(--text);}
+td code{font-size:11px;}
+
+/* ── CHAPTER DIVIDERS ── */
+.ch-lbl{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin:52px 0 24px;display:flex;align-items:center;gap:16px;}
+.ch-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── POINT LIST ── */
+.pts{list-style:none;padding:0;margin:10px 0;}
+.pts li{display:flex;gap:10px;padding:7px 0;font-size:14px;color:var(--text2);border-bottom:1px solid var(--border);line-height:1.6;}
+.pts li:last-child{border-bottom:none;}
+.pts li::before{content:'▸';color:var(--sky);flex-shrink:0;font-size:11px;margin-top:3px;}
+
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
+
+/* ── MOBILE ── */
+.mob-nav{display:none;}
+@media(max-width:768px){
+  .mob-nav{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:10px 14px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;}
+  .mob-nav-left,.mob-nav-right{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .mob-btn{font-family:var(--mono);font-size:11px;color:var(--text2);text-decoration:none;padding:5px 10px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);white-space:nowrap;transition:color .15s;}
+  .mob-btn:hover{color:var(--text);}
+  .mob-btn--accent{color:var(--redis);border-color:var(--redis);}
+  .mob-theme{font-family:var(--mono);font-size:11px;color:var(--text2);padding:5px 10px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);cursor:pointer;white-space:nowrap;}
+  .sb{display:none;}
+  .main{padding:28px 20px;}
+  .hero h1{font-size:34px;}
+}
+@media print{.sb{display:none;}body{background:white;color:black;}}
+</style>
+</head>
+<body>
+
+<!-- ── Mobile top bar ── -->
+<header class="mob-nav" aria-label="Mobile navigation">
+  <div class="mob-nav-left">
+    <a href="index.html" class="mob-btn">&#8962; Home</a>
+    <a href="interview-redis-technical.html" class="mob-btn mob-btn--accent">&#8592; Q&amp;A</a>
+  </div>
+  <div class="mob-nav-right">
+    <button type="button" class="mob-theme" data-theme-toggle aria-label="Switch theme">&#9788; Theme</button>
+  </div>
+</header>
+
+<div class="layout">
+
+<!-- ── SIDEBAR ── -->
+<nav class="sb">
+  <a href="index.html" class="sb-home">&#8592; Home</a>
+  <button type="button" class="theme-toggle theme-toggle--sb" data-theme-toggle aria-pressed="false" aria-label="Switch theme"><span class="theme-toggle__icon" aria-hidden="true">&#9728;</span><span class="theme-toggle__text">Light</span></button>
+  <div class="sb-top">
+    <div class="sb-badge">REDIS</div>
+    <h1>Technical Q&amp;A</h1>
+    <p>20 topics &middot; 5 chapters</p>
+  </div>
+
+  <div class="nav-s">
+    <div class="nav-lbl">Ch 1 &mdash; Internals &amp; Data Types</div>
+    <a class="ni active" href="#t1"><div class="ndot"></div>T1 &middot; Why Redis is fast</a>
+    <a class="ni" href="#t2"><div class="ndot"></div>T2 &middot; Data structures &amp; use cases</a>
+    <a class="ni" href="#t3"><div class="ndot"></div>T3 &middot; String commands</a>
+    <a class="ni" href="#t4"><div class="ndot"></div>T4 &middot; Lists, Sets, Sorted Sets</a>
+    <a class="ni" href="#t5"><div class="ndot"></div>T5 &middot; Hashes &amp; HyperLogLog</a>
+  </div>
+  <div class="nav-s" style="margin-top:4px;">
+    <div class="nav-lbl">Ch 2 &mdash; Persistence &amp; Transactions</div>
+    <a class="ni" href="#t6"><div class="ndot"></div>T6 &middot; TTL &amp; eviction policies</a>
+    <a class="ni" href="#t7"><div class="ndot"></div>T7 &middot; RDB vs AOF persistence</a>
+    <a class="ni" href="#t8"><div class="ndot"></div>T8 &middot; MULTI/EXEC &amp; Lua scripts</a>
+    <a class="ni" href="#t9"><div class="ndot"></div>T9 &middot; Pub/Sub &amp; Streams</a>
+    <a class="ni" href="#t10"><div class="ndot"></div>T10 &middot; Pipelining &amp; batching</a>
+  </div>
+  <div class="nav-s" style="margin-top:4px;">
+    <div class="nav-lbl">Ch 3 &mdash; High Availability</div>
+    <a class="ni" href="#t11"><div class="ndot"></div>T11 &middot; Redis Sentinel</a>
+    <a class="ni" href="#t12"><div class="ndot"></div>T12 &middot; Redis Cluster</a>
+  </div>
+  <div class="nav-s" style="margin-top:4px;">
+    <div class="nav-lbl">Ch 4 &mdash; Patterns &amp; Use Cases</div>
+    <a class="ni" href="#t13"><div class="ndot"></div>T13 &middot; Caching patterns</a>
+    <a class="ni" href="#t14"><div class="ndot"></div>T14 &middot; Cache stampede</a>
+    <a class="ni" href="#t15"><div class="ndot"></div>T15 &middot; Distributed locking &amp; Redlock</a>
+    <a class="ni" href="#t16"><div class="ndot"></div>T16 &middot; Rate limiting</a>
+    <a class="ni" href="#t17"><div class="ndot"></div>T17 &middot; Session management</a>
+    <a class="ni" href="#t18"><div class="ndot"></div>T18 &middot; Redis as a message queue</a>
+  </div>
+  <div class="nav-s" style="margin-top:4px;">
+    <div class="nav-lbl">Ch 5 &mdash; Production</div>
+    <a class="ni" href="#t19"><div class="ndot"></div>T19 &middot; Security best practices</a>
+    <a class="ni" href="#t20"><div class="ndot"></div>T20 &middot; Performance tuning</a>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero" id="overview">
+    <div class="htag">Redis &middot; Interview prep</div>
+    <h1>Technical<br><em>Q&amp;A</em></h1>
+    <p>Interview-style answers with comparison tables, code examples, and quick-recall lines &mdash; five chapters covering Redis internals, data structures, persistence, high availability, caching patterns, and production operations.</p>
+    <div class="hmeta">
+      <div class="hm">&#128172; <span>20 topics &middot; 5 chapters</span></div>
+      <div class="hm">&#127891; <span>Senior SWE level &middot; 6&ndash;7 yrs</span></div>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="pcard">
+    <div class="prow"><span>Interview prep</span><span>Redis &mdash; Technical Q&amp;A</span></div>
+    <div class="pbar"><div class="pfill"></div></div>
+    <p style="margin:10px 0 0;font-size:12px;color:var(--text2);font-family:var(--mono);">20 topics &middot; Chapters: Internals &middot; Persistence &middot; High Availability &middot; Patterns &middot; Production</p>
+  </div>
+
+  <!-- ══════════════════════════════════
+       CHAPTER 1 — INTERNALS & DATA TYPES
+  ══════════════════════════════════════ -->
+  <div class="ch-lbl" id="ch1">Chapter 1 &mdash; Internals &amp; Data Types</div>
+
+  <div class="sec" id="t1">
+    <div class="snum">T1 <span class="snum-badges"><span class="sbadge adv">Core</span></span></div>
+    <h2>Why Redis is extremely fast &mdash; single-threaded architecture, in-memory storage, I/O model</h2>
+    <p>Redis = <strong>RE</strong>mote <strong>DI</strong>ctionary <strong>S</strong>erver. An in-memory data structure store used as cache, database, message broker, and streaming engine. A single Redis instance on modern hardware handles <strong>100,000+ ops/sec</strong> with sub-millisecond latency.</p>
+    <div class="tw"><table>
+      <tr><th>Factor</th><th>Detail</th><th>Impact</th></tr>
+      <tr><td><strong>In-memory storage</strong></td><td>All data in RAM (100ns access vs disk milliseconds)</td><td>Foundation of all speed gains</td></tr>
+      <tr><td><strong>Single-threaded event loop</strong></td><td>One thread executes commands — no mutex, no context switching</td><td>Eliminates lock contention; commands are atomic</td></tr>
+      <tr><td><strong>I/O multiplexing</strong></td><td>epoll/kqueue handles thousands of connections on one thread</td><td>High concurrency without thread overhead</td></tr>
+      <tr><td><strong>Efficient data structures</strong></td><td>Skip lists, hash tables, intsets, ziplist/listpack</td><td>O(1) or O(log n) for most operations</td></tr>
+      <tr><td><strong>RESP protocol</strong></td><td>Simple text protocol, minimal parsing overhead</td><td>Fast serialization on both ends</td></tr>
+    </table></div>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">text &mdash; Redis architecture</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre>Redis Process (single-threaded event loop)
+  ├── epoll/kqueue  — multiplexes thousands of client connections
+  ├── Command parser — RESP protocol
+  ├── Data structures — all in RAM
+  └── Background threads — disk I/O, AOF rewrite, lazy free
+
+Single-threaded = no locks = no context switch overhead
+I/O multiplexing = one thread handles 10,000+ connections
+
+Redis 6+: I/O threading added
+  Main thread: command execution (still single-threaded)
+  I/O threads: reading/writing network data in parallel</pre></div>
+    <div class="box rd"><div class="bxt">Say this in the interview</div><p>"Redis is fast because everything lives in RAM and the single-threaded architecture eliminates lock contention. The single-threaded model means commands are atomic by default &mdash; no partial writes, no race conditions on individual commands. In Redis 6+, I/O threading improves network throughput without changing the single-threaded command execution model."</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>RAM access = 100ns. Single thread = no locks + atomic commands. epoll multiplexing = 10k+ connections on one thread. Redis 6+ added I/O threads for network, not for command execution. Typical latency: &lt;1ms. Throughput: 100k+ ops/sec.</p></div>
+  </div>
+
+  <div class="sec" id="t2">
+    <div class="snum">T2 <span class="snum-badges"><span class="sbadge adv">Core</span></span></div>
+    <h2>Redis data types &mdash; the right structure for every use case</h2>
+    <p>Choosing the right data structure is the key to Redis mastery. Each type has a specific internal implementation optimized for its use case.</p>
+    <div class="tw"><table>
+      <tr><th>Type</th><th>Underlying structure</th><th>Use case</th><th>Max size</th></tr>
+      <tr><td><strong>String</strong></td><td>SDS (simple dynamic string)</td><td>Cache, counters, session tokens, feature flags</td><td>512 MB</td></tr>
+      <tr><td><strong>List</strong></td><td>Linked list / ziplist</td><td>Message queues, activity feeds, recent items</td><td>2³² elements</td></tr>
+      <tr><td><strong>Set</strong></td><td>Hash table / intset</td><td>Unique visitors, tags, friends list, deduplication</td><td>2³² elements</td></tr>
+      <tr><td><strong>Sorted Set</strong></td><td>Skip list + hash table</td><td>Leaderboards, rate limiting, priority queues, autocomplete</td><td>2³² elements</td></tr>
+      <tr><td><strong>Hash</strong></td><td>Hash table / ziplist</td><td>User profiles, product details, grouped fields</td><td>2³² fields</td></tr>
+      <tr><td><strong>Bitmap</strong></td><td>String (bit array)</td><td>Daily active users, feature flags per user, presence tracking</td><td>512 MB = 4 billion bits</td></tr>
+      <tr><td><strong>HyperLogLog</strong></td><td>Probabilistic structure</td><td>Unique count approximation — 12 KB for any cardinality</td><td>12 KB</td></tr>
+      <tr><td><strong>Stream</strong></td><td>Append-only log</td><td>Event sourcing, message broker, IoT, audit log</td><td>Unlimited</td></tr>
+    </table></div>
+    <div class="box rd"><div class="bxt">Say this in the interview</div><p>Sorted Sets are the most powerful and versatile type &mdash; use them for leaderboards (score = points), rate limiting (score = timestamp), and priority queues (score = priority). HyperLogLog is magic for counting unique visitors with only 12 KB regardless of set size &mdash; 0.81% error rate is acceptable for analytics. Streams are Redis's answer to Kafka: append-only, consumer groups, persistent.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>String = cache. List = queue. Set = unique members. Sorted Set = ranked data. Hash = object fields. HyperLogLog = approximate unique count in 12 KB. Stream = persistent pub/sub with consumer groups. When in doubt, reach for Sorted Set &mdash; it solves more problems than any other type.</p></div>
+  </div>
+
+  <div class="sec" id="t3">
+    <div class="snum">T3</div>
+    <h2>String commands in depth &mdash; SET options, atomic operations, counters</h2>
+    <p>Strings are the most fundamental Redis type, but they carry rich semantics beyond simple key-value storage: conditional sets, atomic increments, TTL in one command, and binary bitmaps.</p>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">redis-cli &mdash; String commands</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc"># Basic SET with options</span>
+<span class="ck">SET</span> key value                        <span class="cc"># simple set</span>
+<span class="ck">SET</span> key value <span class="ct">EX</span> <span class="cn">3600</span>               <span class="cc"># expire in 3600 seconds</span>
+<span class="ck">SET</span> key value <span class="ct">PX</span> <span class="cn">5000</span>               <span class="cc"># expire in 5000 milliseconds</span>
+<span class="ck">SET</span> key value <span class="ct">NX</span>                     <span class="cc"># set only if NOT exists (atomic!)</span>
+<span class="ck">SET</span> key value <span class="ct">XX</span>                     <span class="cc"># set only if EXISTS</span>
+<span class="ck">SET</span> key value <span class="ct">EX</span> <span class="cn">3600</span> <span class="ct">NX</span>            <span class="cc"># set with TTL only if not exists — distributed lock pattern</span>
+<span class="ck">SET</span> key value <span class="ct">GET</span>                    <span class="cc"># return old value while setting new one</span>
+
+<span class="cc"># Atomic counters</span>
+<span class="ck">INCR</span>        counter                  <span class="cc"># atomic +1</span>
+<span class="ck">INCRBY</span>      counter <span class="cn">5</span>               <span class="cc"># atomic +5</span>
+<span class="ck">DECR</span>        counter
+<span class="ck">INCRBYFLOAT</span> price <span class="cn">0.99</span>
+
+<span class="cc"># Bulk operations</span>
+<span class="ck">MSET</span>   k1 v1 k2 v2 k3 v3            <span class="cc"># set multiple (atomic)</span>
+<span class="ck">MGET</span>   k1 k2 k3                      <span class="cc"># get multiple in one round-trip</span>
+<span class="ck">MSETNX</span> k1 v1 k2 v2                  <span class="cc"># set multiple only if NONE exist</span>
+
+<span class="cc"># String as bit array (Bitmap)</span>
+<span class="ck">SETBIT</span>   user:flags:123 <span class="cn">0</span> <span class="cn">1</span>         <span class="cc"># bit 0 = email verified</span>
+<span class="ck">GETBIT</span>   user:flags:123 <span class="cn">0</span>
+<span class="ck">BITCOUNT</span> user:logins:2024            <span class="cc"># count active days</span></pre></div>
+    <div class="box em"><div class="bxt">Key pattern: SET NX</div><p><code>SET key value EX 3600 NX</code> is the atomic pattern for distributed locks and idempotent operations &mdash; sets a key with TTL only if it doesn't exist, in a single command. No race condition between check and set.</p></div>
+    <div class="box sk"><div class="bxt">Performance note</div><p>Always prefer <code>MGET</code>/<code>MSET</code> over individual <code>GET</code>/<code>SET</code> in loops. Each Redis round-trip is ~0.5ms on localhost. 100 individual GETs = 50ms. One MGET = 0.5ms.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>SET NX = atomic "set if not exists". INCR = thread-safe counter (no race condition). MGET/MSET = batch for performance. EX/PX = TTL in seconds/milliseconds. GET flag returns old value. Bitmap via SETBIT/BITCOUNT for bit-level flags.</p></div>
+  </div>
+
+  <div class="sec" id="t4">
+    <div class="snum">T4</div>
+    <h2>Lists, Sets, and Sorted Sets &mdash; commands and real-world use cases</h2>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">redis-cli &mdash; List, Set, Sorted Set commands</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc">── LIST (ordered, duplicates allowed) ──</span>
+<span class="ck">LPUSH</span>  queue job1 job2          <span class="cc"># push to head</span>
+<span class="ck">RPUSH</span>  queue job3               <span class="cc"># push to tail</span>
+<span class="ck">LPOP</span>   queue                   <span class="cc"># pop from head</span>
+<span class="ck">RPOP</span>   queue                   <span class="cc"># pop from tail</span>
+<span class="ck">BRPOP</span>  queue <span class="cn">0</span>                 <span class="cc"># BLOCKING pop — waits until item available (task queue!)</span>
+<span class="ck">LRANGE</span> queue <span class="cn">0</span> <span class="cn">-1</span>              <span class="cc"># get all items</span>
+<span class="ck">LLEN</span>   queue                   <span class="cc"># length</span>
+
+<span class="cc">── SET (unordered, unique members) ──</span>
+<span class="ck">SADD</span>      tags:post:1 redis nosql cache
+<span class="ck">SMEMBERS</span>  tags:post:1              <span class="cc"># get all members</span>
+<span class="ck">SISMEMBER</span> tags:post:1 redis        <span class="cc"># O(1) membership check</span>
+<span class="ck">SINTER</span>    tags:post:1 tags:post:2  <span class="cc"># intersection</span>
+<span class="ck">SUNION</span>    tags:post:1 tags:post:2  <span class="cc"># union</span>
+<span class="ck">SDIFF</span>     tags:post:1 tags:post:2  <span class="cc"># difference</span>
+
+<span class="cc">── SORTED SET (unique, ordered by float score) ──</span>
+<span class="ck">ZADD</span>         leaderboard <span class="cn">1500</span> player1 <span class="cn">2200</span> player2 <span class="cn">980</span> player3
+<span class="ck">ZRANK</span>        leaderboard player1    <span class="cc"># rank 0-indexed (low to high)</span>
+<span class="ck">ZREVRANK</span>     leaderboard player2    <span class="cc"># rank high to low (position 0 = top)</span>
+<span class="ck">ZSCORE</span>       leaderboard player1
+<span class="ck">ZINCRBY</span>      leaderboard <span class="cn">100</span> player1
+<span class="ck">ZRANGE</span>       leaderboard <span class="cn">0</span> <span class="cn">9</span> WITHSCORES REV  <span class="cc"># top 10</span>
+<span class="ck">ZRANGEBYSCORE</span> leaderboard <span class="cn">1000</span> <span class="cn">2000</span>          <span class="cc"># by score range</span>
+<span class="ck">ZREMRANGEBYSCORE</span> window:user:1 <span class="cn">-inf</span> <span class="cn">1700000000000</span> <span class="cc"># sliding window cleanup</span></pre></div>
+    <div class="box rd"><div class="bxt">BRPOP is the hidden gem</div><p><code>BRPOP</code> is the secret weapon for simple task queues &mdash; it blocks until an item is available, giving zero-poll-latency. No need for polling loops or sleep() calls in your consumer. LPUSH + BRPOP = a complete task queue in two commands.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>List = ordered with duplicates, BRPOP for blocking consumer. Set = unordered unique, SINTER/SUNION/SDIFF for set math. Sorted Set = unique with float score, ZADD/ZRANK/ZRANGE for ranked data. Sorted Set with score=timestamp = sliding window rate limiter. Sorted Set with score=priority = priority queue.</p></div>
+  </div>
+
+  <div class="sec" id="t5">
+    <div class="snum">T5</div>
+    <h2>Hashes &amp; HyperLogLog &mdash; memory-efficient objects and probabilistic counting</h2>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">redis-cli &mdash; Hash, HyperLogLog, Geo commands</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc">── HASH (field-value pairs for object storage) ──</span>
+<span class="ck">HSET</span>    user:1001 name "Alice" email "alice@mail.com" age <span class="cn">28</span>
+<span class="ck">HGET</span>    user:1001 name
+<span class="ck">HMGET</span>   user:1001 name email         <span class="cc"># get multiple fields</span>
+<span class="ck">HGETALL</span> user:1001                    <span class="cc"># all field-value pairs</span>
+<span class="ck">HINCRBY</span> user:1001 age <span class="cn">1</span>             <span class="cc"># atomic field increment</span>
+<span class="ck">HDEL</span>    user:1001 age
+<span class="ck">HEXISTS</span> user:1001 email
+<span class="cc"># Hash uses ~10x less memory than separate String keys for the same data</span>
+
+<span class="cc">── HYPERLOGLOG (probabilistic unique count) ──</span>
+<span class="ck">PFADD</span>   visitors:2024-01-15 user1 user2 user3
+<span class="ck">PFADD</span>   visitors:2024-01-15 user1        <span class="cc"># duplicate — not counted again</span>
+<span class="ck">PFCOUNT</span> visitors:2024-01-15              <span class="cc"># ≈ unique count (0.81% error rate)</span>
+<span class="ck">PFMERGE</span> visitors:week visitors:2024-01-15 visitors:2024-01-16
+<span class="cc"># 12KB for ANY cardinality — 100 or 100 BILLION unique items!</span>
+
+<span class="cc">── GEOSPATIAL (Sorted Set under the hood) ──</span>
+<span class="ck">GEOADD</span>    restaurants <span class="cn">72.8311</span> <span class="cn">18.9657</span> "Pizza Palace"
+<span class="ck">GEOADD</span>    restaurants <span class="cn">72.8200</span> <span class="cn">18.9500</span> "Burger Barn"
+<span class="ck">GEODIST</span>   restaurants "Pizza Palace" "Burger Barn" km
+<span class="ck">GEOSEARCH</span> restaurants FROMMEMBER "Pizza Palace" BYRADIUS <span class="cn">2</span> km ASC</pre></div>
+    <div class="box em"><div class="bxt">Hash memory advantage</div><p>A Hash of 100 fields uses approximately 10× less memory than 100 separate String keys. For user objects, product records, or any structured data with multiple fields, always use a Hash over individual keys.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>Hash = object with fields, HSET/HGET/HGETALL, 10× memory saving vs separate keys. HyperLogLog = 12 KB fixed for any unique count, 0.81% error, PFADD/PFCOUNT/PFMERGE. Geo commands are backed by Sorted Sets with geohash-encoded scores — GEOSEARCH for "find nearby" queries. No extra infrastructure needed.</p></div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       CHAPTER 2 — PERSISTENCE & TRANSACTIONS
+  ══════════════════════════════════════ -->
+  <div class="ch-lbl" id="ch2">Chapter 2 &mdash; Persistence &amp; Transactions</div>
+
+  <div class="sec" id="t6">
+    <div class="snum">T6 <span class="snum-badges"><span class="sbadge adv">Core</span></span></div>
+    <h2>TTL, key expiry &amp; eviction policies &mdash; what happens when Redis runs out of memory</h2>
+    <p>Redis expires keys using two complementary mechanisms: <strong>lazy expiry</strong> (check on access) and <strong>active expiry</strong> (background sampling of 20 random keys per cycle). The combination means expired keys are cleaned up efficiently without blocking the event loop.</p>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">redis-cli &mdash; TTL commands</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc"># Set expiry</span>
+<span class="ck">EXPIRE</span>   session:abc <span class="cn">3600</span>       <span class="cc"># expire in 3600 seconds</span>
+<span class="ck">EXPIREAT</span> session:abc <span class="cn">1735689600</span> <span class="cc"># expire at Unix timestamp</span>
+<span class="ck">PEXPIRE</span>  session:abc <span class="cn">5000</span>       <span class="cc"># expire in milliseconds</span>
+
+<span class="cc"># Inspect TTL</span>
+<span class="ck">TTL</span>  session:abc                 <span class="cc"># seconds remaining (-1 = no expiry, -2 = key gone)</span>
+<span class="ck">PTTL</span> session:abc                 <span class="cc"># milliseconds remaining</span>
+
+<span class="cc"># Remove expiry (make permanent)</span>
+<span class="ck">PERSIST</span> session:abc
+
+<span class="cc"># Expiry mechanisms:</span>
+<span class="cc"># 1. Lazy: check on access — expired? delete + return nil</span>
+<span class="cc"># 2. Active: background cycle tests 20 random keys/second</span>
+<span class="cc">#    If >25% expired → run cycle again (adaptive frequency)</span></pre></div>
+    <div class="tw"><table>
+      <tr><th>Policy (<code>maxmemory-policy</code>)</th><th>Evicts</th><th>Best for</th></tr>
+      <tr><td><code>noeviction</code></td><td>Nothing — returns error on write when full</td><td>Primary DB (can't lose data)</td></tr>
+      <tr><td><code>allkeys-lru</code></td><td>Least recently used from all keys</td><td>General cache (most common)</td></tr>
+      <tr><td><code>allkeys-lfu</code></td><td>Least frequently used from all keys</td><td>Hot/cold data with clear usage patterns</td></tr>
+      <tr><td><code>volatile-lru</code></td><td>LRU among keys WITH expiry set</td><td>Mixed cache + persistent data in same instance</td></tr>
+      <tr><td><code>volatile-ttl</code></td><td>Shortest TTL first among expiring keys</td><td>Evict soon-to-expire keys first</td></tr>
+      <tr><td><code>allkeys-random</code></td><td>Random key from all keys</td><td>Uniform access patterns</td></tr>
+    </table></div>
+    <div class="box am"><div class="bxt">Production guidance</div><p>For a pure cache: <code>allkeys-lru</code>. For a session store where active sessions must not be evicted: <code>volatile-lru</code> (only expired sessions get evicted). Always set <code>maxmemory</code> to 70–80% of available RAM to leave headroom for fork() during RDB snapshots.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>TTL -1 = no expiry. TTL -2 = key doesn't exist. Lazy + active expiry = efficient cleanup without blocking. allkeys-lru = most common cache policy. volatile-lru = safe for mixed cache/persistent. Set maxmemory with buffer — hitting 100% causes OOM evictions or errors depending on policy.</p></div>
+  </div>
+
+  <div class="sec" id="t7">
+    <div class="snum">T7 <span class="snum-badges"><span class="sbadge adv">Core</span></span></div>
+    <h2>Persistence &mdash; RDB snapshots vs AOF, trade-offs and production config</h2>
+    <div class="tw"><table>
+      <tr><th>Feature</th><th>RDB (snapshot)</th><th>AOF (append-only file)</th></tr>
+      <tr><td><strong>What it stores</strong></td><td>Point-in-time binary snapshot of entire dataset</td><td>Every write command, append-only log</td></tr>
+      <tr><td><strong>Data loss on crash</strong></td><td>Up to last snapshot (minutes)</td><td>Max 1 second (with <code>fsync=everysec</code>)</td></tr>
+      <tr><td><strong>Startup speed</strong></td><td>Fast — load binary snapshot</td><td>Slower — replay all commands</td></tr>
+      <tr><td><strong>File size</strong></td><td>Compact binary format</td><td>Grows large; AOF rewrite shrinks it</td></tr>
+      <tr><td><strong>Performance impact</strong></td><td><code>fork()</code> on snapshot — brief pause on large datasets</td><td>Constant small overhead per write</td></tr>
+      <tr><td><strong>Best for</strong></td><td>Backups, fast restart, cache snapshots</td><td>Sessions, queues — any data you can't lose</td></tr>
+    </table></div>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">config &mdash; redis.conf persistence settings</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc"># RDB — save if N keys changed in M seconds</span>
+save <span class="cn">900</span> <span class="cn">1</span>       <span class="cc"># after 900s if ≥1 key changed</span>
+save <span class="cn">300</span> <span class="cn">10</span>      <span class="cc"># after 300s if ≥10 keys changed</span>
+save <span class="cn">60</span>  <span class="cn">10000</span>  <span class="cc"># after 60s if ≥10000 keys changed</span>
+
+<span class="cc"># AOF</span>
+appendonly yes
+appendfsync everysec    <span class="cc"># fsync every second — recommended (max 1s data loss)</span>
+<span class="cc"># appendfsync always  → fsync every write (max durability, slow)</span>
+<span class="cc"># appendfsync no      → OS decides (fastest, most data loss risk)</span>
+
+<span class="cc"># AOF rewrite — compress the log when it grows too large</span>
+auto-aof-rewrite-percentage <span class="cn">100</span>  <span class="cc"># rewrite when AOF doubles in size</span>
+auto-aof-rewrite-min-size <span class="cn">64</span>mb
+
+<span class="cc"># Best of both worlds — recommended for production:</span>
+appendonly yes
+appendfsync everysec
+save <span class="cn">900</span> <span class="cn">1</span>    <span class="cc"># AOF for durability + RDB for fast restart</span></pre></div>
+    <div class="box rd"><div class="bxt">Production recommendation</div><p>Enable <strong>both RDB and AOF</strong> together. AOF with <code>fsync=everysec</code> gives max 1 second data loss. RDB provides fast restart snapshots. Pure cache? Disable persistence entirely for maximum throughput. Monitor <code>rdb_last_bgsave_status</code> and watch for fork() latency spikes on large datasets.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>RDB = snapshot, fast restart, up to minutes of data loss. AOF = command log, slow replay, max 1s loss with everysec. Run both in production. Cache-only? Disable persistence. <code>fork()</code> for RDB runs in child process — doesn't block commands but can spike RSS memory usage.</p></div>
+  </div>
+
+  <div class="sec" id="t8">
+    <div class="snum">T8 <span class="snum-badges"><span class="sbadge adv">Advanced</span></span></div>
+    <h2>Transactions &mdash; MULTI/EXEC, WATCH optimistic locking, and Lua scripts</h2>
+    <p><code>MULTI/EXEC</code> queues commands and executes them as an atomic block. Unlike SQL transactions, Redis transactions <strong>do not roll back</strong> on command failure — if SET succeeds but INCR fails due to wrong type, the other commands still execute.</p>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">redis-cli &mdash; MULTI/EXEC, WATCH, Lua</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc">── MULTI/EXEC: queue and execute atomically ──</span>
+<span class="ck">MULTI</span>                           <span class="cc"># start transaction</span>
+<span class="ck">INCR</span> account:balance
+<span class="ck">DECRBY</span> account:balance <span class="cn">50</span>      <span class="cc"># queued, not executed yet</span>
+<span class="ck">EXEC</span>                            <span class="cc"># execute all as atomic block</span>
+<span class="cc"># ⚠ Not rollback-able! Individual command errors don't abort others</span>
+
+<span class="cc">── WATCH: optimistic locking (CAS) ──</span>
+<span class="ck">WATCH</span> account:balance           <span class="cc"># monitor this key for changes</span>
+<span class="ck">GET</span>   account:balance           <span class="cc"># read current value</span>
+<span class="ck">MULTI</span>
+<span class="ck">DECRBY</span> account:balance <span class="cn">100</span>
+<span class="ck">EXEC</span>                            <span class="cc"># returns nil if balance changed since WATCH!</span>
+<span class="cc"># Retry the whole block if EXEC returns nil</span>
+
+<span class="cc">── Lua script: preferred for complex atomicity ──</span>
+<span class="cc"># Atomic rate limiting in Lua (entire script runs without interruption)</span>
+<span class="ck">EVAL</span> "
+local current = redis.call('INCR', KEYS[1])
+if current == 1 then
+  redis.call('EXPIRE', KEYS[1], ARGV[1])
+end
+if current > tonumber(ARGV[2]) then
+  return 0
+end
+return 1
+" 1 ratelimit:user:123 <span class="cn">60</span> <span class="cn">100</span>
+<span class="cc"># Args: 1 key, ttl=60s, max=100 requests → returns 0 (blocked) or 1 (allowed)</span>
+
+<span class="cc"># Register script for reuse (avoid re-sending script body each call)</span>
+<span class="ck">SCRIPT LOAD</span> "..."               <span class="cc"># returns SHA1</span>
+<span class="ck">EVALSHA</span> &lt;sha1&gt; 1 key arg1       <span class="cc"># call by SHA — much faster</span></pre></div>
+    <div class="box em"><div class="bxt">When to use Lua vs MULTI/EXEC</div><p>Use Lua when you need true read-modify-write atomicity (check-then-set, rate limiting, distributed locks). The entire Lua script executes atomically in the single-threaded Redis process — no other commands can interleave. WATCH+MULTI is fine for simple CAS operations with low contention, but Lua is superior for high-contention scenarios.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>MULTI/EXEC = atomic execution but no rollback. WATCH = CAS (compare-and-swap): EXEC returns nil if watched key changed → retry loop. Lua = true atomic read-modify-write, no other commands can interleave. EVALSHA + SCRIPT LOAD = efficient repeated Lua calls. Use Lua for rate limiting, locks, conditional updates.</p></div>
+  </div>
+
+  <div class="sec" id="t9">
+    <div class="snum">T9</div>
+    <h2>Pub/Sub &amp; Streams &mdash; fire-and-forget vs persistent messaging</h2>
+    <div class="tw"><table>
+      <tr><th>Feature</th><th>Pub/Sub</th><th>Streams</th></tr>
+      <tr><td><strong>Persistence</strong></td><td>Fire-and-forget</td><td>Stored in Redis</td></tr>
+      <tr><td><strong>Offline consumers</strong></td><td>Miss messages if offline</td><td>Read from any point in history</td></tr>
+      <tr><td><strong>Consumer groups</strong></td><td>All subscribers get all messages</td><td>Each group gets unique messages (parallel workers)</td></tr>
+      <tr><td><strong>Acknowledgement</strong></td><td>No delivery guarantee</td><td>XACK confirms processing</td></tr>
+      <tr><td><strong>Replay</strong></td><td>Not possible</td><td>Replay from any ID</td></tr>
+      <tr><td><strong>Best for</strong></td><td>Live notifications, chat, presence updates</td><td>Event queues, reliable messaging, audit logs</td></tr>
+    </table></div>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">redis-cli &mdash; Pub/Sub and Streams</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc">── PUB/SUB ──</span>
+<span class="ck">PUBLISH</span>    notifications:user:123 '{"type":"order_shipped","id":456}'
+<span class="ck">SUBSCRIBE</span>  notifications:user:123
+<span class="ck">PSUBSCRIBE</span> notifications:user:*      <span class="cc"># pattern matching</span>
+
+<span class="cc">── STREAMS ──</span>
+<span class="cc"># Produce</span>
+<span class="ck">XADD</span> orders * orderId <span class="cn">456</span> userId <span class="cn">123</span> status shipped
+<span class="cc"># * = auto-generate ID (millisecond-sequence)</span>
+
+<span class="cc"># Consume from beginning</span>
+<span class="ck">XREAD</span> COUNT <span class="cn">10</span> STREAMS orders <span class="cn">0</span>
+
+<span class="cc"># Block for new messages</span>
+<span class="ck">XREAD</span> BLOCK <span class="cn">0</span> STREAMS orders $
+
+<span class="cc"># Consumer Groups: multiple parallel consumers, each gets unique messages</span>
+<span class="ck">XGROUP</span> CREATE orders email-svc $          <span class="cc"># create group, start from now</span>
+<span class="ck">XREADGROUP</span> GROUP email-svc consumer1 COUNT <span class="cn">10</span> STREAMS orders &gt;
+<span class="ck">XACK</span> orders email-svc &lt;message-id&gt;        <span class="cc"># confirm processed</span>
+<span class="ck">XPENDING</span> orders email-svc - + <span class="cn">10</span>        <span class="cc"># see unacknowledged messages</span></pre></div>
+    <div class="box rd"><div class="bxt">Pub/Sub vs Streams choice</div><p>Pub/Sub is a broadcast fire-and-forget — if the subscriber is offline, the message is lost. Use it only for ephemeral real-time data: live notifications, presence updates, live dashboards. Streams are the modern default for most messaging use cases — messages are persisted, consumer groups enable parallel processing with at-least-once delivery via XACK.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>Pub/Sub = ephemeral broadcast, fire-and-forget, no persistence, all subscribers get all messages. Streams = persistent log, consumer groups for parallel workers, XACK for at-least-once delivery, replay via message IDs. Streams ≈ Redis's Kafka equivalent for simpler use cases.</p></div>
+  </div>
+
+  <div class="sec" id="t10">
+    <div class="snum">T10</div>
+    <h2>Pipelining &amp; batching &mdash; eliminating round-trip latency</h2>
+    <p>Without pipelining, each command waits for a network round-trip (RTT) before the next command sends. With pipelining, you send N commands without waiting for responses, then read all N responses at once. Result: N×RTT reduced to ~1 RTT.</p>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">javascript &mdash; Pipeline with ioredis</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc">// Without pipeline: 100 round-trips ≈ 50ms on localhost</span>
+<span class="ck">for</span> (<span class="ck">const</span> key <span class="ck">of</span> keys) {
+  <span class="ck">await</span> redis.<span class="cf">get</span>(key);  <span class="cc">// each waits for response</span>
+}
+
+<span class="cc">// With pipeline: 1 round-trip ≈ 0.5ms</span>
+<span class="ck">const</span> pipeline = redis.<span class="cf">pipeline</span>();
+<span class="ck">for</span> (<span class="ck">const</span> key <span class="ck">of</span> keys) {
+  pipeline.<span class="cf">get</span>(key);    <span class="cc">// queued locally</span>
+}
+<span class="ck">const</span> results = <span class="ck">await</span> pipeline.<span class="cf">exec</span>();  <span class="cc">// single round-trip</span>
+
+<span class="cc">// Pipeline vs MULTI/EXEC:
+// Pipeline: commands sent together, server may interleave with other clients
+// MULTI/EXEC: atomic — server buffers then executes without interruption</span>
+
+<span class="cc">// SCAN — safe key enumeration (NEVER use KEYS * in production!)</span>
+<span class="ck">SCAN</span> <span class="cn">0</span> MATCH user:* COUNT <span class="cn">100</span>   <span class="cc"># cursor-based, non-blocking</span>
+<span class="cc"># returns: [nextCursor, [matching_keys]]</span>
+<span class="cc"># iterate until cursor returns 0</span>
+<span class="cc"># KEYS * blocks Redis until complete — do not use in production!</span></pre></div>
+    <div class="box ro"><div class="bxt">Never use KEYS * in production</div><p><code>KEYS *</code> blocks the entire Redis event loop until it scans the full keyspace — on a 10M-key instance this can take seconds, blocking all other clients. Use <code>SCAN</code> with a cursor instead: it's iterative, returns a small batch per call, and never blocks.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>Pipelining = send N commands without waiting, collect N responses in one trip. N×RTT → ~1 RTT. Pipeline is client-side batching — no atomicity guarantee (use MULTI/EXEC for that). SCAN vs KEYS: SCAN is cursor-based and non-blocking; KEYS blocks. HSCAN/SSCAN/ZSCAN for type-specific iteration.</p></div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       CHAPTER 3 — HIGH AVAILABILITY
+  ══════════════════════════════════════ -->
+  <div class="ch-lbl" id="ch3">Chapter 3 &mdash; High Availability</div>
+
+  <div class="sec" id="t11">
+    <div class="snum">T11 <span class="snum-badges"><span class="sbadge adv">Advanced</span></span></div>
+    <h2>Redis Sentinel &mdash; automatic failover and master election</h2>
+    <p>Sentinel provides high availability for a single Redis primary + replicas. It monitors the master, detects failures, elects a new master from replicas, and notifies clients of the new address &mdash; all automatically.</p>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">text &mdash; Sentinel architecture</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre>[ Sentinel 1 ]   [ Sentinel 2 ]   [ Sentinel 3 ]
+      │                 │                 │
+      └─────────── monitors via PING ──────┘
+                        │
+             ┌──────────┴──────────┐
+      [ Master Redis ]    [ Replica 1 ]   [ Replica 2 ]
+             │                    ↑
+             └──── replication ───┘
+
+Failover sequence when master goes down:
+1. Sentinels detect SDOWN (subjectively down) via PING timeout
+2. Quorum agreement: 2/3 sentinels agree → ODOWN (objectively down)
+3. Sentinel leader elected (Raft-like)
+4. Best replica promoted to master (lowest replication lag wins)
+5. Other replicas reconfigured to replicate from new master
+6. Clients notified via Sentinel API</pre></div>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">config + javascript &mdash; Sentinel setup</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc"># sentinel.conf</span>
+sentinel monitor mymaster <span class="cn">127.0.0.1</span> <span class="cn">6379</span> <span class="cn">2</span>
+<span class="cc"># "mymaster" = name, quorum = 2 (2 sentinels must agree on failure)</span>
+sentinel down-after-milliseconds mymaster <span class="cn">5000</span>
+sentinel failover-timeout mymaster <span class="cn">60000</span>
+sentinel parallel-syncs mymaster <span class="cn">1</span>   <span class="cc"># how many replicas sync at once</span>
+
+<span class="cc">// Node.js ioredis: connect via Sentinel, not master directly</span>
+<span class="ck">const</span> redis = <span class="ck">new</span> <span class="cf">Redis</span>({
+  sentinels: [
+    { host: <span class="cs">'sentinel1'</span>, port: <span class="cn">26379</span> },
+    { host: <span class="cs">'sentinel2'</span>, port: <span class="cn">26379</span> },
+    { host: <span class="cs">'sentinel3'</span>, port: <span class="cn">26379</span> }
+  ],
+  name: <span class="cs">'mymaster'</span>   <span class="cc">// Sentinel resolves current master address</span>
+});</pre></div>
+    <div class="box em"><div class="bxt">Sentinel in practice</div><p>Minimum 3 Sentinel nodes (odd number for quorum). Sentinels must run on separate machines from Redis for meaningful HA. In cloud environments (AWS ElastiCache, GCP Memorystore), HA is managed automatically — prefer managed Redis over self-managed Sentinel unless you have a specific reason.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>Sentinel = HA for single primary + replicas. Quorum (usually 2/3) must agree before failover. Clients connect to Sentinel, not master directly — Sentinel resolves current master. 3 Sentinels minimum. Failover time: ~30 seconds default (down-after-milliseconds + election + sync).</p></div>
+  </div>
+
+  <div class="sec" id="t12">
+    <div class="snum">T12 <span class="snum-badges"><span class="sbadge adv">Advanced</span></span></div>
+    <h2>Redis Cluster &mdash; horizontal scaling with hash slots</h2>
+    <p>Redis Cluster shards data automatically across multiple master nodes using <strong>16,384 hash slots</strong>. Each master owns a range of slots. Keys are mapped via <code>CRC16(key) % 16384</code>. This enables scaling beyond single-node memory limits.</p>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">text &mdash; Cluster architecture and slot routing</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre>Redis Cluster = 16384 hash slots distributed across masters
+
+[ Master A ]  slots    0–5460    +  [ Replica A ]
+[ Master B ]  slots 5461–10922   +  [ Replica B ]
+[ Master C ]  slots 10923–16383  +  [ Replica C ]
+
+Slot assignment: CRC16(key) % 16384
+  SET user:123  →  CRC16("user:123") % 16384  →  slot 5298  →  Master A
+
+Client connects to any node:
+  If wrong node: MOVED 5298 127.0.0.1:6379
+  Client redirects to correct node (caches slot map locally)</pre></div>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">redis-cli &mdash; Hash tags for multi-key operations</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc"># Multi-key commands (MGET, MSET, SUNION) only work if all keys are in same slot</span>
+<span class="cc"># Hash tags: {…} portion used for slot calculation</span>
+
+<span class="cc"># These two keys will be on the same slot (hash tag = "user:123")</span>
+<span class="ck">SET</span> {user:123}:profile '...'
+<span class="ck">SET</span> {user:123}:settings '...'
+<span class="ck">MGET</span> {user:123}:profile {user:123}:settings   <span class="cc"># works!</span>
+
+<span class="cc"># Cross-slot transactions are not supported</span>
+<span class="cc"># MULTI/EXEC fails if commands span multiple slots</span>
+
+<span class="cc"># Cluster management</span>
+<span class="ck">CLUSTER INFO</span>
+<span class="ck">CLUSTER NODES</span>
+<span class="ck">CLUSTER KEYSLOT</span> user:123    <span class="cc"># which slot does this key belong to?</span></pre></div>
+    <div class="box am"><div class="bxt">Cluster limitations</div><p>Multi-key operations only work if all keys hash to the same slot. Use hash tags <code>{}</code> to force key colocation. No cross-slot transactions. Minimum 3 masters + 3 replicas for production. Lua scripts cannot access keys across multiple slots.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>16384 hash slots, each master owns a range. CRC16(key) % 16384 = slot. MOVED response = client redirect to correct node. Hash tags {} = force colocation on same slot. No cross-slot multi-key ops. Minimum 6 nodes (3 masters + 3 replicas) for production cluster.</p></div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       CHAPTER 4 — PATTERNS & USE CASES
+  ══════════════════════════════════════ -->
+  <div class="ch-lbl" id="ch4">Chapter 4 &mdash; Patterns &amp; Use Cases</div>
+
+  <div class="sec" id="t13">
+    <div class="snum">T13 <span class="snum-badges"><span class="sbadge adv">Core</span></span></div>
+    <h2>Caching patterns &mdash; Cache-Aside, Write-Through, Write-Behind</h2>
+    <div class="tw"><table>
+      <tr><th>Pattern</th><th>How it works</th><th>Consistency</th><th>Best for</th></tr>
+      <tr><td><strong>Cache-Aside</strong></td><td>App checks cache; miss → fetch DB → populate cache</td><td>Eventual (stale on write until TTL expires)</td><td>Read-heavy workloads (most common)</td></tr>
+      <tr><td><strong>Write-Through</strong></td><td>Every write updates cache AND DB synchronously</td><td>Strong</td><td>Read-heavy + consistency critical</td></tr>
+      <tr><td><strong>Write-Behind</strong></td><td>Write to cache first; async write to DB later</td><td>Weak (loss risk if Redis crashes)</td><td>Write-heavy, tolerable data loss</td></tr>
+      <tr><td><strong>Read-Through</strong></td><td>Cache handles miss automatically (cache populates itself)</td><td>Eventual</td><td>When cache layer manages its own loading</td></tr>
+    </table></div>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">javascript &mdash; Cache-Aside pattern (Node.js)</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="ck">async function</span> <span class="cf">getUser</span>(userId) {
+  <span class="ck">const</span> cacheKey = <span class="cs">`user:${userId}`</span>;
+
+  <span class="cc">// 1. Check cache first</span>
+  <span class="ck">const</span> cached = <span class="ck">await</span> redis.<span class="cf">get</span>(cacheKey);
+  <span class="ck">if</span> (cached) <span class="ck">return</span> JSON.<span class="cf">parse</span>(cached);
+
+  <span class="cc">// 2. Cache miss — fetch from DB</span>
+  <span class="ck">const</span> user = <span class="ck">await</span> db.<span class="cf">query</span>(<span class="cs">'SELECT * FROM users WHERE id = ?'</span>, [userId]);
+
+  <span class="cc">// 3. Populate cache with TTL</span>
+  <span class="ck">await</span> redis.<span class="cf">setex</span>(cacheKey, <span class="cn">3600</span>, JSON.<span class="cf">stringify</span>(user));
+  <span class="ck">return</span> user;
+}
+
+<span class="cc">// Cache invalidation on update</span>
+<span class="ck">async function</span> <span class="cf">updateUser</span>(userId, data) {
+  <span class="ck">await</span> db.<span class="cf">query</span>(<span class="cs">'UPDATE users SET ...'</span>, [userId]);
+  <span class="ck">await</span> redis.<span class="cf">del</span>(<span class="cs">`user:${userId}`</span>);  <span class="cc">// invalidate — next read re-populates</span>
+}
+
+<span class="cc">// Write-Through: update cache AND DB synchronously</span>
+<span class="ck">async function</span> <span class="cf">updateUserWT</span>(userId, data) {
+  <span class="ck">const</span> updated = <span class="ck">await</span> db.<span class="cf">query</span>(<span class="cs">'UPDATE users ...'</span>, [userId]);
+  <span class="ck">await</span> redis.<span class="cf">setex</span>(<span class="cs">`user:${userId}`</span>, <span class="cn">3600</span>, JSON.<span class="cf">stringify</span>(updated));
+}</pre></div>
+    <div class="box rd"><div class="bxt">Cache invalidation is the hard part</div><p>Cache-Aside is the most common and safest pattern — only cache what's actually requested (no cold data waste). The tricky part is invalidation: delete on update, use TTL as a safety net. Write-Through adds write latency but keeps the cache consistent immediately. Write-Behind is fastest for writes but risks data loss if Redis crashes before the async DB write.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>Cache-Aside = check cache → miss → DB → populate (most common). Write-Through = write cache + DB together (consistent). Write-Behind = write cache first + async DB (fast writes, loss risk). Always set a TTL as a safety net against stale data even when doing explicit invalidation.</p></div>
+  </div>
+
+  <div class="sec" id="t14">
+    <div class="snum">T14 <span class="snum-badges"><span class="sbadge adv">Advanced</span></span></div>
+    <h2>Cache stampede &mdash; thundering herd problem and prevention strategies</h2>
+    <p>A popular cache key expires → thousands of concurrent requests simultaneously miss → all query the DB → DB overloads → latency spikes → cascade failure. This is the <strong>thundering herd</strong> or <strong>cache stampede</strong>.</p>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">javascript &mdash; Prevention strategies</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc">── Strategy 1: Mutex lock (most reliable) ──</span>
+<span class="ck">async function</span> <span class="cf">getCachedData</span>(key) {
+  <span class="ck">let</span> data = <span class="ck">await</span> redis.<span class="cf">get</span>(key);
+  <span class="ck">if</span> (data) <span class="ck">return</span> JSON.<span class="cf">parse</span>(data);
+
+  <span class="cc">// Try to acquire lock: SET NX with 10s auto-expire</span>
+  <span class="ck">const</span> lockAcquired = <span class="ck">await</span> redis.<span class="cf">set</span>(<span class="cs">`lock:${key}`</span>, <span class="cs">'1'</span>, <span class="cs">'NX'</span>, <span class="cs">'EX'</span>, <span class="cn">10</span>);
+
+  <span class="ck">if</span> (lockAcquired) {
+    <span class="cc">// Only this request fetches from DB</span>
+    <span class="ck">const</span> fresh = <span class="ck">await</span> <span class="cf">fetchFromDB</span>(key);
+    <span class="ck">await</span> redis.<span class="cf">setex</span>(key, <span class="cn">3600</span>, JSON.<span class="cf">stringify</span>(fresh));
+    <span class="ck">await</span> redis.<span class="cf">del</span>(<span class="cs">`lock:${key}`</span>);
+    <span class="ck">return</span> fresh;
+  } <span class="ck">else</span> {
+    <span class="cc">// Others wait ~50ms then hit the now-populated cache</span>
+    <span class="ck">await</span> <span class="cf">sleep</span>(<span class="cn">50</span>);
+    <span class="ck">return</span> <span class="cf">getCachedData</span>(key);  <span class="cc">// retry</span>
+  }
+}
+
+<span class="cc">── Strategy 2: TTL jitter (prevents mass expiry) ──</span>
+<span class="cc">// Add random offset so bulk-loaded keys don't expire simultaneously</span>
+<span class="ck">const</span> ttl = <span class="cn">3600</span> + Math.<span class="cf">floor</span>(Math.<span class="cf">random</span>() * <span class="cn">300</span>);  <span class="cc">// 3600±300s</span>
+<span class="ck">await</span> redis.<span class="cf">setex</span>(key, ttl, data);
+
+<span class="cc">── Strategy 3: Probabilistic early recompute ──</span>
+<span class="cc">// Start refreshing randomly before expiry — no stampede possible</span>
+<span class="ck">const</span> timeLeft = <span class="ck">await</span> redis.<span class="cf">pttl</span>(key);   <span class="cc">// ms remaining</span>
+<span class="ck">const</span> shouldRefresh = Math.<span class="cf">random</span>() &lt; Math.<span class="cf">exp</span>(<span class="cn">-0.5</span> * timeLeft / <span class="cn">1000</span>);</pre></div>
+    <div class="box am"><div class="bxt">TTL jitter is mandatory for bulk loads</div><p>If you populate 10,000 product cache entries all with the same TTL of 3600 seconds, they all expire at the same moment. Add ±10% random jitter to every TTL when bulk-loading. This one line prevents a guaranteed stampede 60 minutes after every cache warm-up.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>Stampede = mass cache miss → DB overload. Mutex = only first request fetches, others wait then hit warm cache. TTL jitter = ±10% random offset prevents synchronized expiry. Probabilistic early recompute = refresh randomly before expiry to prevent mass expiry entirely. Use all three for truly high-traffic keys.</p></div>
+  </div>
+
+  <div class="sec" id="t15">
+    <div class="snum">T15 <span class="snum-badges"><span class="sbadge adv">Advanced</span></span></div>
+    <h2>Distributed locking &mdash; correct Redis lock implementation and Redlock</h2>
+    <p>A distributed lock ensures only one process executes a critical section at a time across multiple servers. The naive implementation has a race condition; the correct pattern uses a unique value, atomic SET NX, and Lua for safe release.</p>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">javascript &mdash; Single-node lock and Redlock</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc">── Correct single-node Redis lock ──</span>
+<span class="ck">const</span> lockId = crypto.<span class="cf">randomUUID</span>();  <span class="cc">// unique value = owner identity</span>
+
+<span class="ck">const</span> acquired = <span class="ck">await</span> redis.<span class="cf">set</span>(
+  <span class="cs">'lock:payment:order123'</span>,
+  lockId,
+  <span class="cs">'NX'</span>,    <span class="cc">// set only if not exists</span>
+  <span class="cs">'EX'</span>, <span class="cn">30</span> <span class="cc">// auto-expire in 30s — prevents deadlock if process crashes</span>
+);
+
+<span class="ck">if</span> (!acquired) <span class="ck">throw new</span> <span class="cf">Error</span>(<span class="cs">'Could not acquire lock'</span>);
+
+<span class="ck">try</span> {
+  <span class="ck">await</span> <span class="cf">processPayment</span>(<span class="cs">'order123'</span>);
+} <span class="ck">finally</span> {
+  <span class="cc">// MUST use Lua: atomically check value then delete</span>
+  <span class="cc">// Two separate commands (GET + DEL) would have a race condition!</span>
+  <span class="ck">await</span> redis.<span class="cf">eval</span>(<span class="cs">`
+    if redis.call('get', KEYS[1]) == ARGV[1] then
+      return redis.call('del', KEYS[1])
+    else return 0 end
+  `</span>, <span class="cn">1</span>, <span class="cs">'lock:payment:order123'</span>, lockId);
+}
+
+<span class="cc">── Redlock: distributed lock across N independent Redis nodes ──</span>
+<span class="cc">// Use the redlock npm library; acquire lock from majority (N/2+1) nodes</span>
+<span class="ck">const</span> redlock = <span class="ck">new</span> <span class="cf">Redlock</span>([redis1, redis2, redis3]);
+<span class="ck">const</span> lock = <span class="ck">await</span> redlock.<span class="cf">acquire</span>([<span class="cs">'lock:resource'</span>], <span class="cn">30000</span>);
+<span class="ck">try</span> {
+  <span class="ck">await</span> <span class="cf">doWork</span>();
+} <span class="ck">finally</span> {
+  <span class="ck">await</span> lock.<span class="cf">release</span>();
+}</pre></div>
+    <div class="box ro"><div class="bxt">Critical mistake to avoid</div><p>Never use <code>GET</code> then <code>DEL</code> to release a lock — another process could steal and delete your lock between the two commands. Always use the Lua script that atomically checks the value matches your lockId before deleting. The TTL auto-expiry is your deadlock safety net — if the process crashes, the lock auto-releases.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>Lock acquire: SET NX EX (atomic). Lock release: Lua script (check value == lockId, then DEL). Never GET+DEL — race condition. Lock value = UUID (proves ownership). TTL = deadlock prevention. Redlock = acquire from majority of N independent nodes; safer when one Redis node can fail mid-lock.</p></div>
+  </div>
+
+  <div class="sec" id="t16">
+    <div class="snum">T16</div>
+    <h2>Rate limiting with Redis &mdash; fixed window, sliding window, token bucket</h2>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">javascript &mdash; Rate limiting implementations</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc">── Fixed Window (simplest) ──</span>
+<span class="ck">async function</span> <span class="cf">fixedWindowLimit</span>(userId, limit=<span class="cn">100</span>, window=<span class="cn">60</span>) {
+  <span class="ck">const</span> key = <span class="cs">`ratelimit:${userId}:${Math.floor(Date.now()/1000/window)}`</span>;
+  <span class="ck">const</span> count = <span class="ck">await</span> redis.<span class="cf">incr</span>(key);
+  <span class="ck">if</span> (count === <span class="cn">1</span>) <span class="ck">await</span> redis.<span class="cf">expire</span>(key, window);
+  <span class="ck">return</span> count &lt;= limit;
+}
+<span class="cc">// Weakness: burst at window boundary — 100 at 11:59, 100 at 12:00 = 200 in 2s</span>
+
+<span class="cc">── Sliding Window Log (accurate, more memory) ──</span>
+<span class="ck">async function</span> <span class="cf">slidingWindowLog</span>(userId, limit=<span class="cn">100</span>, window=<span class="cn">60</span>) {
+  <span class="ck">const</span> key = <span class="cs">`ratelimit:log:${userId}`</span>;
+  <span class="ck">const</span> now = Date.<span class="cf">now</span>();
+  <span class="ck">const</span> cutoff = now - (window * <span class="cn">1000</span>);
+
+  <span class="ck">await</span> redis.<span class="cf">pipeline</span>()
+    .<span class="cf">zremrangebyscore</span>(key, <span class="cs">'-inf'</span>, cutoff)  <span class="cc">// remove old timestamps</span>
+    .<span class="cf">zadd</span>(key, now, <span class="cs">`${now}-${Math.random()}`</span>)
+    .<span class="cf">expire</span>(key, window)
+    .<span class="cf">exec</span>();
+
+  <span class="ck">const</span> count = <span class="ck">await</span> redis.<span class="cf">zcard</span>(key);
+  <span class="ck">return</span> count &lt;= limit;
+}
+<span class="cc">// Uses Sorted Set: score = timestamp, member = unique request ID</span>
+<span class="cc">// Remove entries older than window, check count after adding current</span></pre></div>
+    <div class="tw"><table>
+      <tr><th>Algorithm</th><th>Accuracy</th><th>Memory</th><th>Atomic (Lua needed?)</th></tr>
+      <tr><td><strong>Fixed window</strong></td><td>Vulnerable to boundary burst</td><td>O(1)</td><td>No</td></tr>
+      <tr><td><strong>Sliding window log</strong></td><td>Exact</td><td>O(N) requests in window</td><td>Pipeline is sufficient</td></tr>
+      <tr><td><strong>Sliding window counter</strong></td><td>~99% accurate</td><td>O(1)</td><td>Yes — Lua for atomicity</td></tr>
+      <tr><td><strong>Token bucket</strong></td><td>Exact, allows controlled bursts</td><td>O(1)</td><td>Yes — Lua required</td></tr>
+    </table></div>
+    <div class="box em"><div class="bxt">Production recommendation</div><p>The sliding window counter (weighted blend of current + previous window) implemented in Lua is both accurate and O(1) memory. Use it for API rate limiting. For burst-tolerant rate limits (download quotas, batch jobs), token bucket is more appropriate. Always implement in Lua to avoid INCR+EXPIRE race conditions.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>Fixed window = O(1) but boundary burst vulnerability. Sliding window log = exact but O(N) memory per user. Sliding window counter = O(1) and ~accurate (weighted blend). Token bucket = O(1) with controlled burst. All production implementations should use Lua for atomicity to avoid INCR+EXPIRE race conditions.</p></div>
+  </div>
+
+  <div class="sec" id="t17">
+    <div class="snum">T17</div>
+    <h2>Session management with Redis &mdash; distributed sessions, TTL sliding, revocation</h2>
+    <p>Redis is the standard choice for session storage in distributed Node.js applications. Any server can look up any session, enabling horizontal scaling without sticky sessions or shared database locks.</p>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">javascript &mdash; Express session with Redis</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="ck">const</span> session = <span class="cf">require</span>(<span class="cs">'express-session'</span>);
+<span class="ck">const</span> RedisStore = <span class="cf">require</span>(<span class="cs">'connect-redis'</span>)(session);
+
+app.<span class="cf">use</span>(<span class="cf">session</span>({
+  store: <span class="ck">new</span> <span class="cf">RedisStore</span>({
+    client: redisClient,
+    prefix: <span class="cs">'sess:'</span>,  <span class="cc">// key prefix: sess:{sessionId}</span>
+    ttl: <span class="cn">86400</span>         <span class="cc">// 24h TTL</span>
+  }),
+  secret: process.env.SESSION_SECRET,
+  resave: <span class="ck">false</span>,
+  saveUninitialized: <span class="ck">false</span>,
+  cookie: {
+    secure: <span class="ck">true</span>,       <span class="cc">// HTTPS only</span>
+    httpOnly: <span class="ck">true</span>,      <span class="cc">// no JS access (XSS protection)</span>
+    maxAge: <span class="cn">86400000</span>,
+    sameSite: <span class="cs">'strict'</span>  <span class="cc">// CSRF protection</span>
+  }
+}));
+
+<span class="cc">// Slide TTL on each request (keep active users logged in)</span>
+app.<span class="cf">use</span>((req, res, next) => {
+  <span class="ck">if</span> (req.session.userId) redis.<span class="cf">expire</span>(<span class="cs">`sess:${req.sessionID}`</span>, <span class="cn">86400</span>);
+  <span class="cf">next</span>();
+});
+
+<span class="cc">// Logout: delete session key → immediate revocation</span>
+req.session.<span class="cf">destroy</span>(<span class="ck">async</span> () => {
+  <span class="ck">await</span> redis.<span class="cf">del</span>(<span class="cs">`sess:${req.sessionID}`</span>);
+});
+
+<span class="cc">// Force logout from all devices for a user (store session IDs per user)</span>
+<span class="ck">const</span> sessionIds = <span class="ck">await</span> redis.<span class="cf">smembers</span>(<span class="cs">`user-sessions:${userId}`</span>);
+<span class="ck">await</span> Promise.<span class="cf">all</span>(sessionIds.<span class="cf">map</span>(id => redis.<span class="cf">del</span>(<span class="cs">`sess:${id}`</span>)));</pre></div>
+    <div class="box rd"><div class="bxt">Redis sessions vs JWT</div><p>The key advantage of Redis sessions over stateless JWT: <strong>immediate revocation</strong>. Delete the session key and the user is logged out instantly. JWT tokens live until they expire (potentially hours). For security-sensitive apps (banking, admin panels), Redis sessions are the correct choice.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>Redis sessions = any server can look up any session (no sticky sessions needed). Sliding TTL = reset expire on each request (active users stay logged in). Immediate revocation = delete key → logged out (vs JWT where you wait for expiry). Store session IDs per user in a Set to enable "logout all devices".</p></div>
+  </div>
+
+  <div class="sec" id="t18">
+    <div class="snum">T18</div>
+    <h2>Redis as a message queue &mdash; Lists, Streams, and BullMQ</h2>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">javascript &mdash; Queue patterns</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc">── Simple queue with Lists ──</span>
+<span class="cc">// Producer: LPUSH jobs to head</span>
+<span class="ck">await</span> redis.<span class="cf">lpush</span>(<span class="cs">'queue:emails'</span>, JSON.<span class="cf">stringify</span>({
+  to: <span class="cs">'user@mail.com'</span>, subject: <span class="cs">'Welcome!'</span>
+}));
+
+<span class="cc">// Consumer: blocking pop from tail (FIFO)</span>
+<span class="ck">while</span> (<span class="ck">true</span>) {
+  <span class="ck">const</span> [, job] = <span class="ck">await</span> redis.<span class="cf">brpop</span>(<span class="cs">'queue:emails'</span>, <span class="cn">0</span>);
+  <span class="ck">await</span> <span class="cf">sendEmail</span>(JSON.<span class="cf">parse</span>(job));
+}
+
+<span class="cc">── Reliable queue: LMOVE prevents message loss on crash ──</span>
+<span class="cc">// Atomically move from queue to processing list</span>
+<span class="ck">const</span> job = <span class="ck">await</span> redis.<span class="cf">lmove</span>(
+  <span class="cs">'queue:emails'</span>,       <span class="cc">// source</span>
+  <span class="cs">'processing:emails'</span>,  <span class="cc">// destination (in-flight tracking)</span>
+  <span class="cs">'RIGHT'</span>, <span class="cs">'LEFT'</span>
+);
+<span class="ck">await</span> <span class="cf">processJob</span>(job);
+<span class="ck">await</span> redis.<span class="cf">lrem</span>(<span class="cs">'processing:emails'</span>, <span class="cn">1</span>, job);  <span class="cc">// remove when done</span>
+<span class="cc">// If crash mid-processing: job stays in processing list for requeue</span>
+
+<span class="cc">── BullMQ (production Redis queue library) ──</span>
+<span class="ck">const</span> queue = <span class="ck">new</span> <span class="cf">Queue</span>(<span class="cs">'emails'</span>, { connection: redis });
+<span class="ck">await</span> queue.<span class="cf">add</span>(<span class="cs">'send'</span>, { to: <span class="cs">'user@mail.com'</span> }, {
+  attempts: <span class="cn">3</span>,          <span class="cc">// retry 3 times on failure</span>
+  backoff: { type: <span class="cs">'exponential'</span>, delay: <span class="cn">1000</span> },
+  removeOnComplete: <span class="cn">100</span>, <span class="cc">// keep last 100 completed jobs</span>
+  delay: <span class="cn">60000</span>           <span class="cc">// delayed job: run after 60s</span>
+});</pre></div>
+    <div class="box em"><div class="bxt">When Redis queue vs Kafka</div><p>Use Redis queues (BullMQ) when: moderate volume (thousands/sec, not millions), no event replay needed, you want simple ops and a Node.js ecosystem. Upgrade to Kafka when: millions of events/sec, you need event replay/audit log, or multiple independent consumer teams need to read the same stream.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>LPUSH + BRPOP = simple FIFO queue. LMOVE to processing list = reliable queue (no message loss on crash). Streams with consumer groups = at-least-once delivery with XACK. BullMQ = production abstraction: retries, backoff, delayed jobs, priority, rate limiting. Redis queue ≠ Kafka — no replay, simpler ops model.</p></div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       CHAPTER 5 — PRODUCTION
+  ══════════════════════════════════════ -->
+  <div class="ch-lbl" id="ch5">Chapter 5 &mdash; Production</div>
+
+  <div class="sec" id="t19">
+    <div class="snum">T19 <span class="snum-badges"><span class="sbadge adv">Advanced</span></span></div>
+    <h2>Security best practices &mdash; auth, ACLs, TLS, network isolation</h2>
+    <p>The most dangerous Redis misconfiguration is binding to <code>0.0.0.0</code> with no password. Redis is frequently targeted by automated scanners; an exposed instance can be wiped with a single <code>FLUSHALL</code> command.</p>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">config &mdash; redis.conf security hardening</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc"># 1. Bind to specific interfaces only</span>
+bind 127.0.0.1 10.0.0.5       <span class="cc"># localhost + private IP only, not 0.0.0.0!</span>
+
+<span class="cc"># 2. Require password (Redis 5 and below)</span>
+requirepass your_strong_password_here
+
+<span class="cc"># 3. Protected mode (refuse external connections if no auth configured)</span>
+protected-mode yes
+
+<span class="cc"># 4. Disable dangerous commands (can't be re-enabled at runtime)</span>
+rename-command FLUSHALL  ""   <span class="cc"># disables FLUSHALL entirely</span>
+rename-command FLUSHDB   ""
+rename-command CONFIG    ""   <span class="cc"># prevents runtime config changes</span>
+rename-command DEBUG     ""
+
+<span class="cc"># 5. Enable TLS (Redis 6+)</span>
+tls-port 6380
+tls-cert-file /etc/ssl/redis/redis.crt
+tls-key-file  /etc/ssl/redis/redis.key
+tls-ca-cert-file /etc/ssl/redis/ca.crt</pre></div>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">redis-cli &mdash; ACLs (Redis 6+)</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc"># Principle of least privilege via ACL</span>
+<span class="cc"># App user: only GET/SET/DEL/EXPIRE on cache:* keys</span>
+<span class="ck">ACL SETUSER</span> appuser on &gt;password ~cache:* +GET +SET +DEL +EXPIRE
+
+<span class="cc"># Read-only analytics user</span>
+<span class="ck">ACL SETUSER</span> readonly on &gt;ropass ~* +GET +MGET +HGET +HGETALL +LRANGE +ZRANGE
+
+<span class="cc"># Disable default user</span>
+<span class="ck">ACL SETUSER</span> default off
+
+<span class="cc"># List all ACL users</span>
+<span class="ck">ACL LIST</span>
+<span class="ck">ACL WHOAMI</span></pre></div>
+    <div class="box ro"><div class="bxt">Non-negotiable in production</div><p>Use security groups / firewall rules to allow only app servers to reach the Redis port (6379) — no public internet access. Even with a password, a publicly accessible Redis is a security risk. Always use ACLs in Redis 6+ to give each service the minimum required permissions. Disable FLUSHALL and FLUSHDB.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>Bind to private IPs only. requirepass or ACL auth. Protected-mode = yes. Disable FLUSHALL/FLUSHDB/CONFIG/DEBUG via rename-command. TLS in Redis 6+. ACLs for per-user key pattern restrictions and command restrictions. Security group rules = only app servers can reach Redis port. Never expose Redis to public internet.</p></div>
+  </div>
+
+  <div class="sec" id="t20">
+    <div class="snum">T20 <span class="snum-badges"><span class="sbadge adv">Advanced</span></span></div>
+    <h2>Performance tuning &mdash; monitoring, slow log, memory optimization, key settings</h2>
+    <p>The cache hit rate is the single most important Redis health metric. Below 95% means your caching strategy has gaps. Memory fragmentation ratio above 1.5 means Redis is using significantly more OS memory than data.</p>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">redis-cli &mdash; Monitoring and diagnostics</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc"># Key INFO sections</span>
+<span class="ck">INFO</span> memory               <span class="cc"># used_memory, mem_fragmentation_ratio</span>
+<span class="ck">INFO</span> stats                <span class="cc"># ops/sec, keyspace hits/misses, evictions</span>
+<span class="ck">INFO</span> replication          <span class="cc"># master/replica lag</span>
+<span class="ck">INFO</span> clients              <span class="cc"># connected clients, blocked clients</span>
+
+<span class="cc"># Critical metrics to watch</span>
+<span class="cc"># keyspace_hits / (keyspace_hits + keyspace_misses) → target >99%</span>
+<span class="cc"># used_memory_rss / used_memory → fragmentation ratio (should be <1.5)</span>
+<span class="cc"># evicted_keys → if >0, maxmemory is too low</span>
+<span class="cc"># blocked_clients → clients waiting on BRPOP/BLPOP</span>
+
+<span class="cc"># Slow log — find expensive commands</span>
+<span class="ck">CONFIG SET</span> slowlog-log-slower-than <span class="cn">10000</span>  <span class="cc"># log commands >10ms</span>
+<span class="ck">SLOWLOG GET</span> <span class="cn">10</span>            <span class="cc"># last 10 slow commands</span>
+<span class="ck">SLOWLOG RESET</span>
+
+<span class="cc"># Memory diagnostics</span>
+<span class="ck">MEMORY USAGE</span> key           <span class="cc"># bytes used by a specific key</span>
+<span class="ck">MEMORY DOCTOR</span>              <span class="cc"># diagnose memory issues</span>
+<span class="ck">OBJECT ENCODING</span> key        <span class="cc"># internal encoding (ziplist, skiplist, hashtable...)</span>
+<span class="ck">DEBUG OBJECT</span> key           <span class="cc"># detailed object info including serialized length</span>
+
+<span class="cc"># Real-time command monitoring (dev only — huge CPU impact!)</span>
+<span class="ck">MONITOR</span>                    <span class="cc"># ⚠ streams every command to client — never in production</span>
+<span class="ck">LATENCY LATEST</span>             <span class="cc"># latest latency samples by event</span></pre></div>
+    <div class="tw"><table>
+      <tr><th>Setting</th><th>Recommended value</th><th>Why</th></tr>
+      <tr><td><code>maxmemory</code></td><td>70–80% of total RAM</td><td>Headroom for fork() and fragmentation</td></tr>
+      <tr><td><code>maxmemory-policy</code></td><td><code>allkeys-lru</code> (cache) / <code>noeviction</code> (db)</td><td>Match to use case</td></tr>
+      <tr><td><code>tcp-keepalive</code></td><td>300</td><td>Detect dead connections</td></tr>
+      <tr><td><code>lazyfree-lazy-eviction</code></td><td>yes</td><td>Evict large objects in background thread</td></tr>
+      <tr><td><code>activedefrag</code></td><td>yes (Redis 4+)</td><td>Reduce memory fragmentation online</td></tr>
+      <tr><td><code>hz</code></td><td>10–100</td><td>Background task frequency (higher = faster expiry)</td></tr>
+    </table></div>
+    <div class="box rd"><div class="bxt">Slow log analysis</div><p>Slow log shows commands taking longer than the threshold (default 10ms). Common culprits: <code>KEYS *</code>, <code>LRANGE</code> on a huge list, <code>SMEMBERS</code> on a large set, unoptimized Lua scripts, and O(N) operations where N is very large. Review slow log weekly in production &mdash; it's often the first sign of a growing data problem.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>Cache hit rate &gt;99% is the key health KPI. Fragmentation ratio &gt;1.5 → enable activedefrag or restart. evicted_keys &gt;0 → increase maxmemory. SLOWLOG for expensive commands. MONITOR only in dev (blocks all clients). maxmemory = 70–80% RAM with headroom. lazyfree = yes to avoid big-key eviction blocking the event loop.</p></div>
+  </div>
+
+</main>
+</div>
+
+<script>
+(function(){
+  const links = document.querySelectorAll('.ni');
+  if(!links.length) return;
+  const secs = Array.from(links).map(l => document.querySelector(l.getAttribute('href'))).filter(Boolean);
+  function setActive(id){
+    links.forEach(l => {
+      l.classList.toggle('active', l.getAttribute('href') === '#' + id);
+    });
+  }
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) setActive(e.target.id); });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  secs.forEach(s => obs.observe(s));
+})();
+</script>
+<script src="assets/theme-toggle.js" defer></script>
+</body>
+</html>

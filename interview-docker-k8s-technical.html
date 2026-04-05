@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en-IN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docker &amp; Kubernetes Interview Prep — Technical Q&amp;A</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,300&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
+<script>try{var k='my-learning-theme',t=localStorage.getItem(k);document.documentElement.setAttribute('data-theme',t==='light'||t==='dark'?t:'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}</script>
+<link rel="stylesheet" href="assets/theme-ui.css">
+<link rel="stylesheet" href="assets/theme-docs.css">
+<style>
+:root{
+  --bg:#07080c;--bg2:#0e0f14;--bg3:#14161c;--bg4:#1b1d25;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.14);
+  --text:#e3e0d6;--text2:#8c8880;--text3:#46433e;
+  --emerald:#10b981;--indigo:#818cf8;--amber:#f59e0b;
+  --sky:#38bdf8;--rose:#f43f5e;--lime:#84cc16;--dk:#2dd4bf;
+  --mono:'IBM Plex Mono',monospace;--serif:'Fraunces',serif;--sans:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.75;}
+.layout{display:flex;min-height:100vh;}
+
+/* ── SIDEBAR ── */
+.sb{width:268px;min-width:268px;background:var(--bg2);border-right:1px solid var(--border);padding:28px 0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sb-top{padding:0 22px 22px;border-bottom:1px solid var(--border);margin-bottom:10px;}
+.sb-badge{display:inline-block;background:var(--dk);color:#020e0d;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.08em;padding:3px 8px;border-radius:3px;margin-bottom:8px;}
+.sb-top h1{font-family:var(--serif);font-weight:700;font-size:17px;line-height:1.3;}
+.sb-top p{font-size:12px;color:var(--text2);margin-top:4px;}
+.nav-s{padding:0 14px;margin-bottom:4px;}
+.nav-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--text3);padding:0 8px;margin-bottom:5px;text-transform:uppercase;}
+.ni{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;font-size:12px;color:var(--text2);transition:all .15s;text-decoration:none;border:1px solid transparent;}
+.ni:hover{background:var(--bg3);color:var(--text);}
+.ni.active{background:var(--bg3);color:var(--emerald);border-color:var(--border);}
+.ndot{width:6px;height:6px;border-radius:50%;background:var(--text3);flex-shrink:0;}
+.ni.active .ndot{background:var(--emerald);}
+.sb-home{display:block;padding:10px 24px;color:var(--text2);text-decoration:none;font-family:var(--mono);font-size:11px;letter-spacing:.06em;border-bottom:1px solid var(--border);transition:color .15s;}
+.sb-home:hover{color:var(--text);}
+
+/* ── MAIN ── */
+.main{flex:1;max-width:920px;padding:48px 56px;}
+
+/* ── HERO ── */
+.hero{padding:40px 0 48px;border-bottom:1px solid var(--border);margin-bottom:48px;scroll-margin-top:24px;}
+.htag{font-family:var(--mono);font-size:11px;color:var(--dk);letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.htag::before{content:'';display:block;width:28px;height:1px;background:var(--dk);}
+.hero h1{font-family:var(--serif);font-size:50px;font-weight:700;line-height:1.06;letter-spacing:-.02em;margin-bottom:18px;}
+.hero h1 em{font-style:italic;color:var(--indigo);}
+.hero p{font-size:16px;color:var(--text2);max-width:580px;line-height:1.7;}
+.hmeta{display:flex;gap:20px;margin-top:24px;flex-wrap:wrap;}
+.hm{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--text2);}
+.hm span,.hm a{color:var(--lime);}
+.hm a{text-decoration:none;}
+.hm a:hover{text-decoration:underline;}
+
+/* ── PROGRESS ── */
+.pcard{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:48px;}
+.prow{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:8px;}
+.pbar{height:3px;background:var(--bg4);border-radius:99px;overflow:hidden;}
+.pfill{height:100%;background:linear-gradient(90deg,var(--dk),var(--indigo));border-radius:99px;width:100%;}
+
+/* ── SECTIONS ── */
+.sec{margin-bottom:64px;scroll-margin-top:24px;}
+.snum{font-family:var(--mono);font-size:11px;color:var(--dk);letter-spacing:.1em;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.snum.k8s{color:var(--indigo);}
+.snum-badges{display:flex;gap:6px;}
+.sbadge{font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 8px;border-radius:10px;letter-spacing:.05em;text-transform:uppercase;}
+.sbadge.new{background:rgba(16,185,129,.1);color:var(--emerald);border:1px solid rgba(16,185,129,.28);}
+.sbadge.adv{background:rgba(244,63,94,.1);color:var(--rose);border:1px solid rgba(244,63,94,.28);}
+.sbadge.mid{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.3);}
+.sec h2{font-family:var(--serif);font-size:28px;font-weight:700;line-height:1.2;margin-bottom:18px;}
+p{margin-bottom:14px;color:var(--text2);}
+strong{color:var(--text);font-weight:500;}
+
+/* ── CALLOUT BOXES ── */
+.box{border-left:3px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0;background:var(--bg2);}
+.box.em{border-color:var(--emerald);}
+.box.in{border-color:var(--indigo);}
+.box.am{border-color:var(--amber);}
+.box.sk{border-color:var(--sky);}
+.box.ro{border-color:var(--rose);}
+.box.dk{border-color:var(--dk);}
+.bxt{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}
+.box.em .bxt{color:var(--emerald);}
+.box.in .bxt{color:var(--indigo);}
+.box.am .bxt{color:var(--amber);}
+.box.sk .bxt{color:var(--sky);}
+.box.ro .bxt{color:var(--rose);}
+.box.dk .bxt{color:var(--dk);}
+.box p{margin:0;font-size:14px;line-height:1.65;}
+
+/* ── INSIGHT ── */
+.insight{background:linear-gradient(135deg,#0d0b1e 0%,#060c0b 100%);border:1px solid var(--indigo);border-radius:12px;padding:18px 20px;margin:20px 0;}
+.insight h4{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--indigo);margin-bottom:8px;}
+.insight p{color:var(--text2);font-size:13.5px;margin:0;line-height:1.65;}
+
+/* ── CODE BLOCKS ── */
+.cb{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden;}
+.cb-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg3);}
+.cb-lang{font-family:var(--mono);font-size:10px;color:var(--emerald);letter-spacing:.08em;text-transform:uppercase;}
+.dots{display:flex;gap:5px;}
+.dot{width:8px;height:8px;border-radius:50%;}
+.dot:nth-child(1){background:rgba(244,63,94,.4);}
+.dot:nth-child(2){background:rgba(245,158,11,.4);}
+.dot:nth-child(3){background:rgba(16,185,129,.4);}
+pre{padding:20px;overflow-x:auto;font-family:var(--mono);font-size:12px;line-height:1.8;color:#b5b0a8;white-space:pre-wrap;word-break:break-word;}
+code{font-family:var(--mono);font-size:12px;background:var(--bg3);border:1px solid var(--border);padding:1px 6px;border-radius:4px;color:var(--emerald);}
+.ck{color:var(--indigo);}
+.cf{color:var(--emerald);}
+.cs{color:var(--amber);}
+.cn{color:#fb923c;}
+.ct{color:var(--sky);}
+.cc{color:#47443d;font-style:italic;}
+.cg{color:#4ade80;}
+.cr{color:var(--rose);}
+.cd{color:var(--dk);}
+
+/* ── TABLE ── */
+.tw{overflow-x:auto;margin:18px 0;border-radius:10px;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:var(--bg3);padding:10px 14px;text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);border-bottom:1px solid var(--border2);}
+td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;line-height:1.55;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--bg2);}
+td strong{color:var(--text);}
+td code{font-size:11px;}
+
+/* ── CHAPTER DIVIDERS ── */
+.ch-lbl{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin:52px 0 24px;display:flex;align-items:center;gap:16px;}
+.ch-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── POINT LIST ── */
+.pts{list-style:none;padding:0;margin:10px 0;}
+.pts li{display:flex;gap:10px;padding:7px 0;font-size:14px;color:var(--text2);border-bottom:1px solid var(--border);line-height:1.6;}
+.pts li:last-child{border-bottom:none;}
+.pts li::before{content:'▸';color:var(--sky);flex-shrink:0;font-size:11px;margin-top:3px;}
+
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
+
+/* ── MOBILE ── */
+.mob-nav{display:none;}
+@media(max-width:768px){
+  .mob-nav{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:10px 14px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;}
+  .mob-nav-left,.mob-nav-right{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .mob-btn{font-family:var(--mono);font-size:11px;color:var(--text2);text-decoration:none;padding:5px 10px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);white-space:nowrap;transition:color .15s;}
+  .mob-btn:hover{color:var(--text);}
+  .mob-btn--accent{color:var(--dk);border-color:var(--dk);}
+  .mob-theme{font-family:var(--mono);font-size:11px;color:var(--text2);padding:5px 10px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);cursor:pointer;white-space:nowrap;}
+  .sb{display:none;}
+  .main{padding:28px 20px;}
+  .hero h1{font-size:34px;}
+}
+@media print{.sb{display:none;}body{background:white;color:black;}}
+</style>
+</head>
+<body>
+
+<!-- ── Mobile top bar ── -->
+<header class="mob-nav" aria-label="Mobile navigation">
+  <div class="mob-nav-left">
+    <a href="index.html" class="mob-btn">&#8962; Home</a>
+    <a href="interview-docker-k8s-technical.html" class="mob-btn mob-btn--accent">&#8592; Q&amp;A</a>
+  </div>
+  <div class="mob-nav-right">
+    <button type="button" class="mob-theme" data-theme-toggle aria-label="Switch theme">&#9788; Theme</button>
+  </div>
+</header>
+
+<div class="layout">
+
+<!-- ── SIDEBAR ── -->
+<nav class="sb">
+  <a href="index.html" class="sb-home">&#8592; Home</a>
+  <button type="button" class="theme-toggle theme-toggle--sb" data-theme-toggle aria-pressed="false" aria-label="Switch theme"><span class="theme-toggle__icon" aria-hidden="true">&#9728;</span><span class="theme-toggle__text">Light</span></button>
+  <div class="sb-top">
+    <div class="sb-badge">DOCKER · K8S</div>
+    <h1>Technical Q&amp;A</h1>
+    <p>20 topics &middot; 5 chapters</p>
+  </div>
+
+  <div class="nav-s">
+    <div class="nav-lbl">Ch 1 &mdash; Docker Internals</div>
+    <a class="ni active" href="#t1"><div class="ndot"></div>T1 &middot; Containers vs VMs</a>
+    <a class="ni" href="#t2"><div class="ndot"></div>T2 &middot; Dockerfile &amp; multi-stage builds</a>
+    <a class="ni" href="#t3"><div class="ndot"></div>T3 &middot; Layers &amp; Union FS</a>
+  </div>
+  <div class="nav-s" style="margin-top:4px;">
+    <div class="nav-lbl">Ch 2 &mdash; Docker Runtime</div>
+    <a class="ni" href="#t4"><div class="ndot"></div>T4 &middot; Docker networking</a>
+    <a class="ni" href="#t5"><div class="ndot"></div>T5 &middot; Volumes &amp; storage</a>
+    <a class="ni" href="#t6"><div class="ndot"></div>T6 &middot; Docker Compose</a>
+    <a class="ni" href="#t7"><div class="ndot"></div>T7 &middot; Security best practices</a>
+    <a class="ni" href="#t8"><div class="ndot"></div>T8 &middot; Resource limits</a>
+    <a class="ni" href="#t9"><div class="ndot"></div>T9 &middot; Registry &amp; image management</a>
+    <a class="ni" href="#t10"><div class="ndot"></div>T10 &middot; Troubleshooting</a>
+  </div>
+  <div class="nav-s" style="margin-top:4px;">
+    <div class="nav-lbl">Ch 3 &mdash; K8s Architecture</div>
+    <a class="ni" href="#t11"><div class="ndot"></div>T11 &middot; Control plane &amp; nodes</a>
+    <a class="ni" href="#t12"><div class="ndot"></div>T12 &middot; Pods, Deployments, ReplicaSets</a>
+    <a class="ni" href="#t13"><div class="ndot"></div>T13 &middot; Services &amp; DNS</a>
+  </div>
+  <div class="nav-s" style="margin-top:4px;">
+    <div class="nav-lbl">Ch 4 &mdash; K8s Config &amp; Scaling</div>
+    <a class="ni" href="#t14"><div class="ndot"></div>T14 &middot; ConfigMaps &amp; Secrets</a>
+    <a class="ni" href="#t15"><div class="ndot"></div>T15 &middot; PersistentVolumes &amp; StatefulSets</a>
+    <a class="ni" href="#t16"><div class="ndot"></div>T16 &middot; HPA, VPA &amp; Cluster Autoscaler</a>
+    <a class="ni" href="#t17"><div class="ndot"></div>T17 &middot; Ingress &amp; TLS</a>
+  </div>
+  <div class="nav-s" style="margin-top:4px;">
+    <div class="nav-lbl">Ch 5 &mdash; K8s Production</div>
+    <a class="ni" href="#t18"><div class="ndot"></div>T18 &middot; Deployment strategies</a>
+    <a class="ni" href="#t19"><div class="ndot"></div>T19 &middot; RBAC &amp; security</a>
+    <a class="ni" href="#t20"><div class="ndot"></div>T20 &middot; Probes &amp; resource QoS</a>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero" id="overview">
+    <div class="htag">Docker &amp; Kubernetes &middot; Interview prep</div>
+    <h1>Technical<br><em>Q&amp;A</em></h1>
+    <p>Interview-style answers with architecture diagrams, YAML examples, and quick-recall lines &mdash; five chapters covering Docker internals, networking, security, Kubernetes architecture, autoscaling, Ingress, RBAC, and deployment strategies.</p>
+    <div class="hmeta">
+      <div class="hm">&#128172; <span>20 topics &middot; 5 chapters</span></div>
+      <div class="hm">&#127891; <span>Senior SWE level &middot; 6&ndash;7 yrs</span></div>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="pcard">
+    <div class="prow"><span>Interview prep</span><span>Docker &amp; Kubernetes &mdash; Technical Q&amp;A</span></div>
+    <div class="pbar"><div class="pfill"></div></div>
+    <p style="margin:10px 0 0;font-size:12px;color:var(--text2);font-family:var(--mono);">20 topics &middot; Chapters: Docker Internals &middot; Docker Runtime &middot; K8s Architecture &middot; K8s Config &middot; K8s Production</p>
+  </div>
+
+  <!-- ══════════════════════════════════
+       CHAPTER 1 — DOCKER INTERNALS
+  ══════════════════════════════════════ -->
+  <div class="ch-lbl" id="ch1">Chapter 1 &mdash; Docker Internals</div>
+
+  <div class="sec" id="t1">
+    <div class="snum">T1 <span class="snum-badges"><span class="sbadge adv">Core</span></span></div>
+    <h2>Containers vs VMs &mdash; Docker architecture, daemon, images, registry</h2>
+    <p>A <strong>container</strong> packages app code + dependencies + config into a portable, isolated unit. Unlike VMs, containers share the host OS kernel &mdash; making them lightweight, fast to start (milliseconds vs minutes), and efficient.</p>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">text &mdash; Architecture comparison</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre>Virtual Machines:
+[ App A ]  [ App B ]  [ App C ]
+[ Guest OS ][ Guest OS ][ Guest OS ]  ← each has full OS (GBs)
+[ Hypervisor (VMware / VirtualBox) ]
+[ Host OS ] [ Hardware ]
+
+Containers:
+[ App A ]  [ App B ]  [ App C ]
+[ Libs  ]  [ Libs  ]  [ Libs  ]      ← only app + deps (MBs)
+[ Docker Engine / Container Runtime ]
+[ Host OS Kernel ]  ← SHARED — no guest OS!
+[ Hardware ]</pre></div>
+    <div class="tw"><table>
+      <tr><th>Component</th><th>Role</th></tr>
+      <tr><td><strong>Docker Client</strong></td><td>CLI tool — sends commands to daemon via REST API</td></tr>
+      <tr><td><strong>Docker Daemon (dockerd)</strong></td><td>Background process — manages images, containers, networks, volumes</td></tr>
+      <tr><td><strong>Docker Image</strong></td><td>Read-only blueprint — layers of filesystem changes</td></tr>
+      <tr><td><strong>Docker Container</strong></td><td>Running instance of an image — adds a writable layer on top</td></tr>
+      <tr><td><strong>Docker Registry</strong></td><td>Stores images — Docker Hub, ECR, GCR, private registries</td></tr>
+      <tr><td><strong>containerd</strong></td><td>Underlying OCI-compliant container runtime used by dockerd</td></tr>
+    </table></div>
+    <div class="box dk"><div class="bxt">Say this in the interview</div><p>"Containers are process isolation via Linux namespaces and cgroups — not full virtualization. They start in milliseconds because there's no OS to boot. One Docker host can run hundreds of containers vs tens of VMs. In production, we don't run dockerd directly — we use containerd or CRI-O under Kubernetes."</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>VM = full guest OS per app (GBs, minutes to start). Container = shared host kernel, only app + libs (MBs, milliseconds to start). Docker daemon = manages lifecycle. Docker client = API calls only. containerd = the actual runtime under K8s. Containers use namespaces (isolation) + cgroups (resource limits).</p></div>
+  </div>
+
+  <div class="sec" id="t2">
+    <div class="snum">T2 <span class="snum-badges"><span class="sbadge adv">Core</span></span></div>
+    <h2>Dockerfile best practices &mdash; multi-stage builds, layer optimization, production-grade images</h2>
+    <p>Multi-stage builds are the single biggest improvement to Dockerfile quality. A Node.js app image drops from ~1.2 GB (with build tools) to ~80 MB (just the runtime output) when build stages are separated from the production stage.</p>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">dockerfile &mdash; Production multi-stage build</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc"># ── Stage 1: Build ──────────────────────────────────────</span>
+<span class="cd">FROM</span> node:20-alpine <span class="cd">AS</span> builder
+<span class="cd">WORKDIR</span> /app
+
+<span class="cc"># Copy package files FIRST — cache layer, only rebuilds if deps change</span>
+<span class="cd">COPY</span> package*.json ./
+<span class="cd">RUN</span> npm ci --only=production   <span class="cc"># ci = clean install, exact lockfile versions</span>
+
+<span class="cd">COPY</span> . .
+<span class="cd">RUN</span> npm run build
+
+<span class="cc"># ── Stage 2: Production ─────────────────────────────────</span>
+<span class="cd">FROM</span> node:20-alpine <span class="cd">AS</span> production
+<span class="cd">WORKDIR</span> /app
+
+<span class="cc"># Security: never run as root!</span>
+<span class="cd">RUN</span> addgroup -S appgroup && adduser -S appuser -G appgroup
+<span class="cd">USER</span> appuser
+
+<span class="cc"># Copy ONLY what's needed from builder — no source, no dev deps</span>
+<span class="cd">COPY</span> --from=builder /app/dist ./dist
+<span class="cd">COPY</span> --from=builder /app/node_modules ./node_modules
+
+<span class="cd">EXPOSE</span> 3000
+<span class="cd">HEALTHCHECK</span> --interval=30s --timeout=3s --retries=3 \
+  <span class="cd">CMD</span> wget -q -O- http://localhost:3000/health || exit 1
+
+<span class="cd">CMD</span> ["node", "dist/server.js"]</pre></div>
+    <div class="tw"><table>
+      <tr><th>Practice</th><th>Why it matters</th></tr>
+      <tr><td><strong>Multi-stage builds</strong></td><td>Final image has no build tools (gcc, npm dev deps) — smaller, more secure</td></tr>
+      <tr><td><strong>Copy package.json first, then code</strong></td><td>Layer cache: if source changes but deps don't, npm install reuses cached layer</td></tr>
+      <tr><td><strong>Specific tags (<code>node:20-alpine</code>)</strong></td><td>Reproducible builds — <code>:latest</code> silently breaks builds</td></tr>
+      <tr><td><strong>Alpine base images</strong></td><td>5 MB vs 900 MB — minimal attack surface, fewer CVEs</td></tr>
+      <tr><td><strong>Non-root USER</strong></td><td>Container escape exploits can't get root on the host</td></tr>
+      <tr><td><strong>HEALTHCHECK instruction</strong></td><td>Docker/K8s knows if app is actually healthy, not just running</td></tr>
+      <tr><td><strong>.dockerignore file</strong></td><td>Exclude <code>node_modules</code>, <code>.git</code>, <code>.env</code> — speeds build, prevents secret leaks</td></tr>
+    </table></div>
+    <div class="insight"><h4>Quick recall</h4><p>Multi-stage = separate build from runtime, 10-15× smaller final image. Layer order = slow-changing layers first (deps), fast-changing last (source). Non-root USER = security. Specific tag = reproducibility. HEALTHCHECK = K8s probe fallback. .dockerignore = don't send secrets to build context.</p></div>
+  </div>
+
+  <div class="sec" id="t3">
+    <div class="snum">T3</div>
+    <h2>Docker layers &amp; Union Filesystem &mdash; OverlayFS, Copy-on-Write, layer sharing</h2>
+    <p>Every Dockerfile instruction creates a <strong>read-only layer</strong>. Docker stacks these using <strong>OverlayFS</strong> (Union Filesystem). When a container runs, a thin <strong>writable layer</strong> is added on top. All writes go there via <strong>Copy-on-Write</strong> &mdash; the underlying image layers are never modified.</p>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">text &mdash; Layer stack</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre>[ Container Writable Layer ]   ← temporary, lost when container stops
+[ COPY . . Layer           ]   ← your source code
+[ RUN npm install Layer    ]   ← node_modules
+[ COPY package.json Layer  ]   ← package files
+[ WORKDIR /app Layer       ]
+[ node:20-alpine Layer     ]   ← base OS (SHARED across all node:20-alpine images!)
+
+Cache invalidation rule:
+  Change instruction 4 → layers 4, 5, 6 ... all rebuilt
+  Change only source code (last COPY) → only that layer rebuilt ✓</pre></div>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">bash &mdash; Layer inspection and optimization</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc"># Inspect layers and their sizes</span>
+docker history myapp:latest          <span class="cc"># show each layer + size</span>
+docker image inspect myapp:latest    <span class="cc"># full layer manifest</span>
+
+<span class="cc"># Combine RUN commands to minimize layer count</span>
+<span class="cc"># Bad: 3 separate layers</span>
+<span class="cd">RUN</span> apt-get update
+<span class="cd">RUN</span> apt-get install -y curl
+<span class="cd">RUN</span> apt-get clean
+
+<span class="cc"># Good: single layer (cleanup in SAME layer or it doesn't shrink image!)</span>
+<span class="cd">RUN</span> apt-get update \
+  && apt-get install -y curl \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*</pre></div>
+    <div class="box dk"><div class="bxt">Layer sharing is the efficiency win</div><p>If 20 containers use the same <code>node:20-alpine</code> base, that base is stored only once on disk and RAM. Copy-on-Write means writing to a file in a container copies it to the writable layer first — reads are O(1), writes have slight overhead. In CI, push to a registry between builds so layer caches persist across runners.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>Each Dockerfile instruction = one read-only layer. OverlayFS = stacks layers. Writable container layer = temporary, lost on stop. Copy-on-Write = writes go to writable layer, reads go through all layers. Layer sharing = identical base layers stored once across all images. Cache invalidation = any changed layer invalidates all layers below it.</p></div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       CHAPTER 2 — DOCKER RUNTIME
+  ══════════════════════════════════════ -->
+  <div class="ch-lbl" id="ch2">Chapter 2 &mdash; Docker Runtime</div>
+
+  <div class="sec" id="t4">
+    <div class="snum">T4</div>
+    <h2>Docker networking &mdash; bridge, host, overlay, DNS between containers</h2>
+    <div class="tw"><table>
+      <tr><th>Driver</th><th>Use case</th><th>Communication</th></tr>
+      <tr><td><strong>bridge</strong> (default)</td><td>Containers on same host</td><td>Container name as DNS on custom networks</td></tr>
+      <tr><td><strong>host</strong></td><td>Maximum performance, no isolation</td><td>Container uses host network stack directly</td></tr>
+      <tr><td><strong>none</strong></td><td>Complete network isolation</td><td>No network access at all</td></tr>
+      <tr><td><strong>overlay</strong></td><td>Multi-host (Docker Swarm)</td><td>Containers across hosts communicate</td></tr>
+      <tr><td><strong>macvlan</strong></td><td>Legacy apps needing a MAC address</td><td>Container appears as physical network device</td></tr>
+    </table></div>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">bash &mdash; Network commands</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc"># Create custom bridge network (better than default bridge)</span>
+docker network create --driver bridge mynet
+
+<span class="cc"># Containers on the same custom network resolve each other by name</span>
+docker run --network mynet --name api myapp
+docker run --network mynet --name db postgres
+<span class="cc"># API container reaches DB via: postgres://db:5432 (name = DNS!)</span>
+
+<span class="cc"># Publish ports: host:container</span>
+docker run -p 8080:3000 myapp                  <span class="cc"># 0.0.0.0:8080 → container:3000</span>
+docker run -p 127.0.0.1:8080:3000 myapp        <span class="cc"># bind localhost only!</span>
+
+docker network ls
+docker network inspect mynet</pre></div>
+    <div class="box em"><div class="bxt">Custom network vs default bridge</div><p>The default <code>bridge</code> network does NOT provide DNS by container name — you'd need to hardcode IPs. Always create a custom bridge network: it gives automatic DNS resolution by service name. In Docker Compose, all services get their own isolated network with name-based DNS automatically.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>Default bridge = no name DNS. Custom bridge = name-based DNS. host mode = container shares host network (no port mapping needed, no isolation). Bind ports to <code>127.0.0.1</code> in production, not <code>0.0.0.0</code>. Docker Compose auto-creates a custom network per compose file — services talk by service name.</p></div>
+  </div>
+
+  <div class="sec" id="t5">
+    <div class="snum">T5</div>
+    <h2>Docker volumes &amp; storage &mdash; volumes vs bind mounts vs tmpfs</h2>
+    <div class="tw"><table>
+      <tr><th>Type</th><th>Stored in</th><th>Managed by</th><th>Best for</th></tr>
+      <tr><td><strong>Volume</strong></td><td><code>/var/lib/docker/volumes/</code></td><td>Docker</td><td>Production data — databases, uploads, persistent app data</td></tr>
+      <tr><td><strong>Bind mount</strong></td><td>Any host path you specify</td><td>Host OS</td><td>Development: live code reload, config injection</td></tr>
+      <tr><td><strong>tmpfs</strong></td><td>Host RAM (never written to disk)</td><td>Docker</td><td>Secrets in memory, temp data, high-speed scratch space</td></tr>
+    </table></div>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">bash &mdash; Volume commands</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc"># Named volume (preferred for production)</span>
+docker volume create pgdata
+docker run -v pgdata:/var/lib/postgresql/data postgres
+
+<span class="cc"># Bind mount (dev: live code changes, no rebuild needed)</span>
+docker run -v $(pwd)/src:/app/src -v /app/node_modules myapp
+
+<span class="cc"># tmpfs — never written to disk (great for secrets)</span>
+docker run --tmpfs /run/secrets:ro,size=65536k myapp
+
+<span class="cc"># Volume management</span>
+docker volume ls
+docker volume inspect pgdata
+docker volume rm pgdata
+docker volume prune         <span class="cc"># remove unused volumes ⚠</span>
+
+<span class="cc"># Backup a named volume</span>
+docker run --rm -v pgdata:/data -v $(pwd):/backup \
+  alpine tar czf /backup/pgdata-backup.tar.gz /data</pre></div>
+    <div class="box am"><div class="bxt">Volumes in production vs development</div><p>Named volumes for production — managed by Docker, good performance, portable. Bind mounts for development — mount your source code so file changes reflect immediately without rebuilding. Never use bind mounts in production: the host path creates tight coupling. tmpfs is underused and perfect for sensitive temporary data like decrypted secrets that must never touch disk.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>Volume = Docker-managed, production-safe, easy backup. Bind mount = host path, dev only. tmpfs = RAM only, never on disk, for secrets or temp data. Backup volumes with <code>docker run --rm</code> + tar. <code>docker volume prune</code> is dangerous — removes ALL unnamed volumes.</p></div>
+  </div>
+
+  <div class="sec" id="t6">
+    <div class="snum">T6 <span class="snum-badges"><span class="sbadge adv">Core</span></span></div>
+    <h2>Docker Compose &mdash; depends_on with healthcheck, resource limits, secrets</h2>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">yaml &mdash; Production docker-compose.yml</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cs">version</span>: '3.9'
+<span class="cs">services</span>:
+  <span class="cs">app</span>:
+    <span class="cs">build</span>:
+      <span class="cs">context</span>: .
+      <span class="cs">target</span>: production          <span class="cc"># multi-stage target</span>
+    <span class="cs">ports</span>: ["3000:3000"]
+    <span class="cs">environment</span>:
+      <span class="cs">NODE_ENV</span>: production
+      <span class="cs">DB_HOST</span>: db                  <span class="cc"># DNS name = service name</span>
+    <span class="cs">depends_on</span>:
+      <span class="cs">db</span>:
+        <span class="cs">condition</span>: service_healthy  <span class="cc"># wait for healthcheck, not just container start!</span>
+    <span class="cs">restart</span>: unless-stopped
+    <span class="cs">deploy</span>:
+      <span class="cs">resources</span>:
+        <span class="cs">limits</span>:        {<span class="cs">cpus</span>: '0.5', <span class="cs">memory</span>: 512M}
+        <span class="cs">reservations</span>:  {<span class="cs">memory</span>: 256M}
+
+  <span class="cs">db</span>:
+    <span class="cs">image</span>: postgres:16-alpine
+    <span class="cs">volumes</span>: [pgdata:/var/lib/postgresql/data]
+    <span class="cs">environment</span>:
+      <span class="cs">POSTGRES_PASSWORD_FILE</span>: /run/secrets/db_password
+    <span class="cs">secrets</span>: [db_password]
+    <span class="cs">healthcheck</span>:
+      <span class="cs">test</span>: ["CMD-SHELL", "pg_isready -U postgres"]
+      <span class="cs">interval</span>: 10s
+      <span class="cs">timeout</span>: 5s
+      <span class="cs">retries</span>: 5
+
+<span class="cs">volumes</span>:
+  <span class="cs">pgdata</span>:
+
+<span class="cs">secrets</span>:
+  <span class="cs">db_password</span>:
+    <span class="cs">file</span>: ./secrets/db_password.txt</pre></div>
+    <div class="box ro"><div class="bxt">depends_on without condition is a footgun</div><p>The common mistake is <code>depends_on: db</code> without a condition — the app container starts but the database process isn't ready yet, causing connection errors at startup. Use <code>condition: service_healthy</code> with a proper healthcheck so Docker Compose waits for the DB to actually accept connections before starting the app.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p><code>depends_on: condition: service_healthy</code> = wait for healthcheck pass (not just container start). Always set resource limits — a runaway container can OOM-kill the host otherwise. Use <code>POSTGRES_PASSWORD_FILE</code> + Docker secrets instead of plain ENV for credentials. <code>restart: unless-stopped</code> for auto-recovery.</p></div>
+  </div>
+
+  <div class="sec" id="t7">
+    <div class="snum">T7 <span class="snum-badges"><span class="sbadge adv">Advanced</span></span></div>
+    <h2>Docker security &mdash; image scanning, secrets management, capability dropping, read-only FS</h2>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">bash &mdash; Security hardening commands</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc"># 1. Scan images for CVEs (integrate into CI)</span>
+docker scout cves myapp:latest
+trivy image myapp:latest
+snyk container test myapp:latest
+
+<span class="cc"># 2. Read-only filesystem — attacker can't write malware</span>
+docker run --read-only \
+  --tmpfs /tmp \          <span class="cc"># allow writable /tmp in RAM only</span>
+  myapp
+
+<span class="cc"># 3. Drop ALL Linux capabilities, add only what's needed</span>
+docker run --cap-drop ALL \
+           --cap-add NET_BIND_SERVICE \
+           myapp
+
+<span class="cc"># 4. Prevent privilege escalation</span>
+docker run --security-opt no-new-privileges myapp
+
+<span class="cc"># 5. Limit syscalls with a seccomp profile</span>
+docker run --security-opt seccomp=/path/to/profile.json myapp
+
+<span class="cc"># 6. Secrets: NEVER use ENV vars — visible in docker inspect!</span>
+<span class="cr"># Bad: exposed in docker inspect output and process lists</span>
+docker run -e DB_PASSWORD=supersecret myapp
+
+<span class="cc"># Good: mount as file</span>
+docker run --secret id=db_pwd,src=/path/to/secret myapp
+<span class="cc"># Available in container at /run/secrets/db_pwd</span></pre></div>
+    <div class="tw"><table>
+      <tr><th>Rule</th><th>Impact</th></tr>
+      <tr><td>Non-root user in Dockerfile</td><td>Container escape can't get host root</td></tr>
+      <tr><td>Minimal base image (distroless / alpine)</td><td>Fewer CVEs, smaller attack surface</td></tr>
+      <tr><td>Scan images in CI pipeline</td><td>Catch vulnerabilities before production</td></tr>
+      <tr><td>Read-only filesystem</td><td>Attacker can't write malware to container</td></tr>
+      <tr><td>Drop capabilities</td><td>Limit what the container can do to the host kernel</td></tr>
+      <tr><td>No secrets in ENV / image layers</td><td>Secrets not exposed via <code>docker inspect</code></td></tr>
+    </table></div>
+    <div class="insight"><h4>Quick recall</h4><p>ENV vars = visible in docker inspect, process lists, image history. Use Docker secrets or vault mounts. --read-only = no filesystem writes (good default). --cap-drop ALL --cap-add needed = minimal kernel attack surface. Scan images with Trivy in CI. Non-root user = defense in depth against container escape.</p></div>
+  </div>
+
+  <div class="sec" id="t8">
+    <div class="snum">T8</div>
+    <h2>Container resource limits &mdash; CPU, memory, OOMKilled, docker stats</h2>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">bash &mdash; Resource limit flags</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc"># Memory limits</span>
+docker run --memory 512m \              <span class="cc"># hard limit</span>
+           --memory-reservation 256m \  <span class="cc"># soft limit (scheduling hint)</span>
+           --memory-swap 512m \         <span class="cc"># = memory → disables swap entirely</span>
+           myapp
+<span class="cc"># If exceeds memory limit → OOMKilled (exit code 137)</span>
+
+<span class="cc"># CPU limits</span>
+docker run --cpus "0.5" myapp           <span class="cc"># max 50% of 1 CPU</span>
+docker run --cpus "2"   myapp           <span class="cc"># max 2 CPU cores</span>
+docker run --cpu-shares 512 myapp       <span class="cc"># relative weight (default 1024)</span>
+
+<span class="cc"># Monitor live usage</span>
+docker stats                            <span class="cc"># live CPU/mem/net/disk per container</span>
+docker stats --no-stream                <span class="cc"># one-shot snapshot</span>
+
+<span class="cc"># Debug OOMKill</span>
+docker inspect container_id --format '{{.State.OOMKilled}}'  <span class="cc"># → true/false</span>
+docker inspect container_id --format '{{.State.ExitCode}}'   <span class="cc"># → 137 = SIGKILL</span></pre></div>
+    <div class="box ro"><div class="bxt">Always set memory limits</div><p>Without memory limits, a memory leak in one container can OOM-kill the Docker host and take down ALL containers. Set <code>--memory-swap</code> equal to <code>--memory</code> to disable swap — swap causes unpredictable latency spikes. CPU limits throttle (don't kill); memory limits kill. In K8s, these map directly to <code>resources.limits</code> in the pod spec.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>Memory limit exceeded → OOMKilled, exit code 137. CPU limit exceeded → throttled, not killed. --memory-swap = --memory disables swap. docker stats for live monitoring. In K8s: requests = scheduling, limits = enforcement. Always set both in production.</p></div>
+  </div>
+
+  <div class="sec" id="t9">
+    <div class="snum">T9</div>
+    <h2>Docker registry &amp; image management &mdash; tagging, multi-arch, lifecycle policies</h2>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">bash &mdash; Tagging, pushing, multi-arch</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc"># Tagging strategy: never use :latest in production!</span>
+docker build -t myapp:1.2.3 .                    <span class="cc"># semantic version</span>
+docker build -t myapp:${GIT_SHA} .               <span class="cc"># git SHA = best for CI/CD traceability</span>
+docker build -t myapp:${GIT_SHA} -t myapp:latest . <span class="cc"># tag both</span>
+
+<span class="cc"># Push to AWS ECR</span>
+docker tag myapp:1.2.3 123456.dkr.ecr.us-east-1.amazonaws.com/myapp:1.2.3
+docker push 123456.dkr.ecr.us-east-1.amazonaws.com/myapp:1.2.3
+
+<span class="cc"># Multi-architecture build (amd64 for servers + arm64 for Graviton/M-series)</span>
+docker buildx create --use
+docker buildx build --platform linux/amd64,linux/arm64 \
+  -t myapp:1.2.3 --push .
+
+<span class="cc"># Cleanup — prevent disk filling up in CI</span>
+docker image prune -f                            <span class="cc"># remove dangling (untagged) images</span>
+docker image prune -a --filter "until=48h"       <span class="cc"># remove images older than 48h</span>
+docker system prune -a -f                        <span class="cc"># nuclear: remove everything unused</span></pre></div>
+    <div class="box em"><div class="bxt">Git SHA tagging in CI/CD</div><p>Tag images with the git commit SHA — it creates a direct link between the running container and the exact code version. Combined with ECR lifecycle policies (keep last 10 tagged images, delete untagged after 1 day, delete anything older than 30 days), you get free disk cost control. Multi-arch builds are now essential: AWS Graviton (arm64) gives 40% better price-performance.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>:latest in production = reproducibility failure. Git SHA tag = exact code traceability. Semantic version tag = for versioned releases. Multi-arch buildx = one push, works on amd64 and arm64. ECR lifecycle policies = auto-delete old images. Never push secrets into image layers.</p></div>
+  </div>
+
+  <div class="sec" id="t10">
+    <div class="snum">T10</div>
+    <h2>Docker troubleshooting &mdash; crash debugging, exit codes, network diagnosis</h2>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">bash &mdash; Debug workflow</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc"># ── Container inspection ──</span>
+docker ps -a                                    <span class="cc"># all containers incl. stopped (see exit codes)</span>
+docker logs container_id                        <span class="cc"># stdout/stderr</span>
+docker logs -f --tail 100 container_id          <span class="cc"># follow last 100 lines</span>
+docker inspect container_id                     <span class="cc"># full config: network, mounts, env, state</span>
+docker events                                   <span class="cc"># real-time Docker event stream</span>
+
+<span class="cc"># ── Shell into a running container ──</span>
+docker exec -it container_id sh                 <span class="cc"># alpine (no bash)</span>
+docker exec -it container_id bash               <span class="cc"># debian/ubuntu</span>
+docker exec -it container_id sh -c "env | grep DB"  <span class="cc"># check env vars</span>
+
+<span class="cc"># ── Debug a CRASHED container (can't exec in) ──</span>
+docker run -it --entrypoint sh myapp:latest     <span class="cc"># override entrypoint to get a shell</span>
+docker cp container_id:/app/logs ./logs         <span class="cc"># copy files out before container dies</span>
+
+<span class="cc"># ── Network debugging from inside the cluster ──</span>
+docker run --rm --network mynet nicolaka/netshoot \
+  curl http://api-service:3000/health           <span class="cc"># test connectivity from same network</span>
+
+<span class="cc"># Exit code reference:
+# 0   = clean exit
+# 1   = application error
+# 137 = OOMKilled (SIGKILL)
+# 143 = graceful shutdown (SIGTERM)
+# 125 = docker run itself failed</span></pre></div>
+    <div class="box dk"><div class="bxt">Debugging workflow</div><p>1. <code>docker ps -a</code> — see exit code. 2. <code>docker logs</code> — see the error (solves 90% of issues). 3. <code>docker inspect</code> — check env vars, volumes, network. 4. <code>docker run --entrypoint sh</code> — if container crashes on start, get a shell and run the start command manually. The <code>nicolaka/netshoot</code> image has curl, dig, nslookup, netstat — invaluable for network debugging.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>Exit code 137 = OOMKilled. Exit code 143 = SIGTERM (graceful). Start debugging with logs → inspect → shell. For crashed containers: override entrypoint. For network debugging: nicolaka/netshoot on the same network. docker events for real-time lifecycle events.</p></div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       CHAPTER 3 — K8S ARCHITECTURE
+  ══════════════════════════════════════ -->
+  <div class="ch-lbl" id="ch3">Chapter 3 &mdash; Kubernetes Architecture</div>
+
+  <div class="sec" id="t11">
+    <div class="snum k8s">T11 <span class="snum-badges"><span class="sbadge adv">Core</span></span></div>
+    <h2>K8s architecture &mdash; control plane components, worker nodes, reconciliation loop</h2>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">text &mdash; Cluster architecture</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre>CONTROL PLANE
+├── kube-apiserver      ← single entry point; all kubectl commands hit here
+├── etcd                ← distributed KV store; ALL cluster state lives here
+├── kube-scheduler      ← assigns pods to nodes (resource-aware, no pods run here)
+├── controller-manager  ← runs all controllers: ReplicaSet, Deployment, Node...
+└── cloud-controller    ← talks to cloud APIs (AWS/GCP/Azure) for LBs, volumes
+
+WORKER NODE
+├── kubelet             ← agent; ensures pod containers are running and healthy
+├── kube-proxy          ← manages iptables/IPVS rules for Service routing
+└── container runtime   ← containerd/CRI-O — actually pulls images and runs containers
+
+Request flow:
+  kubectl apply → API Server → etcd (store desired state)
+               → Scheduler (assign pod to node)
+               → kubelet (pull image, start container)
+               → Controller Manager (watch actual vs desired → reconcile)</pre></div>
+    <div class="box in"><div class="bxt">etcd is the cluster brain</div><p><strong>etcd</strong> stores ALL cluster state — desired state, actual state, configs, Secrets. If etcd is lost without a backup, the cluster is unrecoverable. Best practice: 3 or 5 etcd nodes (odd number for Raft quorum), regular automated backups to S3, cross-AZ placement. <strong>Controllers</strong> run a continuous reconciliation loop: compare desired state (etcd) vs actual state → make them match. This is the fundamental K8s pattern.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>apiserver = REST gateway for everything. etcd = cluster truth (back it up!). scheduler = decides which node, doesn't run pods. kubelet = per-node agent that actually runs pods. kube-proxy = iptables/IPVS for Service routing. controller-manager = reconciliation loops. Reconciliation = desired (etcd) vs actual → converge.</p></div>
+  </div>
+
+  <div class="sec" id="t12">
+    <div class="snum k8s">T12 <span class="snum-badges"><span class="sbadge adv">Core</span></span></div>
+    <h2>Pods, Deployments, ReplicaSets &mdash; hierarchy, lifecycle, rolling updates</h2>
+    <p><strong>Pod</strong> = smallest deployable unit; 1+ containers sharing a network namespace and storage. Pods are <em>ephemeral</em> — they die and are replaced, never restarted in-place. <strong>ReplicaSet</strong> = ensures N replicas always running. <strong>Deployment</strong> = manages ReplicaSets, enables rolling updates and rollback. You almost never create ReplicaSets directly.</p>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">yaml &mdash; Deployment with zero-downtime rolling update</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cs">apiVersion</span>: apps/v1
+<span class="cs">kind</span>: Deployment
+<span class="cs">metadata</span>:
+  <span class="cs">name</span>: api-deployment
+<span class="cs">spec</span>:
+  <span class="cs">replicas</span>: 3
+  <span class="cs">selector</span>:
+    <span class="cs">matchLabels</span>:
+      <span class="cs">app</span>: api
+  <span class="cs">strategy</span>:
+    <span class="cs">type</span>: RollingUpdate
+    <span class="cs">rollingUpdate</span>:
+      <span class="cs">maxSurge</span>: 1        <span class="cc"># max extra pods during update</span>
+      <span class="cs">maxUnavailable</span>: 0  <span class="cc"># never reduce below desired count — zero downtime!</span>
+  <span class="cs">template</span>:
+    <span class="cs">metadata</span>:
+      <span class="cs">labels</span>: {<span class="cs">app</span>: api}
+    <span class="cs">spec</span>:
+      <span class="cs">containers</span>:
+      - <span class="cs">name</span>: api
+        <span class="cs">image</span>: myapp:abc1234       <span class="cc"># git SHA, not :latest!</span>
+        <span class="cs">resources</span>:
+          <span class="cs">requests</span>: {<span class="cs">cpu</span>: "100m", <span class="cs">memory</span>: "128Mi"}
+          <span class="cs">limits</span>:   {<span class="cs">cpu</span>: "500m", <span class="cs">memory</span>: "512Mi"}
+
+<span class="cc"># Key rollout commands</span>
+kubectl rollout status deployment/api-deployment   <span class="cc"># wait for completion</span>
+kubectl rollout undo deployment/api-deployment     <span class="cc"># rollback to previous RS</span>
+kubectl rollout history deployment/api-deployment  <span class="cc"># show revisions</span>
+kubectl describe pod pod-name                      <span class="cc"># events, status, resources</span></pre></div>
+    <div class="box in"><div class="bxt">maxSurge=1 maxUnavailable=0</div><p>This is the zero-downtime rolling update pattern: K8s always keeps the full desired count running, adds one new pod, waits for it to pass readiness checks, then removes one old pod. Never update a Deployment image via <code>kubectl set image</code> directly in production — update the YAML in Git and apply via CI/CD for full auditability. Always run <code>kubectl rollout status</code> in your pipeline to confirm completion.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>Pod → ReplicaSet → Deployment hierarchy. Pod = ephemeral, replaced not restarted. ReplicaSet = N replicas always. Deployment = manages RSes + enables rolling updates. maxUnavailable=0 + maxSurge=1 = zero-downtime. Rollback = kubectl rollout undo (switches Service to old ReplicaSet). Labels = how Services find pods.</p></div>
+  </div>
+
+  <div class="sec" id="t13">
+    <div class="snum k8s">T13</div>
+    <h2>Kubernetes Services &mdash; ClusterIP, NodePort, LoadBalancer, DNS, kube-proxy</h2>
+    <div class="tw"><table>
+      <tr><th>Type</th><th>Access</th><th>Use case</th></tr>
+      <tr><td><strong>ClusterIP</strong> (default)</td><td>Internal cluster only — stable virtual IP</td><td>Service-to-service inside cluster</td></tr>
+      <tr><td><strong>NodePort</strong></td><td>External via &lt;NodeIP&gt;:&lt;Port&gt; (30000–32767)</td><td>Dev/testing; avoid in production</td></tr>
+      <tr><td><strong>LoadBalancer</strong></td><td>External via cloud LB (AWS ALB/NLB)</td><td>Expose externally; expensive per service</td></tr>
+      <tr><td><strong>ExternalName</strong></td><td>DNS CNAME alias to external service</td><td>Bring external services into cluster DNS</td></tr>
+      <tr><td><strong>Headless</strong> (<code>clusterIP: None</code>)</td><td>Returns individual pod IPs directly via DNS</td><td>StatefulSets, direct pod addressing</td></tr>
+    </table></div>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">text &mdash; DNS resolution in K8s</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre>Full DNS:  service-name.namespace.svc.cluster.local
+Short DNS (same namespace):  service-name:port
+
+[ Pod A ] → GET http://api-service:3000 →
+[ CoreDNS ] resolves → [ ClusterIP: 10.96.45.12 ]
+                              ↓
+               kube-proxy iptables/IPVS rules
+                              ↓
+              ┌───────────────┼───────────────┐
+          [ Pod 1 ]       [ Pod 2 ]       [ Pod 3 ]
+                        (load balanced)</pre></div>
+    <div class="box in"><div class="bxt">Production pattern: ClusterIP + Ingress</div><p>Use ClusterIP for internal services and a single Ingress for external access — don't create one LoadBalancer Service per microservice (costs $20+/month each on AWS). ClusterIP + nginx-ingress Controller = one cloud load balancer, path-based routing to all services. Headless Services are essential for StatefulSets — they give stable individual DNS names (<code>redis-0.redis-svc</code>, <code>redis-1.redis-svc</code>).</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>ClusterIP = internal stable VIP. kube-proxy = iptables/IPVS rules that route to real pod IPs. CoreDNS = cluster DNS. Same namespace: <code>service-name</code>. Cross-namespace: <code>service.namespace.svc.cluster.local</code>. Headless = no VIP, DNS returns pod IPs directly (StatefulSets). Never create one LoadBalancer per microservice.</p></div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       CHAPTER 4 — K8S CONFIG & SCALING
+  ══════════════════════════════════════ -->
+  <div class="ch-lbl" id="ch4">Chapter 4 &mdash; K8s Config &amp; Scaling</div>
+
+  <div class="sec" id="t14">
+    <div class="snum k8s">T14 <span class="snum-badges"><span class="sbadge adv">Core</span></span></div>
+    <h2>ConfigMaps &amp; Secrets &mdash; consumption patterns, encryption at rest, secret rotation</h2>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">yaml + bash &mdash; ConfigMap and Secret patterns</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc"># ── ConfigMap ──</span>
+kubectl create configmap app-config \
+  --from-literal=LOG_LEVEL=info \
+  --from-file=config.yaml
+
+<span class="cc"># Consume as env var</span>
+<span class="cs">env</span>:
+- <span class="cs">name</span>: LOG_LEVEL
+  <span class="cs">valueFrom</span>:
+    <span class="cs">configMapKeyRef</span>: {<span class="cs">name</span>: app-config, <span class="cs">key</span>: LOG_LEVEL}
+
+<span class="cc"># Or mount as files (updates live without pod restart!)</span>
+<span class="cs">volumeMounts</span>:
+- {<span class="cs">name</span>: config-vol, <span class="cs">mountPath</span>: /etc/config}
+<span class="cs">volumes</span>:
+- <span class="cs">name</span>: config-vol
+  <span class="cs">configMap</span>: {<span class="cs">name</span>: app-config}
+
+<span class="cc"># ── Secret (base64 encoded, NOT encrypted by default!) ──</span>
+kubectl create secret generic db-creds \
+  --from-literal=password=supersecret
+
+<span class="cc"># Production: External Secrets Operator + AWS Secrets Manager</span>
+<span class="cs">apiVersion</span>: external-secrets.io/v1beta1
+<span class="cs">kind</span>: ExternalSecret
+<span class="cs">spec</span>:
+  <span class="cs">secretStoreRef</span>: {<span class="cs">name</span>: aws-secrets-manager}
+  <span class="cs">data</span>:
+  - <span class="cs">secretKey</span>: db-password
+    <span class="cs">remoteRef</span>: {<span class="cs">key</span>: prod/myapp/db, <span class="cs">property</span>: password}
+  <span class="cs">refreshInterval</span>: 1h         <span class="cc"># auto-sync from AWS Secrets Manager</span></pre></div>
+    <div class="box ro"><div class="bxt">K8s Secrets are not encrypted by default</div><p>K8s Secrets are only base64 encoded — anyone with kubectl or etcd access can decode them instantly. In production: use <strong>External Secrets Operator</strong> to sync from AWS Secrets Manager or HashiCorp Vault so actual values never live in etcd. Enable <strong>encryption at rest</strong> (KMS provider in API server config). Use separate namespaces and RBAC to restrict who can <code>get secrets</code>.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>ConfigMap = non-sensitive config, env var or volume mount. Volume mount = live update without pod restart. Secret = base64 only, not encrypted. External Secrets Operator = sync from Vault/AWS SM into K8s Secret. Enable encryption at rest via KMS. Secret rotation: update in secret store → ESO syncs → mounted volumes update live, ENV vars need pod restart.</p></div>
+  </div>
+
+  <div class="sec" id="t15">
+    <div class="snum k8s">T15 <span class="snum-badges"><span class="sbadge adv">Advanced</span></span></div>
+    <h2>PersistentVolumes &amp; StatefulSets &mdash; stable identities, ordered lifecycle</h2>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">text &mdash; PV architecture</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre>[ StorageClass ]   ← defines provisioner (AWS EBS, GCP PD, NFS)
+      ↓
+[ PersistentVolumeClaim ]  ← pod requests storage (size, access mode)
+      ↓ binds to
+[ PersistentVolume ]  ← actual storage resource (auto-provisioned)
+      ↓ backed by
+[ AWS EBS / GCP PD / NFS / Ceph ]
+
+StatefulSet pods — stable names, stable storage:
+[ redis-0 ] ──→ [ PVC: redis-data-redis-0 ]  ← always this PVC
+[ redis-1 ] ──→ [ PVC: redis-data-redis-1 ]  ← always this PVC
+DNS: redis-0.redis-svc, redis-1.redis-svc (stable even after restart!)</pre></div>
+    <div class="tw"><table>
+      <tr><th></th><th>StatefulSet</th><th>Deployment</th></tr>
+      <tr><td><strong>Pod names</strong></td><td>Stable: <code>redis-0</code>, <code>redis-1</code></td><td>Random: <code>redis-abc12</code>, <code>redis-def34</code></td></tr>
+      <tr><td><strong>DNS</strong></td><td>Stable per-pod DNS via headless Service</td><td>One ClusterIP for all pods</td></tr>
+      <tr><td><strong>Storage</strong></td><td>Each pod gets its own PVC (stable binding)</td><td>All pods share the same PVC (or none)</td></tr>
+      <tr><td><strong>Start/stop order</strong></td><td>Ordered (0 → 1 → 2 up; 2 → 1 → 0 down)</td><td>Parallel</td></tr>
+      <tr><td><strong>Use for</strong></td><td>Databases, Kafka, Redis Cluster, Elasticsearch</td><td>Stateless apps, APIs, workers</td></tr>
+    </table></div>
+    <div class="box am"><div class="bxt">Run databases outside K8s if possible</div><p>StatefulSets give each pod a stable identity — <code>redis-0</code> always gets the same PVC and DNS name even after restart. This is essential for databases that need stable membership. However, in most companies I'd recommend managed databases (RDS, ElastiCache, DocumentDB) outside K8s — the operational overhead of stateful workloads in K8s is significant unless you have dedicated platform engineers.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>StatefulSet = stable pod names + DNS + own PVC per pod + ordered lifecycle. Deployment = stateless, any pod replaceable. StorageClass → PVC → PV → cloud disk. RWO = single node access (EBS). RWX = multi-node (EFS/NFS). Headless Service + StatefulSet = per-pod DNS (<code>pod-0.svc</code>). Prefer managed DBs outside K8s.</p></div>
+  </div>
+
+  <div class="sec" id="t16">
+    <div class="snum k8s">T16 <span class="snum-badges"><span class="sbadge adv">Advanced</span></span></div>
+    <h2>HPA, VPA &amp; Cluster Autoscaler &mdash; three layers of autoscaling</h2>
+    <div class="tw"><table>
+      <tr><th>Autoscaler</th><th>Scales what</th><th>Trigger</th><th>When to use</th></tr>
+      <tr><td><strong>HPA</strong></td><td>Pod count (replicas)</td><td>CPU%, Memory%, custom metrics (RPS, queue depth)</td><td>Traffic spikes, variable load</td></tr>
+      <tr><td><strong>VPA</strong></td><td>Pod CPU/memory requests</td><td>Historical resource usage</td><td>Right-size over/under-provisioned pods</td></tr>
+      <tr><td><strong>Cluster Autoscaler</strong></td><td>Node count</td><td>Pending pods (insufficient node capacity)</td><td>When HPA needs pods but no room on existing nodes</td></tr>
+    </table></div>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">yaml &mdash; HPA with custom metrics</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cs">apiVersion</span>: autoscaling/v2
+<span class="cs">kind</span>: HorizontalPodAutoscaler
+<span class="cs">spec</span>:
+  <span class="cs">scaleTargetRef</span>: {<span class="cs">name</span>: api-deployment}
+  <span class="cs">minReplicas</span>: 2
+  <span class="cs">maxReplicas</span>: 20
+  <span class="cs">metrics</span>:
+  - <span class="cs">type</span>: Resource
+    <span class="cs">resource</span>:
+      <span class="cs">name</span>: cpu
+      <span class="cs">target</span>:
+        <span class="cs">type</span>: Utilization
+        <span class="cs">averageUtilization</span>: 70        <span class="cc"># scale up if avg CPU > 70%</span>
+  - <span class="cs">type</span>: Pods
+    <span class="cs">pods</span>:
+      <span class="cs">metric</span>: {<span class="cs">name</span>: http_requests_per_second}   <span class="cc"># from Prometheus adapter</span>
+      <span class="cs">target</span>:
+        <span class="cs">type</span>: AverageValue
+        <span class="cs">averageValue</span>: "100"</pre></div>
+    <div class="box in"><div class="bxt">The autoscaling chain</div><p>HPA detects high CPU → scales pods → if no node capacity, pods stay Pending → Cluster Autoscaler detects Pending pods → adds a new node → pods schedule. This full chain takes 2–5 minutes. Always maintain a warm buffer: <code>minReplicas ≥ 2</code> and a spare pre-provisioned node. Don't use HPA and VPA on the same resource metric simultaneously — use VPA in Recommendation mode only.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>HPA = pod count, reactive to load. VPA = pod resource requests, corrects sizing. Cluster Autoscaler = node count, reacts to Pending pods. Chain: HPA → pending pods → CA adds node → scheduler assigns. 2–5 min total. minReplicas ≥ 2 for HA. Custom metrics via Prometheus Adapter (KEDA is simpler for queue-based scaling).</p></div>
+  </div>
+
+  <div class="sec" id="t17">
+    <div class="snum k8s">T17</div>
+    <h2>Ingress &amp; Ingress Controllers &mdash; TLS, path routing, cert-manager, rate limiting</h2>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">yaml &mdash; Ingress with auto-TLS and path routing</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cs">apiVersion</span>: networking.k8s.io/v1
+<span class="cs">kind</span>: Ingress
+<span class="cs">metadata</span>:
+  <span class="cs">name</span>: app-ingress
+  <span class="cs">annotations</span>:
+    <span class="cs">nginx.ingress.kubernetes.io/rate-limit</span>: "100"           <span class="cc"># 100 req/s per IP</span>
+    <span class="cs">nginx.ingress.kubernetes.io/use-regex</span>: "true"
+    <span class="cs">cert-manager.io/cluster-issuer</span>: "letsencrypt-prod"       <span class="cc"># auto TLS certificate!</span>
+<span class="cs">spec</span>:
+  <span class="cs">ingressClassName</span>: nginx
+  <span class="cs">tls</span>:
+  - <span class="cs">hosts</span>: [api.myapp.com]
+    <span class="cs">secretName</span>: api-tls-cert           <span class="cc"># cert-manager auto-populates this</span>
+  <span class="cs">rules</span>:
+  - <span class="cs">host</span>: api.myapp.com
+    <span class="cs">http</span>:
+      <span class="cs">paths</span>:
+      - <span class="cs">path</span>: /api/v1
+        <span class="cs">pathType</span>: Prefix
+        <span class="cs">backend</span>:
+          <span class="cs">service</span>: {<span class="cs">name</span>: api-service, <span class="cs">port</span>: {<span class="cs">number</span>: 3000}}
+      - <span class="cs">path</span>: /static
+        <span class="cs">pathType</span>: Prefix
+        <span class="cs">backend</span>:
+          <span class="cs">service</span>: {<span class="cs">name</span>: static-service, <span class="cs">port</span>: {<span class="cs">number</span>: 80}}</pre></div>
+    <div class="box em"><div class="bxt">Ingress vs Service LoadBalancer</div><p>The Ingress object is just routing rules — the <strong>Ingress Controller</strong> (nginx, traefik, AWS ALB Controller) is the actual implementation. One Ingress Controller handles all services, so you pay for one cloud load balancer instead of one per service. <strong>cert-manager</strong> + Let's Encrypt = zero manual TLS certificate management, auto-renewal. nginx annotations let you add rate limiting, auth, CORS, and rewrite rules directly on the Ingress.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>Ingress = routing rules (not the implementation). Ingress Controller = nginx/traefik/ALB that implements them. One controller = one LB for all services. cert-manager + Let's Encrypt = auto TLS issuance and renewal. Path-based routing splits traffic to different Services. Annotations configure nginx behavior per-Ingress.</p></div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       CHAPTER 5 — K8S PRODUCTION
+  ══════════════════════════════════════ -->
+  <div class="ch-lbl" id="ch5">Chapter 5 &mdash; K8s Production</div>
+
+  <div class="sec" id="t18">
+    <div class="snum k8s">T18 <span class="snum-badges"><span class="sbadge adv">Advanced</span></span></div>
+    <h2>Deployment strategies &mdash; Rolling Update, Blue/Green, Canary with Argo Rollouts</h2>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">text &mdash; Strategy comparison</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre>Rolling Update (default):
+  [v1][v1][v1] → [v2][v1][v1] → [v2][v2][v1] → [v2][v2][v2]
+  ✓ Zero downtime  ✓ Gradual  ✗ Brief mix of v1+v2 in prod
+
+Blue/Green:
+  Blue(v1):  [v1][v1][v1]  ← live traffic
+  Green(v2): [v2][v2][v2]  ← deploy, test, then flip Service selector
+  ✓ Instant rollback (flip selector back)  ✗ Double resource cost
+
+Canary:
+  v1 pods: 9  (90% traffic)
+  v2 pods: 1  (10% traffic — canary)
+  Monitor → increase v2 weight → eventual 100%
+  ✓ Minimal blast radius  ✓ Real-user validation  ✗ Requires traffic splitting</pre></div>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">yaml &mdash; Canary with Argo Rollouts</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cs">apiVersion</span>: argoproj.io/v1alpha1
+<span class="cs">kind</span>: Rollout
+<span class="cs">spec</span>:
+  <span class="cs">strategy</span>:
+    <span class="cs">canary</span>:
+      <span class="cs">steps</span>:
+      - <span class="cs">setWeight</span>: 10          <span class="cc"># 10% to new version</span>
+      - <span class="cs">pause</span>: {<span class="cs">duration</span>: 5m}  <span class="cc"># watch metrics for 5 minutes</span>
+      - <span class="cs">setWeight</span>: 50          <span class="cc"># 50% to new version</span>
+      - <span class="cs">pause</span>: {<span class="cs">duration</span>: 10m}
+      - <span class="cs">setWeight</span>: 100         <span class="cc"># full rollout</span>
+      <span class="cs">analysis</span>:
+        <span class="cs">templates</span>:
+        - <span class="cs">templateName</span>: error-rate   <span class="cc"># auto-rollback if error rate spikes!</span></pre></div>
+    <div class="box in"><div class="bxt">Choosing a strategy</div><p>Rolling Update = default, sufficient for most changes. Blue/Green = major breaking changes where instant rollback is critical (just flip the Service selector). Canary = highest-risk changes: send real user traffic to the new version at low percentage, automated Prometheus analysis decides whether to proceed or roll back. Argo Rollouts handles the traffic split and analysis automatically.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>Rolling = default, gradual, v1+v2 briefly coexist. Blue/Green = full parallel deployment, instant rollback via selector flip, 2× resources. Canary = low % to new version, automated analysis, rollback on metric breach. Argo Rollouts = setWeight + pause + AnalysisTemplate = production canary. All three give zero downtime.</p></div>
+  </div>
+
+  <div class="sec" id="t19">
+    <div class="snum k8s">T19 <span class="snum-badges"><span class="sbadge adv">Advanced</span></span></div>
+    <h2>RBAC &amp; K8s security &mdash; Roles, ClusterRoles, ServiceAccounts, PodSecurity</h2>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">yaml &mdash; RBAC configuration</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cc"># Role: namespace-scoped permissions</span>
+<span class="cs">apiVersion</span>: rbac.authorization.k8s.io/v1
+<span class="cs">kind</span>: Role
+<span class="cs">metadata</span>:
+  <span class="cs">name</span>: pod-reader
+  <span class="cs">namespace</span>: production
+<span class="cs">rules</span>:
+- <span class="cs">apiGroups</span>: [""]
+  <span class="cs">resources</span>: ["pods", "pods/logs"]
+  <span class="cs">verbs</span>: ["get", "list", "watch"]    <span class="cc"># read-only</span>
+
+<span class="cc"># RoleBinding: assign role to a ServiceAccount</span>
+<span class="cs">kind</span>: RoleBinding
+<span class="cs">subjects</span>:
+- <span class="cs">kind</span>: ServiceAccount
+  <span class="cs">name</span>: monitoring-sa
+  <span class="cs">namespace</span>: production
+<span class="cs">roleRef</span>:
+  <span class="cs">kind</span>: Role
+  <span class="cs">name</span>: pod-reader
+
+<span class="cc"># Pod: use dedicated ServiceAccount, disable auto-mount if unused</span>
+<span class="cs">spec</span>:
+  <span class="cs">serviceAccountName</span>: monitoring-sa
+  <span class="cs">automountServiceAccountToken</span>: false  <span class="cc"># disable if pod doesn't call K8s API</span></pre></div>
+    <div class="tw"><table>
+      <tr><th>Practice</th><th>Reason</th></tr>
+      <tr><td>Principle of least privilege</td><td>Each SA gets only the verbs and resources it needs</td></tr>
+      <tr><td>Namespace isolation</td><td>Dev/staging/prod in separate namespaces with NetworkPolicy</td></tr>
+      <tr><td>Disable <code>automountServiceAccountToken</code></td><td>Pods that don't call K8s API don't need the JWT token</td></tr>
+      <tr><td>Audit logging enabled</td><td>Track who did what and when</td></tr>
+      <tr><td>PodSecurityAdmission</td><td>Enforce non-root, no privileged containers at namespace level</td></tr>
+      <tr><td>Role vs ClusterRole</td><td>Prefer namespace-scoped Role; only use ClusterRole when truly cluster-wide</td></tr>
+    </table></div>
+    <div class="box ro"><div class="bxt">Default ServiceAccount is dangerous</div><p>The default ServiceAccount in most clusters has broader permissions than needed. Create dedicated ServiceAccounts per application with minimum required permissions. Don't let dev pods reach the production API server. Enable PodSecurityAdmission with <code>restricted</code> profile to enforce non-root and no privilege escalation cluster-wide.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>RBAC = who (Subject) can do what (Verb) on which (Resource). Role = namespace-scoped. ClusterRole = cluster-wide. RoleBinding = assigns role to SA/user. ServiceAccount = workload identity. automountServiceAccountToken: false = no JWT in pod if not needed. PodSecurityAdmission = policy enforcement at namespace level.</p></div>
+  </div>
+
+  <div class="sec" id="t20">
+    <div class="snum k8s">T20 <span class="snum-badges"><span class="sbadge adv">Core</span></span></div>
+    <h2>Probes &amp; resource QoS &mdash; liveness, readiness, startup, Guaranteed vs Burstable</h2>
+    <div class="cb"><div class="cb-hdr"><span class="cb-lang">yaml &mdash; All three probes + resources</span><span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div><pre><span class="cs">containers</span>:
+- <span class="cs">name</span>: api
+  <span class="cs">image</span>: myapp:latest
+  <span class="cs">resources</span>:
+    <span class="cs">requests</span>:               <span class="cc"># used by scheduler to find a fitting node</span>
+      <span class="cs">cpu</span>: "100m"            <span class="cc"># 0.1 CPU cores</span>
+      <span class="cs">memory</span>: "128Mi"
+    <span class="cs">limits</span>:                 <span class="cc"># hard cap enforced by cgroups</span>
+      <span class="cs">cpu</span>: "500m"            <span class="cc"># throttled if exceeded (not killed)</span>
+      <span class="cs">memory</span>: "512Mi"       <span class="cc"># OOMKilled if exceeded</span>
+
+  <span class="cs">startupProbe</span>:             <span class="cc"># delays liveness/readiness for slow-starting apps</span>
+    <span class="cs">httpGet</span>: {<span class="cs">path</span>: /health, <span class="cs">port</span>: 3000}
+    <span class="cs">failureThreshold</span>: 30
+    <span class="cs">periodSeconds</span>: 10        <span class="cc"># 5-minute window for app to start</span>
+
+  <span class="cs">livenessProbe</span>:            <span class="cc"># is app alive? restart container if not</span>
+    <span class="cs">httpGet</span>: {<span class="cs">path</span>: /health, <span class="cs">port</span>: 3000}
+    <span class="cs">initialDelaySeconds</span>: 10
+    <span class="cs">periodSeconds</span>: 15
+    <span class="cs">failureThreshold</span>: 3
+
+  <span class="cs">readinessProbe</span>:           <span class="cc"># can app take traffic? remove from LB endpoints if not</span>
+    <span class="cs">httpGet</span>: {<span class="cs">path</span>: /ready, <span class="cs">port</span>: 3000}
+    <span class="cs">periodSeconds</span>: 5
+    <span class="cs">failureThreshold</span>: 2</pre></div>
+    <div class="tw"><table>
+      <tr><th>Probe</th><th>Failure action</th><th>Use for</th></tr>
+      <tr><td><strong>Liveness</strong></td><td>Restart the container</td><td>Detect deadlocks, infinite loops, unrecoverable state</td></tr>
+      <tr><td><strong>Readiness</strong></td><td>Remove pod from Service endpoints (stays running)</td><td>DB connection not ready, cache warming, slow request in flight</td></tr>
+      <tr><td><strong>Startup</strong></td><td>Delays liveness/readiness checks</td><td>Slow-starting apps: JVM, ML model loading, large migrations</td></tr>
+    </table></div>
+    <div class="tw"><table>
+      <tr><th>QoS class</th><th>Condition</th><th>Eviction priority</th></tr>
+      <tr><td><strong>Guaranteed</strong></td><td>requests == limits for all resources</td><td>Last evicted under node pressure</td></tr>
+      <tr><td><strong>Burstable</strong></td><td>requests &lt; limits</td><td>Middle priority</td></tr>
+      <tr><td><strong>BestEffort</strong></td><td>No requests or limits set</td><td>First evicted under memory pressure</td></tr>
+    </table></div>
+    <div class="box in"><div class="bxt">Liveness vs Readiness — don't mix them up</div><p>Liveness restarts a broken pod (deadlock recovery). Readiness removes a temporarily busy pod from load balancing — it stays running. <strong>Never use the same endpoint for both</strong>: readiness should check if the app can handle requests right now (DB connected, cache warm); liveness should just check if the process is alive. Use separate <code>/health</code> and <code>/ready</code> endpoints.</p></div>
+    <div class="insight"><h4>Quick recall</h4><p>Liveness = restart. Readiness = remove from LB. Startup = delay the others for slow apps. requests = scheduling. limits = enforcement. CPU limit = throttle. Memory limit = OOMKill. QoS: Guaranteed (req=lim) → Burstable (req&lt;lim) → BestEffort (none). Eviction order = BestEffort first, Guaranteed last. Set requests + limits on all production containers.</p></div>
+  </div>
+
+</main>
+</div>
+
+<script>
+(function(){
+  const links = document.querySelectorAll('.ni');
+  if(!links.length) return;
+  const secs = Array.from(links).map(l => document.querySelector(l.getAttribute('href'))).filter(Boolean);
+  function setActive(id){
+    links.forEach(l => {
+      l.classList.toggle('active', l.getAttribute('href') === '#' + id);
+    });
+  }
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) setActive(e.target.id); });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  secs.forEach(s => obs.observe(s));
+})();
+</script>
+<script src="assets/theme-toggle.js" defer></script>
+</body>
+</html>
